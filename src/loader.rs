@@ -1,6 +1,5 @@
 use bevy::{
-    asset::AssetLoader, gltf::GltfLoader, prelude::*, render::texture::CompressedImageFormats,
-    utils::HashMap,
+    asset::AssetLoader, gltf::GltfLoader, render::texture::CompressedImageFormats, utils::HashMap,
 };
 
 #[derive(Default)]
