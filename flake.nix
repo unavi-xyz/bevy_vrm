@@ -51,8 +51,6 @@
           };
 
           default = packages.all;
-
-          # Not sure why we need this for `nix flake check` to work
           override = packages.all;
           overrideDerivation = packages.all;
         };
