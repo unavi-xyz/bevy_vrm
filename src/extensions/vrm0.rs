@@ -5,17 +5,17 @@ pub struct Vrm {
     #[nserde(rename = "exporterVersion")]
     pub exporter_version: Option<String>,
     #[nserde(rename = "specVersion")]
-    pub spec_version: String,
-    pub meta: Meta,
+    pub spec_version: Option<String>,
+    pub meta: Option<Meta>,
     pub humanoid: Humanoid,
     #[nserde(rename = "firstPerson")]
-    pub first_person: FirstPerson,
+    pub first_person: Option<FirstPerson>,
     #[nserde(rename = "blendShapeMaster")]
-    pub blend_shape_master: BlendShapeMaster,
+    pub blend_shape_master: Option<BlendShapeMaster>,
     #[nserde(rename = "secondaryAnimation")]
-    pub secondary_animation: SecondaryAnimation,
+    pub secondary_animation: Option<SecondaryAnimation>,
     #[nserde(rename = "materialProperties")]
-    pub material_properties: Vec<MaterialProperty>,
+    pub material_properties: Option<Vec<MaterialProperty>>,
 }
 
 #[derive(DeJson, SerJson, Debug, Clone)]
@@ -80,9 +80,8 @@ pub struct FirstPerson {
     pub first_person_bone: u32,
     #[nserde(rename = "firstPersonBoneOffset")]
     pub first_person_bone_offset: Vec3,
-    // todo
     #[nserde(rename = "meshAnnotations")]
-    pub mesh_annotations: Vec<()>,
+    pub mesh_annotations: Vec<MeshAnnotation>,
     #[nserde(rename = "lookAtTypeName")]
     pub look_at_type_name: String,
     #[nserde(rename = "lookAtHorizontalInner")]
@@ -93,6 +92,13 @@ pub struct FirstPerson {
     pub look_at_vertical_down: LookAtCurve,
     #[nserde(rename = "lookAtVerticalUp")]
     pub look_at_vertical_up: LookAtCurve,
+}
+
+#[derive(DeJson, SerJson, Debug, Clone)]
+pub struct MeshAnnotation {
+    pub mesh: u32,
+    #[nserde(rename = "firstPersonFlag")]
+    pub first_person_flag: String,
 }
 
 #[derive(DeJson, SerJson, Debug, Clone)]
@@ -116,9 +122,19 @@ pub struct BlendShapeGroup {
     #[nserde(rename = "presetName")]
     pub preset_name: String,
     pub binds: Vec<Bind>,
-    // todo
     #[nserde(rename = "materialValues")]
-    pub material_values: Vec<()>,
+    pub material_values: Vec<MaterialBind>,
+    pub is_binary: bool,
+}
+
+#[derive(DeJson, SerJson, Debug, Clone)]
+pub struct MaterialBind {
+    #[nserde(rename = "materialName")]
+    pub material_name: String,
+    #[nserde(rename = "propertyName")]
+    pub property_name: String,
+    #[nserde(rename = "targetValue")]
+    pub target_value: Vec<f32>,
 }
 
 #[derive(DeJson, SerJson, Debug, Clone)]

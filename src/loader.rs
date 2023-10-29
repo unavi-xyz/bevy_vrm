@@ -35,8 +35,6 @@ impl AssetLoader for VRMLoader {
 
 #[derive(Default, Debug, Clone, DeJson)]
 pub struct RootExtensions {
-    #[nserde(rename = "KHR_lights_punctual")]
-    pub khr_lights_punctual: Option<goth_gltf::extensions::KhrLightsPunctual>,
     #[nserde(rename = "VRM")]
     pub vrm0: Option<super::extensions::vrm0::Vrm>,
     #[nserde(rename = "VRMC_vrm")]
