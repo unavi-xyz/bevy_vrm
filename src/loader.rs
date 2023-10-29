@@ -61,9 +61,9 @@ async fn load_vrm_extensions(bytes: &[u8]) -> Result<(), DeJsonErr> {
     let (gltf, _): (goth_gltf::Gltf<Extensions>, _) = goth_gltf::Gltf::from_bytes(&bytes)?;
 
     if let Some(vrm0) = gltf.extensions.vrm0 {
-        info!("Found VRM 0.0 extension: {:?}", vrm0.meta.title);
+        info!("Found VRM 0.0 extension");
     } else if let Some(vrmc_vrm) = gltf.extensions.vrmc_vrm {
-        info!("Found VRM 1.0 extension: {:?}", vrmc_vrm.meta.name);
+        info!("Found VRM 1.0 extension");
     } else {
         info!("No VRM extension found");
     }
