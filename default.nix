@@ -34,6 +34,7 @@ in {
       cargo build --target ${wasmTarget} --release
     '';
     installPhase = ''
+      mkdir -p $out/lib
       cp target/${wasmTarget}/wasm-release/*.wasm $out/lib/
     '';
   });
