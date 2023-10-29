@@ -970,6 +970,8 @@ name = "bevy_vrm"
 version = "0.0.1"
 dependencies = [
  "bevy",
+ "goth-gltf",
+ "nanoserde",
 ]
 
 [[package]]
@@ -1691,6 +1693,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "goth-gltf"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7a321bce5d6962210f492c9eca623eaaa9d8e2a1a2495110339f3f2cd7463daa"
+dependencies = [
+ "nanoserde",
+]
+
+[[package]]
 name = "gpu-alloc"
 version = "0.5.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2176,6 +2187,21 @@ dependencies = [
  "tracing",
  "unicode-ident",
 ]
+
+[[package]]
+name = "nanoserde"
+version = "0.1.35"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4a983d0b19ed0fcd803c4f04f9b20d5e6dd17e06d44d98742a0985ac45dab1bc"
+dependencies = [
+ "nanoserde-derive",
+]
+
+[[package]]
+name = "nanoserde-derive"
+version = "0.1.21"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d4dc96541767a4279572fdcf9f95af9cc1c9b2a2254e7a079203c81e206a9059"
 
 [[package]]
 name = "ndk"

@@ -24,3 +24,5 @@ opt-level = 'z'
 
 [dependencies]
 bevy = "0.11.3"
+goth-gltf = "0.1.1"
+nanoserde = "0.1.35"

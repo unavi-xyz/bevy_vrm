@@ -1,5 +1,6 @@
 use bevy::prelude::*;
 
+mod extensions;
 pub mod loader;
 
 pub struct VRMPlugin;
