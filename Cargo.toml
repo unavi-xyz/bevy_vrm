@@ -2,6 +2,7 @@
 name = "bevy_vrm"
 version = "0.0.0"
 license = "GPL-3.0-or-later"
+repository = "https://github.com/unavi-xyz/bevy_vrm"
 edition = "2021"
 
 [lib]
