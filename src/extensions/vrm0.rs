@@ -124,6 +124,7 @@ pub struct BlendShapeGroup {
     pub binds: Vec<Bind>,
     #[nserde(rename = "materialValues")]
     pub material_values: Vec<MaterialBind>,
+    #[nserde(rename = "isBinary")]
     pub is_binary: bool,
 }
 
