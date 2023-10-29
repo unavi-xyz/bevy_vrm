@@ -35,7 +35,7 @@ in {
     '';
     installPhase = ''
       mkdir -p $out/lib
-      cp target/${wasmTarget}/wasm-release/*.wasm $out/lib/
+      cp target/${wasmTarget}/release/*.wasm $out/lib/
     '';
   });
 }

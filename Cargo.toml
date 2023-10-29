@@ -20,7 +20,6 @@ lto = true
 [profile.wasm-release]
 inherits = "release"
 opt-level = 'z'
-codegen-units = 1
 
 [dependencies]
 bevy = "0.11.3"
