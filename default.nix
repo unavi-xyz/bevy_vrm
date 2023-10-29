@@ -27,7 +27,7 @@ let
     LD_LIBRARY_PATH = lib.makeLibraryPath build_inputs;
   };
 in {
-  bin = rustPlatform.buildRustPackage (common // { pname = "bevy_vrm"; });
+  lib = rustPlatform.buildRustPackage (common // { pname = "bevy_vrm"; });
   wasm = rustPlatformWasm.buildRustPackage (common // {
     pname = "bevy_vrm";
     buildPhase = ''

@@ -47,7 +47,7 @@
         packages = code // {
           all = pkgs.symlinkJoin {
             name = "all";
-            paths = with code; [ bin wasm ];
+            paths = with code; [ lib wasm ];
           };
 
           default = packages.all;
