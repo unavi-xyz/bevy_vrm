@@ -8,9 +8,9 @@
 [Bevy](https://bevyengine.org/) plugin for loading [VRM](https://vrm.dev/en/) avatars.
 Supports both the VRM 0.0 and VRM 1.0 standards.
 
-![image](https://github.com/unavi-xyz/bevy_vrm/assets/92771507/bdf5d2b6-29b2-4d5b-aa67-79d1de247b34)
-
 ## MToon
 
-Uses the [bevy_shader_mtoon](https://github.com/unavi-xyz/bevy_shader_mtoon) crate,
-and re-exports it's contents under `bevy_vrm::mtoon`.
+For the MToon shader, we use the [bevy_shader_mtoon](https://github.com/unavi-xyz/bevy_shader_mtoon) crate.
+`bevy_vrm` re-exports it's contents under `bevy_vrm::mtoon`.
+
+![image](https://github.com/unavi-xyz/bevy_vrm/assets/92771507/a10143df-ff3c-4832-9408-bc6f80533c3d)
