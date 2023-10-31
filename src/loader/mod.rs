@@ -1,7 +1,10 @@
 use std::fmt::Debug;
 
 use bevy::{
-    asset::AssetLoader, gltf::GltfLoader, prelude::*, render::texture::CompressedImageFormats,
+    asset::{AssetLoader, LoadContext},
+    gltf::GltfLoader,
+    prelude::*,
+    render::texture::CompressedImageFormats,
     utils::HashMap,
 };
 use goth_gltf::default_extensions;
@@ -26,7 +29,7 @@ impl AssetLoader for VrmLoader {
 
         Box::pin(async move {
             gltf_loader.load(bytes, load_context).await?;
-            load_vrm_extensions(bytes).await?;
+            load_vrm_extensions(bytes, load_context).await?;
             Ok(())
         })
     }
@@ -58,12 +61,15 @@ impl goth_gltf::Extensions for Extensions {
     type BufferViewExtensions = default_extensions::BufferViewExtensions;
 }
 
-async fn load_vrm_extensions(bytes: &[u8]) -> Result<(), DeJsonErr> {
+async fn load_vrm_extensions<'a, 'b>(
+    bytes: &'a [u8],
+    load_context: &'a mut LoadContext<'b>,
+) -> Result<(), DeJsonErr> {
     let (gltf, _) = goth_gltf::Gltf::from_bytes(&bytes)?;
 
-    if let Ok(_) = vrm0::load_gltf(&gltf) {
+    if let Ok(_) = vrm0::load_gltf(&gltf, load_context) {
         info!("VRM 0.0 loaded");
-    } else if let Ok(_) = vrm::load_gltf(&gltf) {
+    } else if let Ok(_) = vrm::load_gltf(&gltf, load_context) {
         info!("VRM 1.0 loaded");
     } else {
         error!("VRM extension not found");

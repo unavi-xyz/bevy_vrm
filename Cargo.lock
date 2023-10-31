@@ -819,6 +819,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "bevy_shader_mtoon"
+version = "0.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0a477f01cbf6074d2ac4eb2fc45d503d72c36cc7b0d594735cc5ba42b13806b1"
+dependencies = [
+ "bevy",
+]
+
+[[package]]
 name = "bevy_sprite"
 version = "0.11.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -970,6 +979,7 @@ name = "bevy_vrm"
 version = "0.0.2"
 dependencies = [
  "bevy",
+ "bevy_shader_mtoon",
  "goth-gltf",
  "nanoserde",
 ]

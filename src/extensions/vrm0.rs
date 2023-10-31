@@ -46,32 +46,32 @@ pub struct Meta {
 #[derive(DeJson, SerJson, Debug, Clone)]
 pub struct Humanoid {
     #[nserde(rename = "humanBones")]
-    pub human_bones: Vec<Bone>,
+    pub human_bones: Option<Vec<Bone>>,
     #[nserde(rename = "armStretch")]
-    pub arm_stretch: f32,
+    pub arm_stretch: Option<f32>,
     #[nserde(rename = "legStretch")]
-    pub leg_stretch: f32,
+    pub leg_stretch: Option<f32>,
     #[nserde(rename = "upperArmTwist")]
-    pub upper_arm_twist: f32,
+    pub upper_arm_twist: Option<f32>,
     #[nserde(rename = "lowerArmTwist")]
-    pub lower_arm_twist: f32,
+    pub lower_arm_twist: Option<f32>,
     #[nserde(rename = "upperLegTwist")]
-    pub upper_leg_twist: f32,
+    pub upper_leg_twist: Option<f32>,
     #[nserde(rename = "lowerLegTwist")]
-    pub lower_leg_twist: f32,
+    pub lower_leg_twist: Option<f32>,
     #[nserde(rename = "feetSpacing")]
-    pub feet_spacing: f32,
+    pub feet_spacing: Option<f32>,
     #[nserde(rename = "hasTranslationDoF")]
-    pub has_translation_dof: bool,
+    pub has_translation_dof: Option<bool>,
 }
 
 #[derive(DeJson, SerJson, Debug, Clone)]
 pub struct Bone {
     #[nserde(rename = "bone")]
-    pub name: String,
-    pub node: u32,
+    pub name: Option<String>,
+    pub node: Option<u32>,
     #[nserde(rename = "useDefaultValues")]
-    pub use_default_values: bool,
+    pub use_default_values: Option<bool>,
 }
 
 #[derive(DeJson, SerJson, Debug, Clone)]
@@ -103,11 +103,11 @@ pub struct MeshAnnotation {
 
 #[derive(DeJson, SerJson, Debug, Clone)]
 pub struct LookAtCurve {
-    pub curve: [u32; 8],
+    pub curve: [f32; 8],
     #[nserde(rename = "xRange")]
-    pub x_range: u32,
+    pub x_range: f32,
     #[nserde(rename = "yRange")]
-    pub y_range: u32,
+    pub y_range: f32,
 }
 
 #[derive(DeJson, SerJson, Debug, Clone)]
@@ -142,7 +142,7 @@ pub struct MaterialBind {
 pub struct Bind {
     pub mesh: u32,
     pub index: u32,
-    pub weight: u32,
+    pub weight: f32,
 }
 
 #[derive(DeJson, SerJson, Debug, Clone)]
@@ -194,7 +194,7 @@ pub struct Vec3 {
 pub struct MaterialProperty {
     pub name: String,
     #[nserde(rename = "renderQueue")]
-    pub render_queue: u32,
+    pub render_queue: i32,
     pub shader: String,
     #[nserde(rename = "floatProperties")]
     pub float: FloatProperties,
@@ -225,25 +225,25 @@ pub struct FloatProperties {
 #[derive(DeJson, SerJson, Debug, Clone)]
 pub struct TextureProperties {
     #[nserde(rename = "_MainTex")]
-    pub main_tex: u32,
+    pub main_tex: Option<u32>,
     #[nserde(rename = "_ShadeTexture")]
-    pub shade_texture: u32,
+    pub shade_texture: Option<u32>,
     #[nserde(rename = "_BumpMap")]
-    pub bump_map: u32,
+    pub bump_map: Option<u32>,
     #[nserde(rename = "_SphereAdd")]
-    pub sphere_add: u32,
+    pub sphere_add: Option<u32>,
     #[nserde(rename = "_EmissionMap")]
-    pub emission_map: u32,
+    pub emission_map: Option<u32>,
 }
 
 #[derive(DeJson, SerJson, Debug, Clone)]
 pub struct VectorProperties {
     #[nserde(rename = "_Color")]
-    pub color: [f32; 4],
+    pub color: Option<[f32; 4]>,
     #[nserde(rename = "_ShadeColor")]
-    pub shade_color: [f32; 4],
+    pub shade_color: Option<[f32; 4]>,
     #[nserde(rename = "_OutlineColor")]
-    pub outline_color: [f32; 4],
+    pub outline_color: Option<[f32; 4]>,
 }
 
 #[derive(DeJson, SerJson, Debug, Clone)]

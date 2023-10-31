@@ -1,5 +1,8 @@
+use bevy::asset::LoadContext;
+
 pub fn load_gltf(
     gltf: &goth_gltf::Gltf<super::Extensions>,
+    load_context: &mut LoadContext,
 ) -> Result<(), Box<dyn std::error::Error>> {
     let vrmc_vrm = gltf.extensions.vrmc_vrm.as_ref();
 

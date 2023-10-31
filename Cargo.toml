@@ -24,5 +24,6 @@ opt-level = 'z'
 
 [dependencies]
 bevy = "0.11.3"
+bevy_shader_mtoon = "0.0.1"
 goth-gltf = "0.1.1"
 nanoserde = "0.1.35"

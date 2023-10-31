@@ -15,7 +15,7 @@ fn main() {
 struct VrmTag;
 
 fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
-    let mut transform = Transform::from_xyz(0.0, -1.0, -4.0);
+    let mut transform = Transform::from_xyz(0.0, -1.0, -3.0);
     transform.rotate_y(PI);
 
     commands.spawn((
@@ -27,11 +27,24 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
         VrmTag,
     ));
 
-    commands.spawn(Camera3dBundle::default());
+    commands.spawn((Camera3dBundle::default(), bevy_vrm::mtoon::MtoonMainCamera));
+
+    commands.spawn((
+        DirectionalLightBundle {
+            directional_light: DirectionalLight {
+                shadows_enabled: true,
+                illuminance: 10_000.0,
+                ..default()
+            },
+            transform: Transform::from_xyz(0.0, 5.0, -5.0),
+            ..default()
+        },
+        bevy_vrm::mtoon::MtoonSun,
+    ));
 }
 
 fn rotate_vrm(time: Res<Time>, mut query: Query<&mut Transform, With<VrmTag>>) {
     for mut transform in query.iter_mut() {
-        transform.rotate(Quat::from_rotation_y(time.delta_seconds()));
+        transform.rotate(Quat::from_rotation_y(time.delta_seconds() / 3.0));
     }
 }
