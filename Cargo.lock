@@ -976,7 +976,7 @@ dependencies = [
 
 [[package]]
 name = "bevy_vrm"
-version = "0.0.2"
+version = "0.0.3"
 dependencies = [
  "bevy",
  "bevy_shader_mtoon",
