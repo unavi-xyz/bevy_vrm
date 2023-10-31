@@ -31,11 +31,11 @@ in {
   wasm = rustPlatformWasm.buildRustPackage (common // {
     pname = "bevy_vrm";
     buildPhase = ''
-      cargo build --target ${wasmTarget} --release
+      cargo build --target ${wasmTarget} --profile wasm-release
     '';
     installPhase = ''
       mkdir -p $out/lib
-      cp target/${wasmTarget}/release/*.wasm $out/lib/
+      cp target/${wasmTarget}/wasm-release/*.wasm $out/lib/
     '';
   });
 }

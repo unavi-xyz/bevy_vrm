@@ -7,10 +7,13 @@ use bevy::{
 use goth_gltf::default_extensions;
 use nanoserde::{DeJson, DeJsonErr};
 
-#[derive(Default)]
-pub struct VRMLoader;
+mod vrm;
+mod vrm0;
 
-impl AssetLoader for VRMLoader {
+#[derive(Default)]
+pub struct VrmLoader;
+
+impl AssetLoader for VrmLoader {
     fn load<'a>(
         &'a self,
         bytes: &'a [u8],
@@ -56,16 +59,14 @@ impl goth_gltf::Extensions for Extensions {
 }
 
 async fn load_vrm_extensions(bytes: &[u8]) -> Result<(), DeJsonErr> {
-    info!("load_vrm_extensions");
+    let (gltf, _) = goth_gltf::Gltf::from_bytes(&bytes)?;
 
-    let (gltf, _): (goth_gltf::Gltf<Extensions>, _) = goth_gltf::Gltf::from_bytes(&bytes)?;
-
-    if let Some(vrm0) = gltf.extensions.vrm0 {
-        info!("Found VRM 0.0 extension");
-    } else if let Some(vrmc_vrm) = gltf.extensions.vrmc_vrm {
-        info!("Found VRM 1.0 extension");
+    if let Ok(_) = vrm0::load_gltf(&gltf) {
+        info!("VRM 0.0 loaded");
+    } else if let Ok(_) = vrm::load_gltf(&gltf) {
+        info!("VRM 1.0 loaded");
     } else {
-        info!("No VRM extension found");
+        error!("VRM extension not found");
     }
 
     Ok(())
