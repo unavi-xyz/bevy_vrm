@@ -2,7 +2,7 @@
 name = "bevy_vrm"
 description = "Bevy plugin for loading VRM avatars."
 version = "0.0.1"
-license = "GPL-3.0-or-later"
+license = "MIT OR Apache-2.0"
 repository = "https://github.com/unavi-xyz/bevy_vrm"
 edition = "2021"
 
