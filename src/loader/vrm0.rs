@@ -27,17 +27,19 @@ pub fn load_gltf(
         material_properties
             .iter()
             .enumerate()
-            .for_each(
-                |(i, material_property)| match material_property.shader.as_str() {
-                    MTOON_KEY => {
-                        let handle = load_mtoon(material_property, i, load_context);
-                        mtoon_materials.insert(i, handle);
+            .for_each(|(i, material_property)| {
+                if let Some(shader) = &material_property.shader {
+                    match shader.as_str() {
+                        MTOON_KEY => {
+                            let handle = load_mtoon(material_property, i, load_context);
+                            mtoon_materials.insert(i, handle);
+                        }
+                        _ => {
+                            warn!("Unknown shader: {}", shader);
+                        }
                     }
-                    _ => {
-                        warn!("Unknown shader: {}", material_property.shader);
-                    }
-                },
-            );
+                }
+            });
     }
 
     // Mark materials as needing replacement
@@ -81,41 +83,49 @@ fn load_mtoon(
 
     let mtoon_label = mtoon_label(index);
 
-    let mut mtoon_material = MtoonMaterial {
-        shading_shift_factor: property.float.shade_shift,
-        shading_toony_factor: property.float.shade_toony,
-        ..default()
-    };
+    let mut mtoon_material = MtoonMaterial::default();
 
-    if let Some(color) = property.vector.color {
-        mtoon_material.base_color = color.into();
-    }
+    if let Some(float) = &property.float {
+        if let Some(shade_shift) = float.shade_shift {
+            mtoon_material.shading_shift_factor = shade_shift;
+        }
 
-    if let Some(color) = property.vector.shade_color {
-        mtoon_material.shade_color = color.into();
-    }
-
-    if let Some(main_tex) = property.texture.main_tex {
-        let label = texture_label(main_tex);
-
-        if load_context.has_labeled_asset(label.as_str()) {
-            let handle =
-                load_context.get_handle(AssetPath::new_ref(load_context.path(), Some(&label)));
-            mtoon_material.base_color_texture = Some(handle);
+        if let Some(shade_toony) = float.shade_toony {
+            mtoon_material.shading_toony_factor = shade_toony;
         }
     }
 
-    if let Some(shade_texture) = property.texture.shade_texture {
-        let label = texture_label(shade_texture);
+    if let Some(vector) = &property.vector {
+        if let Some(color) = vector.color {
+            mtoon_material.base_color = color.into();
+        }
 
-        if load_context.has_labeled_asset(label.as_str()) {
-            let handle =
-                load_context.get_handle(AssetPath::new_ref(load_context.path(), Some(&label)));
-            mtoon_material.shade_color_texture = Some(handle);
+        if let Some(color) = vector.shade_color {
+            mtoon_material.shade_color = color.into();
         }
     }
 
-    info!("Loaded MToon material: {:#?}", mtoon_material);
+    if let Some(texture) = &property.texture {
+        if let Some(main_tex) = texture.main_tex {
+            let label = texture_label(main_tex);
+
+            if load_context.has_labeled_asset(label.as_str()) {
+                let handle =
+                    load_context.get_handle(AssetPath::new_ref(load_context.path(), Some(&label)));
+                mtoon_material.base_color_texture = Some(handle);
+            }
+        }
+
+        if let Some(shade_texture) = texture.shade_texture {
+            let label = texture_label(shade_texture);
+
+            if load_context.has_labeled_asset(label.as_str()) {
+                let handle =
+                    load_context.get_handle(AssetPath::new_ref(load_context.path(), Some(&label)));
+                mtoon_material.shade_color_texture = Some(handle);
+            }
+        }
+    }
 
     load_context.set_labeled_asset(&mtoon_label, LoadedAsset::new(mtoon_material))
 }

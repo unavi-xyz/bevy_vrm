@@ -77,110 +77,110 @@ pub struct Bone {
 #[derive(DeJson, SerJson, Debug, Clone)]
 pub struct FirstPerson {
     #[nserde(rename = "firstPersonBone")]
-    pub first_person_bone: u32,
+    pub first_person_bone: Option<u32>,
     #[nserde(rename = "firstPersonBoneOffset")]
-    pub first_person_bone_offset: Vec3,
+    pub first_person_bone_offset: Option<Vec3>,
     #[nserde(rename = "meshAnnotations")]
-    pub mesh_annotations: Vec<MeshAnnotation>,
+    pub mesh_annotations: Option<Vec<MeshAnnotation>>,
     #[nserde(rename = "lookAtTypeName")]
-    pub look_at_type_name: String,
+    pub look_at_type_name: Option<String>,
     #[nserde(rename = "lookAtHorizontalInner")]
-    pub look_at_horizontal_inner: LookAtCurve,
+    pub look_at_horizontal_inner: Option<LookAtCurve>,
     #[nserde(rename = "lookAtHorizontalOuter")]
-    pub look_at_horizontal_outer: LookAtCurve,
+    pub look_at_horizontal_outer: Option<LookAtCurve>,
     #[nserde(rename = "lookAtVerticalDown")]
-    pub look_at_vertical_down: LookAtCurve,
+    pub look_at_vertical_down: Option<LookAtCurve>,
     #[nserde(rename = "lookAtVerticalUp")]
-    pub look_at_vertical_up: LookAtCurve,
+    pub look_at_vertical_up: Option<LookAtCurve>,
 }
 
 #[derive(DeJson, SerJson, Debug, Clone)]
 pub struct MeshAnnotation {
-    pub mesh: u32,
+    pub mesh: Option<u32>,
     #[nserde(rename = "firstPersonFlag")]
-    pub first_person_flag: String,
+    pub first_person_flag: Option<String>,
 }
 
 #[derive(DeJson, SerJson, Debug, Clone)]
 pub struct LookAtCurve {
-    pub curve: [f32; 8],
+    pub curve: Option<[f32; 8]>,
     #[nserde(rename = "xRange")]
-    pub x_range: f32,
+    pub x_range: Option<f32>,
     #[nserde(rename = "yRange")]
-    pub y_range: f32,
+    pub y_range: Option<f32>,
 }
 
 #[derive(DeJson, SerJson, Debug, Clone)]
 pub struct BlendShapeMaster {
     #[nserde(rename = "blendShapeGroups")]
-    pub blend_shape_groups: Vec<BlendShapeGroup>,
+    pub blend_shape_groups: Option<Vec<BlendShapeGroup>>,
 }
 
 #[derive(DeJson, SerJson, Debug, Clone)]
 pub struct BlendShapeGroup {
-    pub name: String,
+    pub name: Option<String>,
     #[nserde(rename = "presetName")]
-    pub preset_name: String,
-    pub binds: Vec<Bind>,
+    pub preset_name: Option<String>,
+    pub binds: Option<Vec<Bind>>,
     #[nserde(rename = "materialValues")]
-    pub material_values: Vec<MaterialBind>,
+    pub material_values: Option<Vec<MaterialBind>>,
     #[nserde(rename = "isBinary")]
-    pub is_binary: bool,
+    pub is_binary: Option<bool>,
 }
 
 #[derive(DeJson, SerJson, Debug, Clone)]
 pub struct MaterialBind {
     #[nserde(rename = "materialName")]
-    pub material_name: String,
+    pub material_name: Option<String>,
     #[nserde(rename = "propertyName")]
-    pub property_name: String,
+    pub property_name: Option<String>,
     #[nserde(rename = "targetValue")]
-    pub target_value: Vec<f32>,
+    pub target_value: Option<Vec<f32>>,
 }
 
 #[derive(DeJson, SerJson, Debug, Clone)]
 pub struct Bind {
-    pub mesh: u32,
-    pub index: u32,
-    pub weight: f32,
+    pub mesh: Option<u32>,
+    pub index: Option<u32>,
+    pub weight: Option<f32>,
 }
 
 #[derive(DeJson, SerJson, Debug, Clone)]
 pub struct SecondaryAnimation {
     #[nserde(rename = "boneGroups")]
-    pub bone_groups: Vec<BoneGroup>,
+    pub bone_groups: Option<Vec<BoneGroup>>,
     #[nserde(rename = "colliderGroups")]
-    pub collider_groups: Vec<ColliderGroup>,
+    pub collider_groups: Option<Vec<ColliderGroup>>,
 }
 
 #[derive(DeJson, SerJson, Debug, Clone)]
 pub struct BoneGroup {
-    pub comment: String,
-    pub stiffiness: f32,
+    pub comment: Option<String>,
+    pub stiffiness: Option<f32>,
     #[nserde(rename = "gravityPower")]
-    pub gravity_power: f32,
+    pub gravity_power: Option<f32>,
     #[nserde(rename = "gravityDir")]
-    pub gravity_dir: Vec3,
+    pub gravity_dir: Option<Vec3>,
     #[nserde(rename = "dragForce")]
-    pub drag_force: f32,
-    pub center: f32,
+    pub drag_force: Option<f32>,
+    pub center: Option<f32>,
     #[nserde(rename = "hitRadius")]
-    pub hit_radius: f32,
-    pub bones: Vec<u32>,
+    pub hit_radius: Option<f32>,
+    pub bones: Option<Vec<u32>>,
     #[nserde(rename = "colliderGroups")]
-    pub collider_groups: Vec<u32>,
+    pub collider_groups: Option<Vec<u32>>,
 }
 
 #[derive(DeJson, SerJson, Debug, Clone)]
 pub struct ColliderGroup {
-    pub node: u32,
-    pub colliders: Vec<Collider>,
+    pub node: Option<u32>,
+    pub colliders: Option<Vec<Collider>>,
 }
 
 #[derive(DeJson, SerJson, Debug, Clone)]
 pub struct Collider {
-    pub offset: Vec3,
-    pub radius: f32,
+    pub offset: Option<Vec3>,
+    pub radius: Option<f32>,
 }
 
 #[derive(DeJson, SerJson, Debug, Clone)]
@@ -192,34 +192,34 @@ pub struct Vec3 {
 
 #[derive(DeJson, SerJson, Debug, Clone)]
 pub struct MaterialProperty {
-    pub name: String,
+    pub name: Option<String>,
     #[nserde(rename = "renderQueue")]
-    pub render_queue: i32,
-    pub shader: String,
+    pub render_queue: Option<i32>,
+    pub shader: Option<String>,
     #[nserde(rename = "floatProperties")]
-    pub float: FloatProperties,
+    pub float: Option<FloatProperties>,
     #[nserde(rename = "vectorProperties")]
-    pub vector: VectorProperties,
+    pub vector: Option<VectorProperties>,
     #[nserde(rename = "textureProperties")]
-    pub texture: TextureProperties,
+    pub texture: Option<TextureProperties>,
     #[nserde(rename = "keywordMap")]
-    pub keyword_map: KeywordMap,
+    pub keyword_map: Option<KeywordMap>,
     #[nserde(rename = "tagMap")]
-    pub tag_map: TagMap,
+    pub tag_map: Option<TagMap>,
 }
 
 #[derive(DeJson, SerJson, Debug, Clone)]
 pub struct FloatProperties {
     #[nserde(rename = "_ShadeShift")]
-    pub shade_shift: f32,
+    pub shade_shift: Option<f32>,
     #[nserde(rename = "_ShadeToony")]
-    pub shade_toony: f32,
+    pub shade_toony: Option<f32>,
     #[nserde(rename = "_Cutoff")]
-    pub cutoff: f32,
+    pub cutoff: Option<f32>,
     #[nserde(rename = "_IndirectLightIntensity")]
-    pub indirect_light_insensity: f32,
+    pub indirect_light_insensity: Option<f32>,
     #[nserde(rename = "_OutlineWidth")]
-    pub outline_width: f32,
+    pub outline_width: Option<f32>,
 }
 
 #[derive(DeJson, SerJson, Debug, Clone)]
@@ -249,7 +249,7 @@ pub struct VectorProperties {
 #[derive(DeJson, SerJson, Debug, Clone)]
 pub struct TagMap {
     #[nserde(rename = "RenderType")]
-    pub render_type: RenderType,
+    pub render_type: Option<RenderType>,
 }
 
 #[derive(Clone, Debug, DeJson, SerJson)]
