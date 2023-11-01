@@ -11,16 +11,19 @@ fn main() {
         .run();
 }
 
+const MODELS: [&str; 3] = ["catbot.vrm", "cool_loops.vrm", "suzuha.vrm"];
+const MODEL_INDEX: usize = 2;
+
 #[derive(Component)]
 struct VrmTag;
 
 fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
-    let mut transform = Transform::from_xyz(0.0, -1.0, -3.0);
+    let mut transform = Transform::from_xyz(0.0, -1.0, -4.0);
     transform.rotate_y(PI);
 
     commands.spawn((
         SceneBundle {
-            scene: asset_server.load("suzuha.vrm#Scene0"),
+            scene: asset_server.load(format!("{}#Scene0", MODELS[MODEL_INDEX]).as_str()),
             transform,
             ..default()
         },
