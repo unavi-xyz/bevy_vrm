@@ -6,7 +6,7 @@
 [![Documentation](https://docs.rs/bevy_vrm/badge.svg)](https://docs.rs/bevy_vrm)
 
 [Bevy](https://bevyengine.org/) plugin for loading [VRM](https://vrm.dev/en/) avatars.
-Supports both the VRM 0.0 and VRM 1.0 standards.
+Aims to support both the VRM 0.0 and VRM 1.0 standards.
 
 ## MToon
 
