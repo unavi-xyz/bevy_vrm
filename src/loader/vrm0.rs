@@ -1,5 +1,5 @@
 use bevy::{
-    asset::{AssetPath, LoadContext, LoadedAsset},
+    asset::{LoadContext, LoadedAsset},
     prelude::*,
     utils::HashMap,
 };
@@ -54,16 +54,18 @@ pub fn load_gltf(
                     if let Some(mtoon_handle) = mtoon_materials.get(&mat_index) {
                         let replace_label = format!("Replace{mat_index}");
 
-                        let mesh_handle = load_context
-                            .get_handle(AssetPath::new_ref(load_context.path(), Some(&mesh_label)));
+                        let mesh_handle = load_context.get_label_handle(&mesh_label);
 
-                        load_context.set_labeled_asset(
-                            &replace_label,
-                            LoadedAsset::new(MtoonReplaceMat {
-                                mesh: mesh_handle,
-                                primitive: j,
-                                mtoon: mtoon_handle.clone(),
-                            }),
+                        load_context.add_loaded_labeled_asset(
+                            replace_label,
+                            LoadedAsset::new_with_dependencies(
+                                MtoonReplaceMat {
+                                    mesh: mesh_handle,
+                                    primitive: j,
+                                    mtoon: mtoon_handle.clone(),
+                                },
+                                None,
+                            ),
                         );
                     }
                 }
@@ -109,9 +111,8 @@ fn load_mtoon(
         if let Some(main_tex) = texture.main_tex {
             let label = texture_label(main_tex);
 
-            if load_context.has_labeled_asset(label.as_str()) {
-                let handle =
-                    load_context.get_handle(AssetPath::new_ref(load_context.path(), Some(&label)));
+            if load_context.has_labeled_asset(&label) {
+                let handle = load_context.get_label_handle(&label);
                 mtoon_material.base_color_texture = Some(handle);
             }
         }
@@ -119,15 +120,17 @@ fn load_mtoon(
         if let Some(shade_texture) = texture.shade_texture {
             let label = texture_label(shade_texture);
 
-            if load_context.has_labeled_asset(label.as_str()) {
-                let handle =
-                    load_context.get_handle(AssetPath::new_ref(load_context.path(), Some(&label)));
+            if load_context.has_labeled_asset(&label) {
+                let handle = load_context.get_label_handle(&label);
                 mtoon_material.shade_color_texture = Some(handle);
             }
         }
     }
 
-    load_context.set_labeled_asset(&mtoon_label, LoadedAsset::new(mtoon_material))
+    load_context.add_loaded_labeled_asset(
+        mtoon_label,
+        LoadedAsset::new_with_dependencies(mtoon_material, None),
+    )
 }
 
 fn mesh_label(index: usize) -> String {

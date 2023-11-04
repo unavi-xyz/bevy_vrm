@@ -23,7 +23,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
 
     commands.spawn((
         SceneBundle {
-            scene: asset_server.load(format!("{}#Scene0", MODELS[MODEL_INDEX]).as_str()),
+            scene: asset_server.load(format!("{}#Scene0", MODELS[MODEL_INDEX])),
             transform,
             ..default()
         },

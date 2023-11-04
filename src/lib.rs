@@ -1,4 +1,5 @@
 use bevy::{
+    asset::VisitAssetDependencies,
     gltf::GltfMesh,
     prelude::*,
     reflect::{TypePath, TypeUuid},
@@ -17,8 +18,8 @@ pub struct VrmPlugin;
 impl Plugin for VrmPlugin {
     fn build(&self, app: &mut App) {
         app.add_plugins(MtoonPlugin)
-            .add_asset::<MtoonReplaceMat>()
             .init_asset_loader::<loader::VrmLoader>()
+            .init_asset::<MtoonReplaceMat>()
             .add_systems(Update, replace_mtoon_materials);
     }
 }
@@ -30,6 +31,11 @@ pub struct MtoonReplaceMat {
     primitive: usize,
     mtoon: Handle<mtoon::MtoonMaterial>,
 }
+
+impl VisitAssetDependencies for MtoonReplaceMat {
+    fn visit_dependencies(&self, _: &mut impl FnMut(bevy::asset::UntypedAssetId)) {}
+}
+impl Asset for MtoonReplaceMat {}
 
 fn replace_mtoon_materials(
     mut commands: Commands,

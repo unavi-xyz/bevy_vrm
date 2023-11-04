@@ -1,8 +1,11 @@
 use std::fmt::Debug;
 
 use bevy::{
-    asset::{AssetLoader, LoadContext},
-    gltf::GltfLoader,
+    asset::{
+        io::{Reader, VecReader},
+        AssetLoader, AsyncReadExt, LoadContext,
+    },
+    gltf::{GltfError, GltfLoader},
     prelude::*,
     render::texture::CompressedImageFormats,
     utils::HashMap,
@@ -16,20 +19,40 @@ mod vrm0;
 #[derive(Default)]
 pub struct VrmLoader;
 
+#[derive(Debug, thiserror::Error)]
+pub enum VrmError {
+    #[error("{0}")]
+    DeJsonErr(#[from] DeJsonErr),
+    #[error("{0}")]
+    GltfError(#[from] GltfError),
+    #[error("{0}")]
+    IoError(#[from] std::io::Error),
+}
+
 impl AssetLoader for VrmLoader {
+    type Asset = ();
+    type Settings = ();
+    type Error = VrmError;
+
     fn load<'a>(
         &'a self,
-        bytes: &'a [u8],
+        reader: &'a mut Reader,
+        _: &'a Self::Settings,
         load_context: &'a mut bevy::asset::LoadContext,
-    ) -> bevy::utils::BoxedFuture<'a, Result<(), bevy::asset::Error>> {
+    ) -> bevy::utils::BoxedFuture<'a, Result<Self::Asset, Self::Error>> {
         let gltf_loader = GltfLoader {
             custom_vertex_attributes: HashMap::default(),
             supported_compressed_formats: CompressedImageFormats::default(),
         };
 
         Box::pin(async move {
-            gltf_loader.load(bytes, load_context).await?;
-            load_vrm_extensions(bytes, load_context).await?;
+            let mut bytes = Vec::new();
+            reader.read_to_end(&mut bytes).await?;
+
+            gltf_loader
+                .load(&mut VecReader::new(bytes.clone()), &(), load_context)
+                .await?;
+            load_vrm_extensions(&bytes, load_context).await?;
             Ok(())
         })
     }
@@ -64,7 +87,7 @@ impl goth_gltf::Extensions for Extensions {
 async fn load_vrm_extensions<'a, 'b>(
     bytes: &'a [u8],
     load_context: &'a mut LoadContext<'b>,
-) -> Result<(), DeJsonErr> {
+) -> Result<(), VrmError> {
     let (gltf, _) = goth_gltf::Gltf::from_bytes(&bytes)?;
 
     if let Ok(_) = vrm0::load_gltf(&gltf, load_context) {
