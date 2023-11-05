@@ -857,7 +857,9 @@ dependencies = [
 
 [[package]]
 name = "bevy_shader_mtoon"
-version = "0.0.1"
+version = "0.0.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "194c167e96bb637b27f352e0a63a6cc8aa20cb5fcc160f896d437e9ae1a9235e"
 dependencies = [
  "bevy",
 ]
