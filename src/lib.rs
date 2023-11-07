@@ -121,7 +121,6 @@ fn replace_mtoon_materials(
                     }
 
                     replaced = true;
-                    info!("Replacing MToon material for {:?}", entity);
 
                     commands
                         .entity(entity)
