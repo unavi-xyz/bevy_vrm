@@ -13,6 +13,8 @@ use bevy::{
 use goth_gltf::default_extensions;
 use nanoserde::{DeJson, DeJsonErr};
 
+use crate::Vrm;
+
 mod vrm;
 mod vrm0;
 
@@ -30,7 +32,7 @@ pub enum VrmError {
 }
 
 impl AssetLoader for VrmLoader {
-    type Asset = ();
+    type Asset = Vrm;
     type Settings = ();
     type Error = VrmError;
 
@@ -49,11 +51,18 @@ impl AssetLoader for VrmLoader {
             let mut bytes = Vec::new();
             reader.read_to_end(&mut bytes).await?;
 
-            gltf_loader
+            let gltf = gltf_loader
                 .load(&mut VecReader::new(bytes.clone()), &(), load_context)
-                .await?;
-            load_vrm_extensions(&bytes, load_context).await?;
-            Ok(())
+                .await;
+
+            let gltf = match gltf {
+                Ok(gltf) => gltf,
+                Err(err) => {
+                    return Err(VrmError::GltfError(err));
+                }
+            };
+
+            load_vrm(gltf, &bytes, load_context).await
         })
     }
 
@@ -84,19 +93,27 @@ impl goth_gltf::Extensions for Extensions {
     type BufferViewExtensions = default_extensions::BufferViewExtensions;
 }
 
-async fn load_vrm_extensions<'a, 'b>(
+async fn load_vrm<'a, 'b>(
+    gltf: bevy::gltf::Gltf,
     bytes: &'a [u8],
     load_context: &'a mut LoadContext<'b>,
-) -> Result<(), VrmError> {
-    let (gltf, _) = goth_gltf::Gltf::from_bytes(&bytes)?;
+) -> Result<Vrm, VrmError> {
+    let (gltf_file, _) = goth_gltf::Gltf::from_bytes(&bytes)?;
 
-    if let Ok(_) = vrm0::load_gltf(&gltf, load_context) {
+    let mut vrm = Vrm {
+        gltf,
+        mtoon_materials: HashMap::default(),
+        mtoon_markers: Vec::default(),
+        mtoon_replaced: false,
+    };
+
+    if let Ok(_) = vrm0::load_gltf(&mut vrm, &gltf_file, load_context) {
         info!("VRM 0.0 loaded");
-    } else if let Ok(_) = vrm::load_gltf(&gltf, load_context) {
+    } else if let Ok(_) = vrm::load_gltf(&mut vrm, &gltf_file, load_context) {
         info!("VRM 1.0 loaded");
     } else {
         error!("VRM extension not found");
     }
 
-    Ok(())
+    Ok(vrm)
 }

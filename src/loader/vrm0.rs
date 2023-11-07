@@ -1,28 +1,24 @@
 use bevy::{
     asset::{LoadContext, LoadedAsset},
     prelude::*,
-    utils::HashMap,
 };
 use bevy_shader_mtoon::MtoonMaterial;
 
-use crate::{extensions::vrm0::MaterialProperty, MtoonReplaceMat};
+use crate::{extensions::vrm0::MaterialProperty, MtoonMarker, Vrm};
 
 const MTOON_KEY: &str = "VRM/MToon";
 
 pub fn load_gltf(
+    vrm: &mut Vrm,
     gltf: &goth_gltf::Gltf<super::Extensions>,
     load_context: &mut LoadContext,
 ) -> Result<(), Box<dyn std::error::Error>> {
-    let vrm0 = gltf.extensions.vrm0.as_ref();
+    let vrm0 = match &gltf.extensions.vrm0 {
+        Some(vrm0) => vrm0,
+        None => return Err("VRM0 not found".into()),
+    };
 
-    if vrm0.is_none() {
-        return Err("VRM0 not found".into());
-    }
-
-    let vrm0 = vrm0.unwrap();
-
-    let mut mtoon_materials = HashMap::<usize, Handle<MtoonMaterial>>::new();
-
+    // Load MToon materials
     if let Some(material_properties) = &vrm0.material_properties {
         material_properties
             .iter()
@@ -32,7 +28,7 @@ pub fn load_gltf(
                     match shader.as_str() {
                         MTOON_KEY => {
                             let handle = load_mtoon(material_property, i, load_context);
-                            mtoon_materials.insert(i, handle);
+                            vrm.mtoon_materials.insert(i, handle);
                         }
                         _ => {
                             warn!("Unknown shader: {}", shader);
@@ -42,47 +38,49 @@ pub fn load_gltf(
             });
     }
 
-    // Mark materials as needing replacement
-    gltf.meshes.iter().enumerate().for_each(|(i, mesh)| {
-        let mesh_label = mesh_label(i);
+    // Create MtoonMarkers
+    gltf.meshes
+        .iter()
+        .enumerate()
+        .for_each(|(mesh_index, mesh)| {
+            let mesh_label = mesh_label(mesh_index);
 
-        mesh.primitives
-            .iter()
-            .enumerate()
-            .for_each(|(j, primitive)| {
-                if let Some(mat_index) = primitive.material {
-                    if let Some(mtoon_handle) = mtoon_materials.get(&mat_index) {
-                        let replace_label = format!("Replace{mat_index}");
+            mesh.primitives
+                .iter()
+                .enumerate()
+                .for_each(|(primitive_index, primitive)| {
+                    let material_index = match primitive.material {
+                        Some(material_index) => material_index,
+                        None => return,
+                    };
 
-                        let mesh_handle = load_context.get_label_handle(&mesh_label);
+                    let mtoon_material = match vrm.mtoon_materials.get(&material_index) {
+                        Some(mtoon_material) => mtoon_material,
+                        None => return,
+                    };
 
-                        load_context.add_loaded_labeled_asset(
-                            replace_label,
-                            LoadedAsset::new_with_dependencies(
-                                MtoonReplaceMat {
-                                    mesh: mesh_handle,
-                                    primitive: j,
-                                    mtoon: mtoon_handle.clone(),
-                                },
-                                None,
-                            ),
-                        );
+                    if !load_context.has_labeled_asset(&mesh_label) {
+                        warn!("Mesh not loaded: {}", mesh_label);
+                        return;
                     }
-                }
-            });
-    });
+
+                    vrm.mtoon_markers.push(MtoonMarker {
+                        mesh: load_context.get_label_handle(&mesh_label),
+                        primitive: primitive_index,
+                        mtoon: mtoon_material.clone(),
+                    });
+                });
+        });
 
     Ok(())
 }
 
-/// Loads a VRM/MToon material and returns it
+/// Loads a VRM/MToon material and returns a handle
 fn load_mtoon(
     property: &MaterialProperty,
     index: usize,
     load_context: &mut LoadContext,
 ) -> Handle<MtoonMaterial> {
-    // info!("Loading MToon material: {:#?}", property);
-
     let mtoon_label = mtoon_label(index);
 
     let mut mtoon_material = MtoonMaterial::default();

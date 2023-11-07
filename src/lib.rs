@@ -1,10 +1,6 @@
-use bevy::{
-    asset::VisitAssetDependencies,
-    gltf::GltfMesh,
-    prelude::*,
-    reflect::{TypePath, TypeUuid},
-};
-use bevy_shader_mtoon::MtoonPlugin;
+use bevy::{gltf::GltfMesh, prelude::*, utils::HashMap};
+use bevy_shader_mtoon::{MtoonMaterial, MtoonPlugin};
+use loader::VrmLoader;
 
 mod extensions;
 pub mod loader;
@@ -18,62 +14,68 @@ pub struct VrmPlugin;
 impl Plugin for VrmPlugin {
     fn build(&self, app: &mut App) {
         app.add_plugins(MtoonPlugin)
-            .init_asset_loader::<loader::VrmLoader>()
-            .init_asset::<MtoonReplaceMat>()
+            .register_asset_loader(VrmLoader)
+            .init_asset::<Vrm>()
             .add_systems(Update, replace_mtoon_materials);
     }
 }
 
-#[derive(TypeUuid, TypePath, Debug, Clone)]
-#[uuid = "e16c60c0-fa00-4ead-b76f-f97823b8404e"]
-pub struct MtoonReplaceMat {
+#[derive(Debug)]
+pub struct MtoonMarker {
     mesh: Handle<GltfMesh>,
     primitive: usize,
-    mtoon: Handle<mtoon::MtoonMaterial>,
+    mtoon: Handle<MtoonMaterial>,
 }
 
-impl VisitAssetDependencies for MtoonReplaceMat {
-    fn visit_dependencies(&self, _: &mut impl FnMut(bevy::asset::UntypedAssetId)) {}
+#[derive(Asset, TypePath, Debug)]
+pub struct Vrm {
+    pub gltf: bevy::gltf::Gltf,
+    /// Map of material index -> MToon material
+    pub mtoon_materials: HashMap<usize, Handle<MtoonMaterial>>,
+    /// Meshes that use MToon
+    pub mtoon_markers: Vec<MtoonMarker>,
+    /// Whether MToon materials have been replaced
+    pub mtoon_replaced: bool,
 }
-impl Asset for MtoonReplaceMat {}
 
 fn replace_mtoon_materials(
     mut commands: Commands,
-    mut replacements: ResMut<Assets<MtoonReplaceMat>>,
+    mut vrms: ResMut<Assets<Vrm>>,
     gltf_meshes: Res<Assets<GltfMesh>>,
-    meshes: Query<(Entity, &Handle<Mesh>), Without<Handle<mtoon::MtoonMaterial>>>,
+    meshes: Query<(Entity, &Handle<Mesh>)>,
 ) {
-    let mut to_remove = Vec::new();
+    for (_, vrm) in vrms.iter_mut() {
+        if vrm.mtoon_replaced {
+            continue;
+        }
 
-    for (replacement_handle, replacement) in replacements.iter() {
-        let target = gltf_meshes.get(&replacement.mesh).unwrap();
+        info!("Replacing MToon materials");
 
-        target
-            .primitives
-            .iter()
-            .enumerate()
-            .for_each(|(i, primitive)| {
-                if i != replacement.primitive {
-                    return;
-                }
+        vrm.mtoon_markers.iter().for_each(|marker| {
+            let gltf_mesh = gltf_meshes.get(&marker.mesh).unwrap();
 
-                for (ent, ent_mesh) in meshes.iter() {
-                    if *ent_mesh != primitive.mesh {
-                        continue;
+            gltf_mesh
+                .primitives
+                .iter()
+                .enumerate()
+                .for_each(|(primitive_index, primitive)| {
+                    if primitive_index != marker.primitive {
+                        return;
                     }
 
-                    commands
-                        .entity(ent)
-                        .remove::<Handle<StandardMaterial>>()
-                        .insert(replacement.mtoon.clone());
+                    for (entity, mesh_handle) in meshes.iter() {
+                        if mesh_handle.id() != primitive.mesh.id() {
+                            continue;
+                        }
 
-                    to_remove.push(replacement_handle);
-                    break;
-                }
-            });
-    }
+                        commands
+                            .entity(entity)
+                            .remove::<Handle<StandardMaterial>>()
+                            .insert(marker.mtoon.clone());
+                    }
+                });
+        });
 
-    for handle in to_remove {
-        replacements.remove(handle);
+        vrm.mtoon_replaced = true;
     }
 }
