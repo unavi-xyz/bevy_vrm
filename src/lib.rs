@@ -49,8 +49,6 @@ fn replace_mtoon_materials(
             continue;
         }
 
-        info!("Replacing MToon materials");
-
         vrm.mtoon_markers.iter().for_each(|marker| {
             let gltf_mesh = gltf_meshes.get(&marker.mesh).unwrap();
 
