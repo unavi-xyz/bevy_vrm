@@ -16,11 +16,14 @@ impl Plugin for VrmPlugin {
         app.add_plugins(MtoonPlugin)
             .register_asset_loader(VrmLoader)
             .init_asset::<Vrm>()
-            .add_systems(Update, replace_mtoon_materials);
+            .add_systems(
+                Update,
+                (set_vrm_scene, spawn_mtoon_markers, replace_mtoon_materials),
+            );
     }
 }
 
-#[derive(Debug)]
+#[derive(Component, Debug, Clone)]
 pub struct MtoonMarker {
     mesh: Handle<GltfMesh>,
     primitive: usize,
@@ -34,46 +37,101 @@ pub struct Vrm {
     pub mtoon_materials: HashMap<usize, Handle<MtoonMaterial>>,
     /// Meshes that use MToon
     pub mtoon_markers: Vec<MtoonMarker>,
-    /// Whether MToon materials have been replaced
-    pub mtoon_replaced: bool,
+}
+
+#[derive(Bundle, Default)]
+pub struct VrmBundle {
+    pub vrm: Handle<Vrm>,
+    pub scene_bundle: SceneBundle,
+}
+
+fn set_vrm_scene(
+    mut commands: Commands,
+    vrm: Res<Assets<Vrm>>,
+    scenes: Query<(Entity, &mut Handle<Scene>, &Handle<Vrm>)>,
+) {
+    for (entity, scene_handle, vrm_handle) in scenes.iter() {
+        let vrm = match vrm.get(vrm_handle) {
+            Some(vrm) => vrm,
+            None => continue,
+        };
+
+        let vrm_scene = match &vrm.gltf.default_scene {
+            Some(handle) => handle,
+            None => match vrm.gltf.scenes.first() {
+                Some(handle) => handle,
+                None => continue,
+            },
+        };
+
+        if scene_handle.id() == vrm_scene.id() {
+            continue;
+        }
+
+        commands.entity(entity).insert(vrm_scene.clone());
+    }
+}
+
+fn spawn_mtoon_markers(
+    mut commands: Commands,
+    vrms: Res<Assets<Vrm>>,
+    mut events: EventReader<AssetEvent<Vrm>>,
+) {
+    for event in events.read() {
+        let id = match event {
+            AssetEvent::Added { id } => id,
+            AssetEvent::Modified { id } => id,
+            _ => continue,
+        };
+
+        let vrm = match vrms.get(id.clone()) {
+            Some(vrm) => vrm,
+            None => continue,
+        };
+
+        vrm.mtoon_markers.iter().for_each(|marker| {
+            commands.spawn(marker.clone());
+        });
+    }
 }
 
 fn replace_mtoon_materials(
     mut commands: Commands,
-    mut vrms: ResMut<Assets<Vrm>>,
+    markers: Query<(Entity, &MtoonMarker)>,
     gltf_meshes: Res<Assets<GltfMesh>>,
     meshes: Query<(Entity, &Handle<Mesh>)>,
 ) {
-    for (_, vrm) in vrms.iter_mut() {
-        if vrm.mtoon_replaced {
-            continue;
+    for (entity, marker) in markers.iter() {
+        let gltf_mesh = gltf_meshes.get(&marker.mesh).unwrap();
+
+        let mut replaced = false;
+
+        gltf_mesh
+            .primitives
+            .iter()
+            .enumerate()
+            .for_each(|(primitive_index, primitive)| {
+                if primitive_index != marker.primitive {
+                    return;
+                }
+
+                for (entity, mesh_handle) in meshes.iter() {
+                    if mesh_handle.id() != primitive.mesh.id() {
+                        continue;
+                    }
+
+                    replaced = true;
+                    info!("Replacing MToon material for {:?}", entity);
+
+                    commands
+                        .entity(entity)
+                        .remove::<Handle<StandardMaterial>>()
+                        .insert(marker.mtoon.clone());
+                }
+            });
+
+        if replaced {
+            commands.entity(entity).remove::<MtoonMarker>();
         }
-
-        vrm.mtoon_markers.iter().for_each(|marker| {
-            let gltf_mesh = gltf_meshes.get(&marker.mesh).unwrap();
-
-            gltf_mesh
-                .primitives
-                .iter()
-                .enumerate()
-                .for_each(|(primitive_index, primitive)| {
-                    if primitive_index != marker.primitive {
-                        return;
-                    }
-
-                    for (entity, mesh_handle) in meshes.iter() {
-                        if mesh_handle.id() != primitive.mesh.id() {
-                            continue;
-                        }
-
-                        commands
-                            .entity(entity)
-                            .remove::<Handle<StandardMaterial>>()
-                            .insert(marker.mtoon.clone());
-                    }
-                });
-        });
-
-        vrm.mtoon_replaced = true;
     }
 }

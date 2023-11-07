@@ -104,7 +104,6 @@ async fn load_vrm<'a, 'b>(
         gltf,
         mtoon_materials: HashMap::default(),
         mtoon_markers: Vec::default(),
-        mtoon_replaced: false,
     };
 
     if let Ok(_) = vrm0::load_gltf(&mut vrm, &gltf_file, load_context) {
