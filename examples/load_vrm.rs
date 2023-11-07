@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use std::f32::consts::PI;
 
-use bevy_vrm::VrmPlugin;
+use bevy_vrm::{VrmBundle, VrmPlugin};
 
 fn main() {
     App::new()
@@ -12,7 +12,7 @@ fn main() {
 }
 
 const MODELS: [&str; 3] = ["catbot.vrm", "cool_loops.vrm", "suzuha.vrm"];
-const MODEL_INDEX: usize = 2;
+const PATH: &str = MODELS[2];
 
 #[derive(Component)]
 struct VrmTag;
@@ -22,10 +22,12 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     transform.rotate_y(PI);
 
     commands.spawn((
-        SceneBundle {
-            scene: asset_server.load(format!("{}#Scene0", MODELS[MODEL_INDEX]).as_str()),
-            transform,
-            ..default()
+        VrmBundle {
+            vrm: asset_server.load(PATH),
+            scene_bundle: SceneBundle {
+                transform,
+                ..default()
+            },
         },
         VrmTag,
     ));

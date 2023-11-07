@@ -1,8 +1,11 @@
 use std::fmt::Debug;
 
 use bevy::{
-    asset::{AssetLoader, LoadContext},
-    gltf::GltfLoader,
+    asset::{
+        io::{Reader, VecReader},
+        AssetLoader, AsyncReadExt, LoadContext,
+    },
+    gltf::{GltfError, GltfLoader},
     prelude::*,
     render::texture::CompressedImageFormats,
     utils::HashMap,
@@ -10,27 +13,56 @@ use bevy::{
 use goth_gltf::default_extensions;
 use nanoserde::{DeJson, DeJsonErr};
 
+use crate::Vrm;
+
 mod vrm;
 mod vrm0;
 
 #[derive(Default)]
 pub struct VrmLoader;
 
+#[derive(Debug, thiserror::Error)]
+pub enum VrmError {
+    #[error("{0}")]
+    DeJsonErr(#[from] DeJsonErr),
+    #[error("{0}")]
+    GltfError(#[from] GltfError),
+    #[error("{0}")]
+    IoError(#[from] std::io::Error),
+}
+
 impl AssetLoader for VrmLoader {
+    type Asset = Vrm;
+    type Settings = ();
+    type Error = VrmError;
+
     fn load<'a>(
         &'a self,
-        bytes: &'a [u8],
+        reader: &'a mut Reader,
+        _: &'a Self::Settings,
         load_context: &'a mut bevy::asset::LoadContext,
-    ) -> bevy::utils::BoxedFuture<'a, Result<(), bevy::asset::Error>> {
+    ) -> bevy::utils::BoxedFuture<'a, Result<Self::Asset, Self::Error>> {
         let gltf_loader = GltfLoader {
             custom_vertex_attributes: HashMap::default(),
             supported_compressed_formats: CompressedImageFormats::default(),
         };
 
         Box::pin(async move {
-            gltf_loader.load(bytes, load_context).await?;
-            load_vrm_extensions(bytes, load_context).await?;
-            Ok(())
+            let mut bytes = Vec::new();
+            reader.read_to_end(&mut bytes).await?;
+
+            let gltf = gltf_loader
+                .load(&mut VecReader::new(bytes.clone()), &(), load_context)
+                .await;
+
+            let gltf = match gltf {
+                Ok(gltf) => gltf,
+                Err(err) => {
+                    return Err(VrmError::GltfError(err));
+                }
+            };
+
+            load_vrm(gltf, &bytes, load_context).await
         })
     }
 
@@ -61,19 +93,26 @@ impl goth_gltf::Extensions for Extensions {
     type BufferViewExtensions = default_extensions::BufferViewExtensions;
 }
 
-async fn load_vrm_extensions<'a, 'b>(
+async fn load_vrm<'a, 'b>(
+    gltf: bevy::gltf::Gltf,
     bytes: &'a [u8],
     load_context: &'a mut LoadContext<'b>,
-) -> Result<(), DeJsonErr> {
-    let (gltf, _) = goth_gltf::Gltf::from_bytes(&bytes)?;
+) -> Result<Vrm, VrmError> {
+    let (gltf_file, _) = goth_gltf::Gltf::from_bytes(&bytes)?;
 
-    if let Ok(_) = vrm0::load_gltf(&gltf, load_context) {
+    let mut vrm = Vrm {
+        gltf,
+        mtoon_materials: HashMap::default(),
+        mtoon_markers: Vec::default(),
+    };
+
+    if let Ok(_) = vrm0::load_gltf(&mut vrm, &gltf_file, load_context) {
         info!("VRM 0.0 loaded");
-    } else if let Ok(_) = vrm::load_gltf(&gltf, load_context) {
+    } else if let Ok(_) = vrm::load_gltf(&mut vrm, &gltf_file, load_context) {
         info!("VRM 1.0 loaded");
     } else {
         error!("VRM extension not found");
     }
 
-    Ok(())
+    Ok(vrm)
 }
