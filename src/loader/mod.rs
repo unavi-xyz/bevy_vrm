@@ -98,7 +98,7 @@ async fn load_vrm<'a, 'b>(
     bytes: &'a [u8],
     load_context: &'a mut LoadContext<'b>,
 ) -> Result<Vrm, VrmError> {
-    let (gltf_file, _) = goth_gltf::Gltf::from_bytes(&bytes)?;
+    let (gltf_file, _) = goth_gltf::Gltf::from_bytes(bytes)?;
 
     let mut vrm = Vrm {
         gltf,

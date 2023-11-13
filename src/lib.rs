@@ -84,7 +84,7 @@ fn spawn_mtoon_markers(
             _ => continue,
         };
 
-        let vrm = match vrms.get(id.clone()) {
+        let vrm = match vrms.get(*id) {
             Some(vrm) => vrm,
             None => continue,
         };
