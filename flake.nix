@@ -14,9 +14,7 @@
         overlays = [ (import rust-overlay) ];
         pkgs = import nixpkgs { inherit system overlays; };
 
-        wasmTarget = "wasm32-unknown-unknown";
         rustBin = pkgs.rust-bin.stable.latest.default;
-        rustBinWasm = rustBin.override { targets = [ wasmTarget ]; };
 
         build_inputs = pkgs.lib.optionals pkgs.stdenv.isLinux (with pkgs; [
           # Bevy
@@ -37,7 +35,6 @@
           # Rust
           cargo-auditable
           pkg-config
-          wasm-bindgen-cli
         ];
 
         code = pkgs.callPackage ./. {
@@ -47,7 +44,7 @@
         packages = code // {
           all = pkgs.symlinkJoin {
             name = "all";
-            paths = with code; [ lib wasm ];
+            paths = with code; [ lib ];
           };
 
           default = packages.all;
@@ -61,7 +58,7 @@
               # Rust
               cargo-watch
               rust-analyzer
-              rustBinWasm
+              rustBin
             ] ++ build_inputs;
           nativeBuildInputs = native_build_inputs;
 
