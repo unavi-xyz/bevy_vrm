@@ -23,7 +23,7 @@ inherits = "release"
 opt-level = 'z'
 
 [dependencies]
-bevy = "0.12.0"
+bevy = "0.12.1"
 bevy_shader_mtoon = "0.0.3"
 goth-gltf = "0.1.1"
 nanoserde = "0.1.35"
