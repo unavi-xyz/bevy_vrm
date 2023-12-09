@@ -5,7 +5,13 @@ use bevy_vrm::{VrmBundle, VrmPlugin};
 
 fn main() {
     App::new()
-        .add_plugins((DefaultPlugins, VrmPlugin))
+        .add_plugins((
+            DefaultPlugins.set(AssetPlugin {
+                file_path: "../assets".to_string(),
+                ..default()
+            }),
+            VrmPlugin,
+        ))
         .add_systems(Startup, setup)
         .add_systems(Update, rotate_vrm)
         .run();
