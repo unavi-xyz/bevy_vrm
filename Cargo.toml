@@ -1,13 +1,18 @@
-[package]
-name = "bevy_vrm"
-description = "Bevy plugin for loading VRM avatars."
+[workspace]
+resolver = "2"
+members = [
+  "bevy_vrm",
+  "bevy_shader_mtoon",
+]
+
+[workspace.package]
 version = "0.0.5"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/unavi-xyz/bevy_vrm"
 edition = "2021"
 
-[lib]
-crate-type = ["cdylib", "rlib"]
+[workspace.lints.clippy]
+type_complexity = "allow"
 
 [profile.dev]
 opt-level = 1
@@ -21,10 +26,3 @@ lto = true
 [profile.wasm-release]
 inherits = "release"
 opt-level = 'z'
-
-[dependencies]
-bevy = "0.12.1"
-bevy_shader_mtoon = "0.0.3"
-goth-gltf = "0.1.1"
-nanoserde = "0.1.35"
-thiserror = "1.0"

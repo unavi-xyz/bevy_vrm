@@ -1,0 +1,16 @@
+[package]
+name = "bevy_shader_mtoon"
+description = "Bevy MToon shader."
+version.workspace = true
+license.workspace = true
+repository.workspace = true
+edition.workspace = true
+
+[lints]
+workspace = true
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+bevy = "0.12.1"

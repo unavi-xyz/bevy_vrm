@@ -44,7 +44,7 @@
         packages = code // {
           all = pkgs.symlinkJoin {
             name = "all";
-            paths = with code; [ lib ];
+            paths = with code; [ bevy_vrm bevy_shader_mtoon ];
           };
 
           default = packages.all;

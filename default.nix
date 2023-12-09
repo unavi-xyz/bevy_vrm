@@ -18,4 +18,8 @@ let
 
     LD_LIBRARY_PATH = lib.makeLibraryPath build_inputs;
   };
-in { lib = rustPlatform.buildRustPackage (common // { pname = "bevy_vrm"; }); }
+in {
+  bevy_vrm = rustPlatform.buildRustPackage (common // { pname = "bevy_vrm"; });
+  bevy_shader_mtoon =
+    rustPlatform.buildRustPackage (common // { pname = "bevy_shader_mtoon"; });
+}
