@@ -14,6 +14,9 @@ edition = "2021"
 [workspace.lints.clippy]
 type_complexity = "allow"
 
+[workspace.dependencies]
+bevy = { version = "0.12.1" }
+
 [profile.dev]
 opt-level = 1
 

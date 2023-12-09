@@ -13,4 +13,4 @@ workspace = true
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-bevy = "0.12.1"
+bevy = { workspace = true }

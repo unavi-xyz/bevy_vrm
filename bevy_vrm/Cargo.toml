@@ -13,7 +13,7 @@ workspace = true
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-bevy = "0.12.1"
+bevy = { workspace = true }
 bevy_shader_mtoon = { path = "../bevy_shader_mtoon" }
 goth-gltf = "0.1.1"
 nanoserde = "0.1.35"
