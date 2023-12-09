@@ -10,8 +10,8 @@ edition.workspace = true
 workspace = true
 
 [dependencies]
-bevy = { workspace = true }
-bevy_shader_mtoon = { path = "../bevy_shader_mtoon" }
+bevy.workspace = true
+bevy_shader_mtoon = { path = "../bevy_shader_mtoon", version = "0.0.5" } 
 goth-gltf = "0.1.1"
 nanoserde = "0.1.35"
 thiserror = "1.0"

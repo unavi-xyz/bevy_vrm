@@ -10,4 +10,4 @@ edition.workspace = true
 workspace = true
 
 [dependencies]
-bevy = { workspace = true }
+bevy.workspace = true
