@@ -9,8 +9,5 @@ edition.workspace = true
 [lints]
 workspace = true
 
-[lib]
-crate-type = ["cdylib", "rlib"]
-
 [dependencies]
 bevy = { workspace = true }
