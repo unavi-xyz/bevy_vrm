@@ -8,12 +8,12 @@ use crate::{extensions::vrm0::MaterialProperty, MtoonMarker, Vrm};
 
 const MTOON_KEY: &str = "VRM/MToon";
 
-pub fn load_gltf(
+pub(crate) fn load_gltf(
     vrm: &mut Vrm,
-    gltf: &goth_gltf::Gltf<super::Extensions>,
+    goth_gltf: &goth_gltf::Gltf<super::Extensions>,
     load_context: &mut LoadContext,
 ) -> Result<(), Box<dyn std::error::Error>> {
-    let vrm0 = match &gltf.extensions.vrm0 {
+    let vrm0 = match &goth_gltf.extensions.vrm0 {
         Some(vrm0) => vrm0,
         None => return Err("VRM0 not found".into()),
     };
@@ -39,7 +39,8 @@ pub fn load_gltf(
     }
 
     // Create MtoonMarkers
-    gltf.meshes
+    goth_gltf
+        .meshes
         .iter()
         .enumerate()
         .for_each(|(mesh_index, mesh)| {
@@ -71,6 +72,8 @@ pub fn load_gltf(
                     });
                 });
         });
+
+    vrm.extensions = goth_gltf.extensions.clone();
 
     Ok(())
 }

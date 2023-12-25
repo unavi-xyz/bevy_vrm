@@ -1,8 +1,8 @@
 use bevy::{gltf::GltfMesh, prelude::*, utils::HashMap};
 use bevy_shader_mtoon::{MtoonMaterial, MtoonPlugin};
-use loader::VrmLoader;
+use loader::{RootExtensions, VrmLoader};
 
-mod extensions;
+pub mod extensions;
 pub mod loader;
 
 pub mod mtoon {
@@ -37,6 +37,8 @@ pub struct Vrm {
     pub mtoon_materials: HashMap<usize, Handle<MtoonMaterial>>,
     /// Meshes that use MToon
     pub mtoon_markers: Vec<MtoonMarker>,
+    /// GLTF vrm extension info.
+    pub extensions: RootExtensions,
 }
 
 #[derive(Bundle, Default)]

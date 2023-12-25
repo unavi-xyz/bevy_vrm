@@ -99,20 +99,20 @@ async fn load_vrm<'a, 'b>(
     load_context: &'a mut LoadContext<'b>,
 ) -> Result<Vrm, VrmError> {
     let (gltf_file, _) = goth_gltf::Gltf::from_bytes(bytes)?;
-
     let mut vrm = Vrm {
         gltf,
-        mtoon_materials: HashMap::default(),
-        mtoon_markers: Vec::default(),
+        mtoon_materials: default(),
+        mtoon_markers: default(),
+        extensions: default(),
     };
 
-    if let Ok(_) = vrm0::load_gltf(&mut vrm, &gltf_file, load_context) {
+    if let Ok(()) = vrm0::load_gltf(&mut vrm, &gltf_file, load_context) {
         info!("VRM 0.0 loaded");
-    } else if let Ok(_) = vrm::load_gltf(&mut vrm, &gltf_file, load_context) {
+    } else if let Ok(()) = vrm::load_gltf(&mut vrm, &gltf_file, load_context) {
         info!("VRM 1.0 loaded");
     } else {
         error!("VRM extension not found");
-    }
+    };
 
     Ok(vrm)
 }
