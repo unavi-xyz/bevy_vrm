@@ -19,23 +19,17 @@
         build_inputs = pkgs.lib.optionals pkgs.stdenv.isLinux (with pkgs; [
           # Bevy
           alsa-lib
+          libxkbcommon
           udev
           vulkan-loader
-
-          libxkbcommon
           wayland
-
           xorg.libX11
           xorg.libXcursor
           xorg.libXi
           xorg.libXrandr
         ]);
 
-        native_build_inputs = with pkgs; [
-          # Rust
-          cargo-auditable
-          pkg-config
-        ];
+        native_build_inputs = with pkgs; [ cargo-auditable pkg-config ];
 
         code = pkgs.callPackage ./. {
           inherit pkgs system build_inputs native_build_inputs;
@@ -54,12 +48,7 @@
 
         devShells.default = pkgs.mkShell {
           buildInputs = with pkgs;
-            [
-              # Rust
-              cargo-watch
-              rust-analyzer
-              rustBin
-            ] ++ build_inputs;
+            [ cargo-watch rust-analyzer rustBin ] ++ build_inputs;
           nativeBuildInputs = native_build_inputs;
 
           LD_LIBRARY_PATH = pkgs.lib.makeLibraryPath build_inputs;
