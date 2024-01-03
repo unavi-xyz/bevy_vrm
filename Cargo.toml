@@ -15,7 +15,7 @@ edition = "2021"
 type_complexity = "allow"
 
 [workspace.dependencies]
-bevy = { version = "0.12.1" }
+bevy = "0.12.1"
 
 [profile.dev]
 opt-level = 1
