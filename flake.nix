@@ -1,57 +1,111 @@
 {
   inputs = {
+    crane = {
+      url = "github:ipetkov/crane";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     flake-utils.url = "github:numtide/flake-utils";
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    rust-overlay.url = "github:oxalica/rust-overlay";
-
-    rust-overlay.inputs.flake-utils.follows = "flake-utils";
-    rust-overlay.inputs.nixpkgs.follows = "nixpkgs";
+    rust-overlay = {
+      url = "github:oxalica/rust-overlay";
+      inputs = {
+        nixpkgs.follows = "nixpkgs";
+        flake-utils.follows = "flake-utils";
+      };
+    };
   };
 
-  outputs = { self, flake-utils, nixpkgs, rust-overlay, ... }:
-    flake-utils.lib.eachDefaultSystem (system:
+  outputs = { self, nixpkgs, crane, flake-utils, rust-overlay, ... }:
+    flake-utils.lib.eachDefaultSystem (localSystem:
       let
-        overlays = [ (import rust-overlay) ];
-        pkgs = import nixpkgs { inherit system overlays; };
-
-        rustBin = pkgs.rust-bin.stable.latest.default;
-
-        build_inputs = pkgs.lib.optionals pkgs.stdenv.isLinux (with pkgs; [
-          # Bevy
-          alsa-lib
-          libxkbcommon
-          udev
-          vulkan-loader
-          wayland
-          xorg.libX11
-          xorg.libXcursor
-          xorg.libXi
-          xorg.libXrandr
-        ]);
-
-        native_build_inputs = with pkgs; [ cargo-auditable pkg-config ];
-
-        code = pkgs.callPackage ./. {
-          inherit pkgs system build_inputs native_build_inputs;
+        pkgs = import nixpkgs {
+          inherit localSystem;
+          overlays = [ (import rust-overlay) ];
         };
-      in rec {
-        packages = code // {
-          all = pkgs.symlinkJoin {
-            name = "all";
-            paths = with code; [ bevy_vrm bevy_shader_mtoon ];
+
+        inherit (pkgs) lib;
+
+        rustToolchain =
+          pkgs.pkgsBuildHost.rust-bin.stable.latest.default.override {
+            targets = [ "wasm32-unknown-unknown" ];
           };
 
-          default = packages.all;
-          override = packages.all;
-          overrideDerivation = packages.all;
+        craneLib = (crane.mkLib pkgs).overrideToolchain rustToolchain;
+
+        commonArgs = {
+          src = lib.cleanSource ./.;
+
+          strictDeps = true;
+
+          buildInputs = lib.optionals pkgs.stdenv.isLinux (with pkgs; [
+            alsa-lib
+            alsa-lib.dev
+            libxkbcommon
+            udev
+            vulkan-loader
+            wayland
+            xorg.libX11
+            xorg.libXcursor
+            xorg.libXi
+            xorg.libXrandr
+          ]) ++ lib.optionals pkgs.stdenv.isDarwin
+            (with pkgs; [ pkgs.darwin.apple_sdk.frameworks.Cocoa ]);
+
+          nativeBuildInputs = with pkgs;
+            [ nodePackages.prettier pkg-config ]
+            ++ lib.optionals (!pkgs.stdenv.isDarwin)
+            (with pkgs; [ alsa-lib alsa-lib.dev ]);
         };
 
-        devShells.default = pkgs.mkShell {
-          buildInputs = with pkgs;
-            [ cargo-watch rust-analyzer rustBin ] ++ build_inputs;
-          nativeBuildInputs = native_build_inputs;
+        commonShell = {
+          checks = self.checks.${localSystem};
+          packages = with pkgs; [ cargo-watch rust-analyzer ];
 
-          LD_LIBRARY_PATH = pkgs.lib.makeLibraryPath build_inputs;
+          LD_LIBRARY_PATH = pkgs.lib.makeLibraryPath commonArgs.buildInputs;
         };
+
+        cargoArtifacts =
+          craneLib.buildDepsOnly (commonArgs // { pname = "deps"; });
+
+        cargoArtifactsWasm = craneLib.buildDepsOnly (commonArgs // {
+          pname = "deps-wasm";
+          doCheck = false;
+        });
+
+        cargoClippy = craneLib.cargoClippy (commonArgs // {
+          inherit cargoArtifacts;
+          pname = "clippy";
+        });
+
+        cargoDoc = craneLib.cargoDoc (commonArgs // {
+          inherit cargoArtifacts;
+          pname = "doc";
+        });
+
+        bevy_shader_mtoon = craneLib.buildPackage (commonArgs // {
+          inherit cargoArtifacts;
+          pname = "bevy_shader_mtoon";
+          cargoExtraArgs = "-p bevy_shader_mtoon";
+        });
+
+        bevy_vrm = craneLib.buildPackage (commonArgs // {
+          inherit cargoArtifacts;
+          pname = "bevy_vrm";
+          cargoExtraArgs = "-p bevy_vrm";
+        });
+      in {
+        checks = { inherit bevy_vrm bevy_shader_mtoon cargoClippy cargoDoc; };
+
+        packages = {
+          bevy_shader_mtoon = bevy_shader_mtoon;
+          bevy_vrm = bevy_vrm;
+
+          default = pkgs.symlinkJoin {
+            name = "all";
+            paths = [ bevy_shader_mtoon bevy_vrm ];
+          };
+        };
+
+        devShells.default = craneLib.devShell commonShell;
       });
 }
