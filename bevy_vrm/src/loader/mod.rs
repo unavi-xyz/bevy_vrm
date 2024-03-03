@@ -5,7 +5,7 @@ use bevy::{
         io::{Reader, VecReader},
         AssetLoader, AsyncReadExt, LoadContext,
     },
-    gltf::{GltfError, GltfLoader},
+    gltf::{GltfError, GltfLoader, GltfLoaderSettings},
     prelude::*,
     render::texture::CompressedImageFormats,
     utils::HashMap,
@@ -52,7 +52,11 @@ impl AssetLoader for VrmLoader {
             reader.read_to_end(&mut bytes).await?;
 
             let gltf = gltf_loader
-                .load(&mut VecReader::new(bytes.clone()), &(), load_context)
+                .load(
+                    &mut VecReader::new(bytes.clone()),
+                    &GltfLoaderSettings::default(),
+                    load_context,
+                )
                 .await;
 
             let gltf = match gltf {

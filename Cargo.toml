@@ -15,7 +15,7 @@ edition = "2021"
 type_complexity = "allow"
 
 [workspace.dependencies]
-bevy = "0.12.1"
+bevy = "0.13.0"
 
 [profile.dev]
 opt-level = 1
@@ -25,7 +25,3 @@ opt-level = 3
 
 [profile.release]
 lto = true
-
-[profile.wasm-release]
-inherits = "release"
-opt-level = 'z'

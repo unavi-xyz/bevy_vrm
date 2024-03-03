@@ -100,11 +100,11 @@ fn load_mtoon(
 
     if let Some(vector) = &property.vector {
         if let Some(color) = vector.color {
-            mtoon_material.base_color = color.into();
+            mtoon_material.base_color = Color::rgba_from_array(color);
         }
 
         if let Some(color) = vector.shade_color {
-            mtoon_material.shade_color = color.into();
+            mtoon_material.shade_color = Color::rgba_from_array(color);
         }
     }
 

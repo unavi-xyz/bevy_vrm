@@ -1,6 +1,12 @@
 use std::f32::consts::PI;
 
-use bevy::prelude::*;
+use bevy::{
+    prelude::*,
+    render::{
+        render_asset::RenderAssetUsages,
+        render_resource::{Extent3d, TextureDimension, TextureFormat},
+    },
+};
 
 use bevy_shader_mtoon::{MtoonMainCamera, MtoonMaterial, MtoonPlugin, MtoonSun};
 
@@ -57,13 +63,11 @@ fn setup(
     });
 
     let shapes = [
-        meshes.add(shape::Cube::default().into()),
-        meshes.add(shape::Box::default().into()),
-        meshes.add(shape::Capsule::default().into()),
-        meshes.add(shape::Torus::default().into()),
-        meshes.add(shape::Cylinder::default().into()),
-        meshes.add(shape::Icosphere::default().try_into().unwrap()),
-        meshes.add(shape::UVSphere::default().into()),
+        meshes.add(Cuboid::default()),
+        meshes.add(Capsule3d::default()),
+        meshes.add(Torus::default()),
+        meshes.add(Cylinder::default()),
+        meshes.add(Sphere::default()),
     ];
 
     let num_shapes = shapes.len();
@@ -98,8 +102,8 @@ fn setup(
     }
 
     commands.spawn(PbrBundle {
-        mesh: meshes.add(shape::Plane::from_size(50.0).into()),
-        material: materials.add(Color::SILVER.into()),
+        mesh: meshes.add(Plane3d::default()),
+        material: materials.add(StandardMaterial::from(Color::SILVER)),
         ..default()
     });
 }
@@ -126,13 +130,14 @@ fn uv_debug_texture() -> Image {
     }
 
     Image::new_fill(
-        bevy::render::render_resource::Extent3d {
+        Extent3d {
             width: TEXTURE_SIZE as u32,
             height: TEXTURE_SIZE as u32,
             depth_or_array_layers: 1,
         },
-        bevy::render::render_resource::TextureDimension::D2,
+        TextureDimension::D2,
         &texture_data,
-        bevy::render::render_resource::TextureFormat::Rgba8UnormSrgb,
+        TextureFormat::Rgba8UnormSrgb,
+        RenderAssetUsages::all(),
     )
 }

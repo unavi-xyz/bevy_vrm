@@ -1,7 +1,7 @@
 use bevy::{
     asset::load_internal_asset,
     prelude::*,
-    reflect::{TypePath, TypeUuid},
+    reflect::TypePath,
     render::render_resource::{AsBindGroup, AsBindGroupShaderType, ShaderRef, ShaderType},
 };
 
@@ -19,8 +19,7 @@ impl Plugin for MtoonPlugin {
     }
 }
 
-#[derive(Asset, AsBindGroup, TypeUuid, TypePath, Debug, Clone)]
-#[uuid = "c114d3b1-2274-4733-99df-f1fb5fd80bd1"]
+#[derive(Asset, AsBindGroup, TypePath, Debug, Clone)]
 #[uniform(0, MtoonMaterialUniform)]
 pub struct MtoonMaterial {
     pub base_color: Color,
@@ -114,19 +113,19 @@ impl AsBindGroupShaderType<MtoonMaterialUniform> for MtoonMaterial {
         _images: &bevy::render::render_asset::RenderAssets<Image>,
     ) -> MtoonMaterialUniform {
         MtoonMaterialUniform {
-            base_color: self.base_color.into(),
-            shade_color: self.shade_color.into(),
+            base_color: Color::rgba_to_vec4(&self.base_color),
+            shade_color: Color::rgba_to_vec4(&self.shade_color),
             light_dir: self.light_dir,
             shading_shift_factor: self.shading_shift_factor,
             shading_toony_factor: self.shading_toony_factor,
-            light_color: self.light_color.into(),
+            light_color: Color::rgba_to_vec4(&self.light_color),
 
-            ambient_color: self.ambient_color.into(),
+            ambient_color: Color::rgba_to_vec4(&self.ambient_color),
             gl_equalization_factor: self.gl_equalization_factor,
 
             view_dir: self.view_dir,
             matcap_factor: self.matcap_factor,
-            parametric_rim_color: self.parametric_rim_color.into(),
+            parametric_rim_color: Color::rgba_to_vec4(&self.parametric_rim_color),
             parametric_rim_fresnel_power: self.parametric_rim_fresnel_power,
             parametric_rim_lift_factor: self.parametric_rim_lift_factor,
             rim_lighting_mix_factor: self.rim_lighting_mix_factor,
@@ -148,11 +147,11 @@ pub fn update_mtoon_shader(
 ) {
     for (_, mtoon) in materials.iter_mut() {
         if let Ok(cam_t) = main_cam.get_single() {
-            mtoon.view_dir = cam_t.back();
+            mtoon.view_dir = *cam_t.back();
         }
 
         if let Ok((transform, light)) = sun.get_single() {
-            mtoon.light_dir = transform.back();
+            mtoon.light_dir = *transform.back();
             mtoon.light_color = light.color;
         }
 
