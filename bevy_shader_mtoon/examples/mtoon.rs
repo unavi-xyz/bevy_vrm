@@ -71,7 +71,9 @@ fn setup(
     ];
 
     let num_shapes = shapes.len();
-    const X_EXTENT: f32 = 14.5;
+
+    // Spacing between shapes
+    const X_EXTENT: f32 = 10.0;
 
     for (i, mesh) in shapes.into_iter().enumerate() {
         // Texture

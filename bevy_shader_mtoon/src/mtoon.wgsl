@@ -17,15 +17,15 @@ struct MtoonMaterial {
     rim_lighting_mix_factor: f32,
 };
 
-@group(1) @binding(0)
+@group(2) @binding(0)
 var<uniform> material: MtoonMaterial;
-@group(1) @binding(1)
+@group(2) @binding(1)
 var base_color_texture: texture_2d<f32>;
-@group(1) @binding(2)
+@group(2) @binding(2)
 var base_color_sampler: sampler;
-@group(1) @binding(3)
+@group(2) @binding(3)
 var shade_color_texture: texture_2d<f32>;
-@group(1) @binding(4)
+@group(2) @binding(4)
 var shade_color_sampler: sampler;
 //var shading_shift_texture: texture_2d<f32>;
 //var shading_shift_sampler: sampler;
@@ -33,13 +33,13 @@ var shade_color_sampler: sampler;
 //var normal_sampler: sampler;
 //var emissive_texture: texture_2d<f32>;
 //var emissive_sampler: sampler;
-@group(1) @binding(5)
+@group(2) @binding(5)
 var matcap_texture: texture_2d<f32>;
-@group(1) @binding(6)
+@group(2) @binding(6)
 var matcap_sampler: sampler;
-@group(1) @binding(7)
+@group(2) @binding(7)
 var rim_multiply_texture: texture_2d<f32>;
-@group(1) @binding(8)
+@group(2) @binding(8)
 var rim_multiply_sampler: sampler;
 
 #import bevy_pbr::forward_io::VertexOutput
