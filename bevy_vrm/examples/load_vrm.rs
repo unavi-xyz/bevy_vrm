@@ -77,11 +77,13 @@ fn move_arm(
 
 fn draw_spring_bones(
     mut gizmos: Gizmos,
-    mut config: ResMut<GizmoConfig>,
+    mut config: ResMut<GizmoConfigStore>,
     spring_bones: Query<&SpringBones>,
     transforms: Query<&GlobalTransform>,
 ) {
+    let (config, _) = config.config_mut::<DefaultGizmoConfigGroup>();
     config.depth_bias = -1.0;
+
     for spring_bones in spring_bones.iter() {
         for spring_bone in spring_bones.0.iter() {
             for bone_entity in spring_bone.bones.iter() {
