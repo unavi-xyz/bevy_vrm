@@ -850,7 +850,7 @@ dependencies = [
 
 [[package]]
 name = "bevy_shader_mtoon"
-version = "0.0.7"
+version = "0.0.8"
 dependencies = [
  "bevy",
 ]
@@ -1005,7 +1005,7 @@ dependencies = [
 
 [[package]]
 name = "bevy_vrm"
-version = "0.0.7"
+version = "0.0.8"
 dependencies = [
  "bevy",
  "bevy_shader_mtoon",
