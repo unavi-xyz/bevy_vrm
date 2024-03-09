@@ -22,7 +22,14 @@ const PATH: &str = MODELS[2];
 #[derive(Component)]
 struct VrmTag;
 
-fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
+fn setup(
+    mut commands: Commands,
+    mut config: ResMut<GizmoConfigStore>,
+    asset_server: Res<AssetServer>,
+) {
+    let (config, _) = config.config_mut::<DefaultGizmoConfigGroup>();
+    config.depth_bias = -1.0;
+
     let mut transform = Transform::from_xyz(0.0, -1.0, -4.0);
     transform.rotate_y(PI);
 
@@ -77,13 +84,9 @@ fn move_arm(
 
 fn draw_spring_bones(
     mut gizmos: Gizmos,
-    mut config: ResMut<GizmoConfigStore>,
     spring_bones: Query<&SpringBones>,
     transforms: Query<&GlobalTransform>,
 ) {
-    let (config, _) = config.config_mut::<DefaultGizmoConfigGroup>();
-    config.depth_bias = -1.0;
-
     for spring_bones in spring_bones.iter() {
         for spring_bone in spring_bones.0.iter() {
             for bone_entity in spring_bone.bones.iter() {
