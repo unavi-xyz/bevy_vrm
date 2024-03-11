@@ -1967,6 +1967,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "gltf_kun_vrm"
+version = "0.0.8"
+
+[[package]]
 name = "glutin_wgl_sys"
 version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3125,6 +3129,10 @@ dependencies = [
  "ryu",
  "serde",
 ]
+
+[[package]]
+name = "serde_vrm"
+version = "0.0.8"
 
 [[package]]
 name = "sharded-slab"
