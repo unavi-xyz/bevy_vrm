@@ -235,7 +235,6 @@ impl ExtensionImport<GltfDocument, GltfFormat> for Vrm {
             }
         }
 
-        // ext.secondary_animation;
         let weight = VrmWeight {
             meta,
             humanoid,
