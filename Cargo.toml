@@ -1,8 +1,7 @@
 [workspace]
 resolver = "2"
 members = [
-  "bevy_shader_mtoon",
-  "bevy_vrm",
+  "crates/*"
 ]
 
 [workspace.package]
@@ -16,7 +15,7 @@ type_complexity = "allow"
 
 [workspace.dependencies]
 bevy = "0.13.0"
-bevy_shader_mtoon = { path = "bevy_shader_mtoon", version = "0.0.8" }
+bevy_shader_mtoon = { path = "crates/bevy_shader_mtoon", version = "0.0.8" }
 
 [profile.dev]
 opt-level = 1
