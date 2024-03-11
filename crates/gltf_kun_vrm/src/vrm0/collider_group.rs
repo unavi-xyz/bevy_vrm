@@ -1,6 +1,6 @@
-use gltf_kun::graph::{gltf::Node, ByteNode, Graph, NodeIndex, OtherEdgeHelpers};
+use gltf_kun::graph::{gltf::Node, ByteNode, Graph, NodeIndex, OtherEdgeHelpers, Weight};
 use serde::{Deserialize, Serialize};
-use serde_vrm::vrm0::Vec3;
+use serde_vrm::vrm0::Collider;
 
 #[derive(Copy, Clone, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
 pub enum ColliderGroupEdges {
@@ -17,12 +17,6 @@ impl ToString for ColliderGroupEdges {
 #[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
 pub struct ColliderGroupWeight {
     pub colliders: Vec<Collider>,
-}
-
-#[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
-pub struct Collider {
-    pub offset: Vec3,
-    pub radius: Option<f32>,
 }
 
 impl From<&Vec<u8>> for ColliderGroupWeight {
@@ -59,6 +53,11 @@ impl ByteNode<ColliderGroupWeight> for ColliderGroup {}
 impl OtherEdgeHelpers for ColliderGroup {}
 
 impl ColliderGroup {
+    pub fn new(graph: &mut Graph) -> Self {
+        let weight = &ColliderGroupWeight::default();
+        Self(graph.add_node(Weight::Bytes(weight.into())))
+    }
+
     pub fn node(&self, graph: &Graph) -> Option<Node> {
         self.find_property(graph, &ColliderGroupEdges::Node.to_string())
     }

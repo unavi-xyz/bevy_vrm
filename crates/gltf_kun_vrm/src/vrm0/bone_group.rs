@@ -1,6 +1,8 @@
-use gltf_kun::graph::{gltf::Node, ByteNode, Graph, NodeIndex, OtherEdgeHelpers};
+use gltf_kun::graph::{ByteNode, Graph, NodeIndex, OtherEdgeHelpers, Weight};
 use serde::{Deserialize, Serialize};
 use serde_vrm::vrm0::Vec3;
+
+use super::{bone::Bone, collider_group::ColliderGroup};
 
 #[derive(Copy, Clone, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
 pub enum BoneGroupEdges {
@@ -61,25 +63,30 @@ impl ByteNode<BoneGroupWeight> for BoneGroup {}
 impl OtherEdgeHelpers for BoneGroup {}
 
 impl BoneGroup {
-    pub fn bones(&self, graph: &Graph) -> Vec<Node> {
+    pub fn new(graph: &mut Graph) -> Self {
+        let weight = &BoneGroupWeight::default();
+        Self(graph.add_node(Weight::Bytes(weight.into())))
+    }
+
+    pub fn bones(&self, graph: &Graph) -> Vec<Bone> {
         self.find_properties(graph, &BoneGroupEdges::Bone.to_string())
             .collect()
     }
-    pub fn add_bone(&self, graph: &mut Graph, bone: Node) {
+    pub fn add_bone(&self, graph: &mut Graph, bone: Bone) {
         self.add_property(graph, BoneGroupEdges::Bone.to_string(), bone);
     }
-    pub fn remove_bone(&self, graph: &mut Graph, bone: Node) {
+    pub fn remove_bone(&self, graph: &mut Graph, bone: Bone) {
         self.remove_property(graph, &BoneGroupEdges::Bone.to_string(), bone);
     }
 
-    pub fn collider_groups(&self, graph: &Graph) -> Vec<Node> {
+    pub fn collider_groups(&self, graph: &Graph) -> Vec<ColliderGroup> {
         self.find_properties(graph, &BoneGroupEdges::ColliderGroup.to_string())
             .collect()
     }
-    pub fn add_collider_group(&self, graph: &mut Graph, group: Node) {
+    pub fn add_collider_group(&self, graph: &mut Graph, group: ColliderGroup) {
         self.add_property(graph, BoneGroupEdges::ColliderGroup.to_string(), group);
     }
-    pub fn remove_collider_group(&self, graph: &mut Graph, group: Node) {
+    pub fn remove_collider_group(&self, graph: &mut Graph, group: ColliderGroup) {
         self.remove_property(graph, &BoneGroupEdges::ColliderGroup.to_string(), group);
     }
 }

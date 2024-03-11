@@ -651,7 +651,7 @@ dependencies = [
 [[package]]
 name = "bevy_gltf_kun"
 version = "0.0.8"
-source = "git+https://github.com/unavi-xyz/gltf_kun.git#c3ffaca0b756f41946ebf83e0f365cdccfb2b761"
+source = "git+https://github.com/unavi-xyz/gltf_kun.git#01ed0f060605fd5c20a14f5510312e50869a4e2d"
 dependencies = [
  "bevy",
  "glam",
@@ -2073,7 +2073,7 @@ dependencies = [
 [[package]]
 name = "gltf_kun"
 version = "0.0.8"
-source = "git+https://github.com/unavi-xyz/gltf_kun.git#c3ffaca0b756f41946ebf83e0f365cdccfb2b761"
+source = "git+https://github.com/unavi-xyz/gltf_kun.git#01ed0f060605fd5c20a14f5510312e50869a4e2d"
 dependencies = [
  "base64 0.22.0",
  "byteorder",
@@ -2094,6 +2094,7 @@ dependencies = [
  "serde",
  "serde_json",
  "serde_vrm",
+ "tracing",
 ]
 
 [[package]]
