@@ -32,4 +32,5 @@ lto = true
 
 [patch.crates-io]
 bevy = { git = "https://github.com/eero-lehtinen/bevy.git", branch = "v0.13.0-nvidia-fix" }
+bevy_gltf_kun = { git = "https://github.com/unavi-xyz/gltf_kun.git" }
 gltf_kun = { git = "https://github.com/unavi-xyz/gltf_kun.git" }

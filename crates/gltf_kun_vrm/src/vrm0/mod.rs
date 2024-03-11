@@ -14,6 +14,8 @@ pub mod blend_shape_group;
 pub mod bone;
 pub mod bone_group;
 pub mod collider_group;
+pub mod export;
+pub mod import;
 pub mod mesh_annotation;
 pub mod weight;
 
