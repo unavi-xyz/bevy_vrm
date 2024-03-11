@@ -1954,7 +1954,7 @@ dependencies = [
 [[package]]
 name = "gltf_kun"
 version = "0.0.8"
-source = "git+https://github.com/unavi-xyz/gltf_kun.git#b2988283fbc4b40b85a0dc68dfffee283fcf7195"
+source = "git+https://github.com/unavi-xyz/gltf_kun.git#6af13cea27defff52e66f0a08c5f629ac804e848"
 dependencies = [
  "base64 0.22.0",
  "byteorder",

@@ -1,4 +1,4 @@
-use gltf_kun::graph::{gltf::Node, ByteNode, Graph, NodeIndex, OtherEdgeHelpers};
+use gltf_kun::graph::{gltf::Node, ByteNode, Graph, NodeIndex, OtherEdgeHelpers, Weight};
 use serde::{Deserialize, Serialize};
 use serde_vrm::vrm0::BoneName;
 
@@ -54,6 +54,12 @@ impl ByteNode<BoneWeight> for Bone {}
 impl OtherEdgeHelpers for Bone {}
 
 impl Bone {
+    pub fn new(graph: &mut Graph) -> Self {
+        let weight = &BoneWeight::default();
+        let node = graph.add_node(Weight::Bytes(weight.into()));
+        Self(node)
+    }
+
     pub fn node(&self, graph: &Graph) -> Option<Node> {
         self.find_property(graph, &BoneEdges::Node.to_string())
     }

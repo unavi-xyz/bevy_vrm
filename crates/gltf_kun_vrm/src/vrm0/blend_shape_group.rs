@@ -1,4 +1,4 @@
-use gltf_kun::graph::{ByteNode, Graph, NodeIndex, OtherEdgeHelpers};
+use gltf_kun::graph::{ByteNode, Graph, NodeIndex, OtherEdgeHelpers, Weight};
 use serde::{Deserialize, Serialize};
 use serde_vrm::vrm0::{MaterialBind, PresetName};
 
@@ -58,6 +58,12 @@ impl ByteNode<BlendShapeGroupWeight> for BlendShapeGroup {}
 impl OtherEdgeHelpers for BlendShapeGroup {}
 
 impl BlendShapeGroup {
+    pub fn new(graph: &mut Graph) -> Self {
+        let weight = &BlendShapeGroupWeight::default();
+        let node = graph.add_node(Weight::Bytes(weight.into()));
+        Self(node)
+    }
+
     pub fn binds(&self, graph: &Graph) -> Vec<Bind> {
         self.find_properties(graph, &BlendShapeGroupEdges::Bind.to_string())
             .collect()

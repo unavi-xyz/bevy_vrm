@@ -1,4 +1,4 @@
-use gltf_kun::graph::{gltf::Mesh, ByteNode, Graph, NodeIndex, OtherEdgeHelpers};
+use gltf_kun::graph::{gltf::Mesh, ByteNode, Graph, NodeIndex, OtherEdgeHelpers, Weight};
 use serde::{Deserialize, Serialize};
 
 #[derive(Copy, Clone, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
@@ -52,6 +52,12 @@ impl ByteNode<MeshAnnotationWeight> for MeshAnnotation {}
 impl OtherEdgeHelpers for MeshAnnotation {}
 
 impl MeshAnnotation {
+    pub fn new(graph: &mut Graph) -> Self {
+        let weight = &MeshAnnotationWeight::default();
+        let node = graph.add_node(Weight::Bytes(weight.into()));
+        Self(node)
+    }
+
     pub fn mesh(&self, graph: &Graph) -> Option<Mesh> {
         self.find_property(graph, &MeshAnnotationEdges::Mesh.to_string())
     }
