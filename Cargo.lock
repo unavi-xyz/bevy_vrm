@@ -1972,6 +1972,8 @@ name = "gltf_kun_vrm"
 version = "0.0.8"
 dependencies = [
  "gltf_kun",
+ "serde",
+ "serde_json",
  "serde_vrm",
 ]
 
