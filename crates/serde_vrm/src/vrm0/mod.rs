@@ -248,12 +248,52 @@ pub struct BlendShapeMaster {
 pub struct BlendShapeGroup {
     pub name: Option<String>,
     #[serde(rename = "presetName")]
-    pub preset_name: Option<String>,
+    pub preset_name: Option<PresetName>,
     pub binds: Option<Vec<Bind>>,
     #[serde(rename = "materialValues")]
     pub material_values: Option<Vec<MaterialBind>>,
     #[serde(rename = "isBinary")]
     pub is_binary: Option<bool>,
+}
+
+#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+pub enum PresetName {
+    #[serde(rename = "unknown")]
+    Unknown,
+    #[serde(rename = "neutral")]
+    Neutral,
+    #[serde(rename = "a")]
+    A,
+    #[serde(rename = "i")]
+    I,
+    #[serde(rename = "u")]
+    U,
+    #[serde(rename = "e")]
+    E,
+    #[serde(rename = "o")]
+    O,
+    #[serde(rename = "blink")]
+    Blink,
+    #[serde(rename = "joy")]
+    Joy,
+    #[serde(rename = "angry")]
+    Angry,
+    #[serde(rename = "sorrow")]
+    Sorrow,
+    #[serde(rename = "fun")]
+    Fun,
+    #[serde(rename = "lookup")]
+    LookUp,
+    #[serde(rename = "lookdown")]
+    LookDown,
+    #[serde(rename = "lookleft")]
+    LookLeft,
+    #[serde(rename = "lookright")]
+    LookRight,
+    #[serde(rename = "blink_l")]
+    BlinkLeft,
+    #[serde(rename = "blink_r")]
+    BlinkRight,
 }
 
 #[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]

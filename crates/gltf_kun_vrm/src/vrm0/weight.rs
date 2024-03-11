@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use serde_vrm::vrm0::{Allow, AllowedUserName, BoneName, LookAtCurve, Vec3};
+use serde_vrm::vrm0::{Allow, AllowedUserName, LookAtCurve, MaterialProperty, Vec3};
 
 #[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
 pub struct VrmWeight {
@@ -7,9 +7,7 @@ pub struct VrmWeight {
     pub meta: Meta,
     pub humanoid: Humanoid,
     pub first_person: FirstPerson,
-    // pub blend_shape_master: Option<BlendShapeMaster>,
-    // pub secondary_animation: Option<SecondaryAnimation>,
-    // pub material_properties: Option<Vec<MaterialProperty>>,
+    pub material_properties: Vec<MaterialProperty>,
 }
 
 impl From<&Vec<u8>> for VrmWeight {
@@ -34,7 +32,6 @@ pub struct Meta {
     pub author: Option<String>,
     pub contact_information: Option<String>,
     pub reference: Option<String>,
-    // pub texture: Option<u32>,
     pub allowed_user_name: Option<AllowedUserName>,
     pub violent_usage_name: Option<Allow>,
     pub sexual_usage_name: Option<Allow>,
@@ -46,7 +43,6 @@ pub struct Meta {
 
 #[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
 pub struct Humanoid {
-    // pub human_bones: Option<Vec<Bone>>,
     pub arm_stretch: Option<f32>,
     pub leg_stretch: Option<f32>,
     pub upper_arm_twist: Option<f32>,
@@ -58,26 +54,11 @@ pub struct Humanoid {
 }
 
 #[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
-pub struct Bone {
-    pub bone: Option<BoneName>,
-    // pub node: Option<u32>,
-    pub use_default_values: Option<bool>,
-}
-
-#[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
 pub struct FirstPerson {
-    // pub first_person_bone: Option<u32>,
     pub first_person_bone_offset: Vec3,
-    pub mesh_annotations: Option<Vec<MeshAnnotation>>,
     pub look_at_type_name: Option<String>,
     pub look_at_horizontal_inner: Option<LookAtCurve>,
     pub look_at_horizontal_outer: Option<LookAtCurve>,
     pub look_at_vertical_down: Option<LookAtCurve>,
     pub look_at_vertical_up: Option<LookAtCurve>,
-}
-
-#[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
-pub struct MeshAnnotation {
-    // pub mesh: Option<u32>,
-    pub first_person_flag: Option<String>,
 }

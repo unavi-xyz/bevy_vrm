@@ -1,8 +1,43 @@
-use gltf_kun::{extensions::Extension, graph::NodeIndex};
+use gltf_kun::{
+    extensions::Extension,
+    graph::{gltf::TextureInfo, ByteNode, Graph, NodeIndex, OtherEdgeHelpers},
+};
+use serde::{Deserialize, Serialize};
 
+use self::{
+    blend_shape_group::BlendShapeGroup, bone::Bone, mesh_annotation::MeshAnnotation,
+    weight::VrmWeight,
+};
+
+pub mod bind;
+pub mod blend_shape_group;
+pub mod bone;
+pub mod bone_group;
+pub mod collider_group;
+pub mod mesh_annotation;
 pub mod weight;
 
 pub const EXTENSION_NAME: &str = "VRM";
+
+#[derive(Copy, Clone, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
+pub enum VrmEdge {
+    #[serde(rename = "VRM/BlendShapeGroup")]
+    BlendShapeGroup,
+    #[serde(rename = "VRM/FirstPersonBone")]
+    FirstPersonBone,
+    #[serde(rename = "VRM/HumanBone")]
+    HumanBone,
+    #[serde(rename = "VRM/MeshAnnotation")]
+    MeshAnnotation,
+    #[serde(rename = "VRM/Thumbnail")]
+    Thumbnail,
+}
+
+impl ToString for VrmEdge {
+    fn to_string(&self) -> String {
+        serde_json::to_string(self).unwrap()
+    }
+}
 
 #[derive(Copy, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub struct Vrm(pub NodeIndex);
@@ -14,13 +49,65 @@ impl From<NodeIndex> for Vrm {
 }
 
 impl From<Vrm> for NodeIndex {
-    fn from(physics_shape: Vrm) -> Self {
-        physics_shape.0
+    fn from(vrm: Vrm) -> Self {
+        vrm.0
     }
 }
+
+impl ByteNode<VrmWeight> for Vrm {}
+impl OtherEdgeHelpers for Vrm {}
 
 impl Extension for Vrm {
     fn name() -> &'static str {
         EXTENSION_NAME
+    }
+}
+
+impl Vrm {
+    pub fn blend_shape_groups(&self, graph: &Graph) -> Vec<BlendShapeGroup> {
+        self.find_properties(graph, &VrmEdge::BlendShapeGroup.to_string())
+            .collect()
+    }
+    pub fn add_blend_shape_group(&self, graph: &mut Graph, group: BlendShapeGroup) {
+        self.add_property(graph, VrmEdge::BlendShapeGroup.to_string(), group);
+    }
+    pub fn remove_blend_shape_group(&self, graph: &mut Graph, group: BlendShapeGroup) {
+        self.remove_property(graph, &VrmEdge::BlendShapeGroup.to_string(), group);
+    }
+
+    pub fn first_person_bone(&self, graph: &Graph) -> Option<Bone> {
+        self.find_property(graph, &VrmEdge::FirstPersonBone.to_string())
+    }
+    pub fn set_first_person_bone(&self, graph: &mut Graph, bone: Option<Bone>) {
+        self.set_property(graph, VrmEdge::FirstPersonBone.to_string(), bone);
+    }
+
+    pub fn human_bones(&self, graph: &Graph) -> Vec<Bone> {
+        self.find_properties(graph, &VrmEdge::HumanBone.to_string())
+            .collect()
+    }
+    pub fn add_human_bone(&self, graph: &mut Graph, bone: Bone) {
+        self.add_property(graph, VrmEdge::HumanBone.to_string(), bone);
+    }
+    pub fn remove_human_bone(&self, graph: &mut Graph, bone: Bone) {
+        self.remove_property(graph, &VrmEdge::HumanBone.to_string(), bone);
+    }
+
+    pub fn mesh_annotations(&self, graph: &Graph) -> Vec<MeshAnnotation> {
+        self.find_properties(graph, &VrmEdge::MeshAnnotation.to_string())
+            .collect()
+    }
+    pub fn add_mesh_annotation(&self, graph: &mut Graph, annotation: MeshAnnotation) {
+        self.add_property(graph, VrmEdge::MeshAnnotation.to_string(), annotation);
+    }
+    pub fn remove_mesh_annotation(&self, graph: &mut Graph, annotation: MeshAnnotation) {
+        self.remove_property(graph, &VrmEdge::MeshAnnotation.to_string(), annotation);
+    }
+
+    pub fn thumbnail(&self, graph: &Graph) -> Option<TextureInfo> {
+        self.find_property(graph, &VrmEdge::Thumbnail.to_string())
+    }
+    pub fn set_thumbnail(&self, graph: &mut Graph, texture: Option<TextureInfo>) {
+        self.set_property(graph, VrmEdge::Thumbnail.to_string(), texture);
     }
 }
