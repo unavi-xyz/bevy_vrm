@@ -996,6 +996,7 @@ dependencies = [
  "bevy_gltf_kun",
  "bevy_shader_mtoon",
  "gltf_kun",
+ "gltf_kun_vrm",
  "serde",
  "thiserror",
 ]
@@ -1969,6 +1970,10 @@ dependencies = [
 [[package]]
 name = "gltf_kun_vrm"
 version = "0.0.8"
+dependencies = [
+ "gltf_kun",
+ "serde_vrm",
+]
 
 [[package]]
 name = "glutin_wgl_sys"
@@ -3133,6 +3138,9 @@ dependencies = [
 [[package]]
 name = "serde_vrm"
 version = "0.0.8"
+dependencies = [
+ "serde",
+]
 
 [[package]]
 name = "sharded-slab"

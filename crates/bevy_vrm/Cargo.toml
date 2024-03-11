@@ -14,6 +14,7 @@ workspace = true
 bevy.workspace = true
 bevy_gltf_kun = { version = "0.0.8", default-features = false, features = ["import"] }
 bevy_shader_mtoon.workspace = true
-gltf_kun = { version = "0.0.8", default-features = false }
-serde = { version = "1.0.197", features = ["derive"] }
+gltf_kun.workspace = true
+gltf_kun_vrm.workspace = true
+serde.workspace = true
 thiserror = "1.0.57"
