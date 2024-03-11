@@ -1,8 +1,8 @@
 [workspace]
 resolver = "2"
 members = [
-  "bevy_vrm",
   "bevy_shader_mtoon",
+  "bevy_vrm",
 ]
 
 [workspace.package]
@@ -16,6 +16,7 @@ type_complexity = "allow"
 
 [workspace.dependencies]
 bevy = "0.13.0"
+bevy_shader_mtoon = { path = "bevy_shader_mtoon", version = "0.0.8" }
 
 [profile.dev]
 opt-level = 1
@@ -25,3 +26,7 @@ opt-level = 3
 
 [profile.release]
 lto = true
+
+[patch.crates-io]
+bevy = { git = "https://github.com/eero-lehtinen/bevy.git", branch = "v0.13.0-nvidia-fix" }
+gltf_kun = { git = "https://github.com/unavi-xyz/gltf_kun.git" }

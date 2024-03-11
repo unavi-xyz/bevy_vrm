@@ -1,5 +1,3 @@
-use nanoserde::{DeJson, SerJson};
-
 #[derive(DeJson, SerJson, Debug, Clone)]
 pub struct Vrm {
     #[nserde(rename = "exporterVersion")]

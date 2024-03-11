@@ -2,7 +2,7 @@ use bevy::gltf::GltfNode;
 use bevy::scene::SceneInstance;
 use bevy::{gltf::GltfMesh, prelude::*, utils::HashMap};
 use bevy_shader_mtoon::{MtoonMaterial, MtoonPlugin};
-use loader::{RootExtensions, VrmLoader};
+use loader::VrmLoader;
 
 pub mod extensions;
 pub mod loader;
@@ -16,8 +16,8 @@ pub struct VrmPlugin;
 impl Plugin for VrmPlugin {
     fn build(&self, app: &mut App) {
         app.add_plugins(MtoonPlugin)
-            .register_asset_loader(VrmLoader)
             .init_asset::<Vrm>()
+            .init_asset_loader::<VrmLoader>()
             .add_systems(
                 Update,
                 (
@@ -44,8 +44,6 @@ pub struct Vrm {
     pub mtoon_materials: HashMap<usize, Handle<MtoonMaterial>>,
     /// Meshes that use MToon
     pub mtoon_markers: Vec<MtoonMarker>,
-    /// GLTF vrm extension info.
-    pub extensions: RootExtensions,
 }
 
 #[derive(Bundle, Default)]
