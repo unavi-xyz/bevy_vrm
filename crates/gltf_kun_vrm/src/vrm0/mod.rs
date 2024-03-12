@@ -5,8 +5,8 @@ use gltf_kun::{
 use serde::{Deserialize, Serialize};
 
 use self::{
-    blend_shape_group::BlendShapeGroup, bone::Bone, mesh_annotation::MeshAnnotation,
-    weight::VrmWeight,
+    blend_shape_group::BlendShapeGroup, bone::Bone, material_property::MaterialProperty,
+    mesh_annotation::MeshAnnotation, weight::VrmWeight,
 };
 
 pub mod bind;
@@ -15,6 +15,7 @@ pub mod bone;
 pub mod bone_group;
 pub mod collider_group;
 pub mod import;
+pub mod material_property;
 pub mod mesh_annotation;
 pub mod weight;
 
@@ -28,6 +29,8 @@ pub enum VrmEdge {
     FirstPersonBone,
     #[serde(rename = "VRM/HumanBone")]
     HumanBone,
+    #[serde(rename = "VRM/MaterialProperty")]
+    MaterialProperty,
     #[serde(rename = "VRM/MeshAnnotation")]
     MeshAnnotation,
     #[serde(rename = "VRM/Thumbnail")]
@@ -92,6 +95,17 @@ impl Vrm {
     }
     pub fn remove_human_bone(&self, graph: &mut Graph, bone: Bone) {
         self.remove_property(graph, &VrmEdge::HumanBone.to_string(), bone);
+    }
+
+    pub fn material_properties(&self, graph: &Graph) -> Vec<MaterialProperty> {
+        self.find_properties(graph, &VrmEdge::MaterialProperty.to_string())
+            .collect()
+    }
+    pub fn add_material_property(&self, graph: &mut Graph, property: MaterialProperty) {
+        self.add_property(graph, VrmEdge::MaterialProperty.to_string(), property);
+    }
+    pub fn remove_material_property(&self, graph: &mut Graph, property: MaterialProperty) {
+        self.remove_property(graph, &VrmEdge::MaterialProperty.to_string(), property);
     }
 
     pub fn mesh_annotations(&self, graph: &Graph) -> Vec<MeshAnnotation> {
@@ -169,6 +183,25 @@ mod tests {
 
         vrm.remove_human_bone(&mut graph, bone);
         assert_eq!(vrm.human_bones(&graph), vec![bone_2]);
+    }
+
+    #[test]
+    fn material_properties() {
+        let mut graph = Graph::new();
+
+        let vrm = Vrm::new(&mut graph);
+        let property = MaterialProperty::new(&mut graph);
+
+        vrm.add_material_property(&mut graph, property);
+        assert_eq!(vrm.material_properties(&graph), vec![property]);
+
+        let property_2 = MaterialProperty::new(&mut graph);
+        vrm.add_material_property(&mut graph, property_2);
+        assert!(vrm.material_properties(&graph).contains(&property));
+        assert!(vrm.material_properties(&graph).contains(&property_2));
+
+        vrm.remove_material_property(&mut graph, property);
+        assert_eq!(vrm.material_properties(&graph), vec![property_2]);
     }
 
     #[test]

@@ -11,6 +11,7 @@ use super::{
     bone::{Bone, BoneWeight},
     bone_group::{BoneGroup, BoneGroupWeight},
     collider_group::{ColliderGroup, ColliderGroupWeight},
+    material_property::{MaterialProperty, MaterialPropertyWeight},
     weight::{FirstPerson, Humanoid, Meta, VrmWeight},
     Vrm, EXTENSION_NAME,
 };
@@ -34,6 +35,65 @@ impl ExtensionImport<GltfDocument, GltfFormat> for Vrm {
         let ext: serde_vrm::vrm0::Vrm = serde_json::from_value(ext.clone())?;
 
         let vrm = Vrm::new(graph);
+
+        for material_property_json in ext.material_properties.unwrap_or_default() {
+            let material_property = MaterialProperty::new(graph);
+            vrm.add_material_property(graph, material_property);
+
+            if let Some(texture_properties) = material_property_json.texture {
+                if let Some(idx) = texture_properties.main_tex {
+                    if let Some(texture) = doc.textures(graph).get(idx as usize) {
+                        material_property.set_main_texture(graph, Some(*texture));
+                    } else {
+                        warn!("VRM main texture not found: {}", idx);
+                    }
+                }
+
+                if let Some(idx) = texture_properties.shade_texture {
+                    if let Some(texture) = doc.textures(graph).get(idx as usize) {
+                        material_property.set_shade_texture(graph, Some(*texture));
+                    } else {
+                        warn!("VRM shade color texture not found: {}", idx);
+                    }
+                }
+
+                if let Some(idx) = texture_properties.sphere_add {
+                    if let Some(texture) = doc.textures(graph).get(idx as usize) {
+                        material_property.set_sphere_add_texture(graph, Some(*texture));
+                    } else {
+                        warn!("VRM sphere add texture not found: {}", idx);
+                    }
+                }
+
+                if let Some(idx) = texture_properties.bump_map {
+                    if let Some(texture) = doc.textures(graph).get(idx as usize) {
+                        material_property.set_bump_map(graph, Some(*texture));
+                    } else {
+                        warn!("VRM bump map texture not found: {}", idx);
+                    }
+                }
+
+                if let Some(idx) = texture_properties.emission_map {
+                    if let Some(texture) = doc.textures(graph).get(idx as usize) {
+                        material_property.set_emission_map(graph, Some(*texture));
+                    } else {
+                        warn!("VRM emission map texture not found: {}", idx);
+                    }
+                }
+            }
+
+            let weight = MaterialPropertyWeight {
+                name: material_property_json.name,
+                float: material_property_json.float,
+                shader: material_property_json.shader,
+                vector: material_property_json.vector,
+                tag_map: material_property_json.tag_map,
+                keyword_map: material_property_json.keyword_map,
+                render_queue: material_property_json.render_queue,
+            };
+
+            material_property.write(graph, &weight);
+        }
 
         let meta = ext
             .meta
@@ -240,7 +300,6 @@ impl ExtensionImport<GltfDocument, GltfFormat> for Vrm {
             humanoid,
             first_person,
             exporter_version: ext.exporter_version.unwrap_or_default(),
-            material_properties: ext.material_properties.unwrap_or_default(),
         };
 
         vrm.write(graph, &weight);

@@ -363,7 +363,7 @@ pub struct MaterialProperty {
     pub name: Option<String>,
     #[serde(rename = "renderQueue")]
     pub render_queue: Option<i32>,
-    pub shader: Option<String>,
+    pub shader: Option<Shader>,
     #[serde(rename = "floatProperties")]
     pub float: Option<FloatProperties>,
     #[serde(rename = "vectorProperties")]
@@ -374,6 +374,23 @@ pub struct MaterialProperty {
     pub keyword_map: Option<KeywordMap>,
     #[serde(rename = "tagMap")]
     pub tag_map: Option<TagMap>,
+}
+
+#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+pub enum Shader {
+    #[serde(rename = "VRM_USE_GLTFSHADER")]
+    Gltf,
+    #[serde(rename = "VRM/MToon")]
+    MToon,
+    #[serde(rename = "VRM/UnlitCutout")]
+    UnlitCutout,
+    #[serde(rename = "VRM/UnlitTexture")]
+    UnlitTexture,
+    #[serde(rename = "VRM/UnlitTransparent")]
+    UnlitTransparent,
+    #[serde(rename = "VRM/UnlitTransparentZWrite")]
+    UnlitTransparentZWrite,
+    Other(String),
 }
 
 #[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]

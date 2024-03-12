@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use serde_vrm::vrm0::{Allow, AllowedUserName, LookAtCurve, MaterialProperty, Vec3};
+use serde_vrm::vrm0::{Allow, AllowedUserName, LookAtCurve, Vec3};
 
 #[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
 pub struct VrmWeight {
@@ -7,7 +7,6 @@ pub struct VrmWeight {
     pub meta: Meta,
     pub humanoid: Humanoid,
     pub first_person: FirstPerson,
-    pub material_properties: Vec<MaterialProperty>,
 }
 
 impl From<&Vec<u8>> for VrmWeight {

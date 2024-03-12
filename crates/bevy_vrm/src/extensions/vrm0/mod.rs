@@ -32,6 +32,6 @@ impl Extension for BevyVrm {
 
 impl RootExtensionImport<GltfDocument> for BevyVrm {
     fn import_root(context: &mut ImportContext, ext: Self) {
-        // TODO: Implement
+        let ext = ext.0;
     }
 }
