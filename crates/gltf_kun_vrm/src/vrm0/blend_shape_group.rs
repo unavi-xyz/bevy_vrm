@@ -66,7 +66,6 @@ impl BlendShapeGroup {
 
     pub fn binds(&self, graph: &Graph) -> Vec<Bind> {
         self.find_properties(graph, &BlendShapeGroupEdges::Bind.to_string())
-            .collect()
     }
     pub fn add_bind(&self, graph: &mut Graph, bind: Bind) {
         self.add_property(graph, BlendShapeGroupEdges::Bind.to_string(), bind);

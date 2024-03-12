@@ -70,7 +70,6 @@ impl BoneGroup {
 
     pub fn bones(&self, graph: &Graph) -> Vec<Bone> {
         self.find_properties(graph, &BoneGroupEdges::Bone.to_string())
-            .collect()
     }
     pub fn add_bone(&self, graph: &mut Graph, bone: Bone) {
         self.add_property(graph, BoneGroupEdges::Bone.to_string(), bone);
@@ -81,7 +80,6 @@ impl BoneGroup {
 
     pub fn collider_groups(&self, graph: &Graph) -> Vec<ColliderGroup> {
         self.find_properties(graph, &BoneGroupEdges::ColliderGroup.to_string())
-            .collect()
     }
     pub fn add_collider_group(&self, graph: &mut Graph, group: ColliderGroup) {
         self.add_property(graph, BoneGroupEdges::ColliderGroup.to_string(), group);

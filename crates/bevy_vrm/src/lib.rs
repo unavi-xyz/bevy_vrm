@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use bevy_gltf_kun::import::gltf::{mesh::GltfMesh, node::GltfNode, GltfKun};
 use bevy_shader_mtoon::MtoonPlugin;
 use loader::{Vrm, VrmLoader};
 
@@ -14,6 +15,9 @@ pub struct VrmPlugin;
 impl Plugin for VrmPlugin {
     fn build(&self, app: &mut App) {
         app.add_plugins(MtoonPlugin)
+            .init_asset::<GltfKun>()
+            .init_asset::<GltfMesh>()
+            .init_asset::<GltfNode>()
             .init_asset::<Vrm>()
             .init_asset_loader::<VrmLoader>();
     }

@@ -1,7 +1,8 @@
-use bevy::prelude::*;
-use bevy_shader_mtoon::MtoonSun;
-use bevy_vrm::{VrmBundle, VrmPlugin};
 use std::f32::consts::PI;
+
+use bevy::prelude::*;
+use bevy_shader_mtoon::{MtoonMainCamera, MtoonSun};
+use bevy_vrm::{VrmBundle, VrmPlugin};
 
 fn main() {
     App::new()
@@ -45,7 +46,7 @@ fn setup(
         VrmTag,
     ));
 
-    commands.spawn((Camera3dBundle::default(), bevy_vrm::mtoon::MtoonMainCamera));
+    commands.spawn((Camera3dBundle::default(), MtoonMainCamera));
 
     commands.spawn((
         DirectionalLightBundle {

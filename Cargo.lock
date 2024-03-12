@@ -651,8 +651,7 @@ dependencies = [
 [[package]]
 name = "bevy_gltf_kun"
 version = "0.0.9"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7feca34449a3137c733d6322894f56e225783a3059ba47eadeb028bf353260ba"
+source = "git+https://github.com/unavi-xyz/gltf_kun.git#2d0f9e7389e55ef6f73738784fbfd8c4e4ac76f0"
 dependencies = [
  "bevy",
  "glam",
@@ -2074,8 +2073,7 @@ dependencies = [
 [[package]]
 name = "gltf_kun"
 version = "0.0.9"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b62e62d022e94dab86e0b9bb646f9bde379a24a23e570fa1ef8fc5dcad5884cf"
+source = "git+https://github.com/unavi-xyz/gltf_kun.git#2d0f9e7389e55ef6f73738784fbfd8c4e4ac76f0"
 dependencies = [
  "base64 0.22.0",
  "byteorder",

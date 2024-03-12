@@ -1,6 +1,6 @@
 use gltf_kun::{
     extensions::Extension,
-    graph::{gltf::TextureInfo, ByteNode, Graph, NodeIndex, OtherEdgeHelpers},
+    graph::{gltf::Texture, ByteNode, Graph, NodeIndex, OtherEdgeHelpers},
 };
 use serde::{Deserialize, Serialize};
 
@@ -70,7 +70,6 @@ impl Extension for Vrm {
 impl Vrm {
     pub fn blend_shape_groups(&self, graph: &Graph) -> Vec<BlendShapeGroup> {
         self.find_properties(graph, &VrmEdge::BlendShapeGroup.to_string())
-            .collect()
     }
     pub fn add_blend_shape_group(&self, graph: &mut Graph, group: BlendShapeGroup) {
         self.add_property(graph, VrmEdge::BlendShapeGroup.to_string(), group);
@@ -88,7 +87,6 @@ impl Vrm {
 
     pub fn human_bones(&self, graph: &Graph) -> Vec<Bone> {
         self.find_properties(graph, &VrmEdge::HumanBone.to_string())
-            .collect()
     }
     pub fn add_human_bone(&self, graph: &mut Graph, bone: Bone) {
         self.add_property(graph, VrmEdge::HumanBone.to_string(), bone);
@@ -99,7 +97,6 @@ impl Vrm {
 
     pub fn material_properties(&self, graph: &Graph) -> Vec<MaterialProperty> {
         self.find_properties(graph, &VrmEdge::MaterialProperty.to_string())
-            .collect()
     }
     pub fn add_material_property(&self, graph: &mut Graph, property: MaterialProperty) {
         self.add_property(graph, VrmEdge::MaterialProperty.to_string(), property);
@@ -110,7 +107,6 @@ impl Vrm {
 
     pub fn mesh_annotations(&self, graph: &Graph) -> Vec<MeshAnnotation> {
         self.find_properties(graph, &VrmEdge::MeshAnnotation.to_string())
-            .collect()
     }
     pub fn add_mesh_annotation(&self, graph: &mut Graph, annotation: MeshAnnotation) {
         self.add_property(graph, VrmEdge::MeshAnnotation.to_string(), annotation);
@@ -119,17 +115,17 @@ impl Vrm {
         self.remove_property(graph, &VrmEdge::MeshAnnotation.to_string(), annotation);
     }
 
-    pub fn thumbnail(&self, graph: &Graph) -> Option<TextureInfo> {
+    pub fn thumbnail(&self, graph: &Graph) -> Option<Texture> {
         self.find_property(graph, &VrmEdge::Thumbnail.to_string())
     }
-    pub fn set_thumbnail(&self, graph: &mut Graph, texture: Option<TextureInfo>) {
+    pub fn set_thumbnail(&self, graph: &mut Graph, texture: Option<Texture>) {
         self.set_property(graph, VrmEdge::Thumbnail.to_string(), texture);
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use gltf_kun::graph::GraphNodeWeight;
+    use gltf_kun::graph::{gltf::Texture, GraphNodeWeight};
 
     use super::*;
 
@@ -145,8 +141,7 @@ mod tests {
 
         let group_2 = BlendShapeGroup::new(&mut graph);
         vrm.add_blend_shape_group(&mut graph, group_2);
-        assert!(vrm.blend_shape_groups(&graph).contains(&group));
-        assert!(vrm.blend_shape_groups(&graph).contains(&group_2));
+        assert_eq!(vrm.blend_shape_groups(&graph), vec![group, group_2]);
 
         vrm.remove_blend_shape_group(&mut graph, group);
         assert_eq!(vrm.blend_shape_groups(&graph), vec![group_2]);
@@ -178,8 +173,7 @@ mod tests {
 
         let bone_2 = Bone::new(&mut graph);
         vrm.add_human_bone(&mut graph, bone_2);
-        assert!(vrm.human_bones(&graph).contains(&bone));
-        assert!(vrm.human_bones(&graph).contains(&bone_2));
+        assert_eq!(vrm.human_bones(&graph), vec![bone, bone_2]);
 
         vrm.remove_human_bone(&mut graph, bone);
         assert_eq!(vrm.human_bones(&graph), vec![bone_2]);
@@ -197,8 +191,7 @@ mod tests {
 
         let property_2 = MaterialProperty::new(&mut graph);
         vrm.add_material_property(&mut graph, property_2);
-        assert!(vrm.material_properties(&graph).contains(&property));
-        assert!(vrm.material_properties(&graph).contains(&property_2));
+        assert_eq!(vrm.material_properties(&graph), vec![property, property_2]);
 
         vrm.remove_material_property(&mut graph, property);
         assert_eq!(vrm.material_properties(&graph), vec![property_2]);
@@ -216,8 +209,7 @@ mod tests {
 
         let annotation_2 = MeshAnnotation::new(&mut graph);
         vrm.add_mesh_annotation(&mut graph, annotation_2);
-        assert!(vrm.mesh_annotations(&graph).contains(&annotation));
-        assert!(vrm.mesh_annotations(&graph).contains(&annotation_2));
+        assert_eq!(vrm.mesh_annotations(&graph), vec![annotation, annotation_2]);
 
         vrm.remove_mesh_annotation(&mut graph, annotation);
         assert_eq!(vrm.mesh_annotations(&graph), vec![annotation_2]);
@@ -228,7 +220,7 @@ mod tests {
         let mut graph = Graph::new();
 
         let vrm = Vrm::new(&mut graph);
-        let texture = TextureInfo::new(&mut graph);
+        let texture = Texture::new(&mut graph);
 
         vrm.set_thumbnail(&mut graph, Some(texture));
         assert_eq!(vrm.thumbnail(&graph), Some(texture));

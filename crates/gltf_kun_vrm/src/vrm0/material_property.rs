@@ -1,5 +1,5 @@
 use gltf_kun::graph::{
-    gltf::{Material, TextureInfo},
+    gltf::{Material, Texture},
     ByteNode, Graph, NodeIndex, OtherEdgeHelpers, Weight,
 };
 use serde::{Deserialize, Serialize};
@@ -85,10 +85,10 @@ impl MaterialProperty {
         self.set_property(graph, MaterialPropertyEdges::Material.to_string(), material);
     }
 
-    pub fn main_texture(&self, graph: &Graph) -> Option<TextureInfo> {
+    pub fn main_texture(&self, graph: &Graph) -> Option<Texture> {
         self.find_property(graph, &MaterialPropertyEdges::MainTexture.to_string())
     }
-    pub fn set_main_texture(&self, graph: &mut Graph, texture: Option<TextureInfo>) {
+    pub fn set_main_texture(&self, graph: &mut Graph, texture: Option<Texture>) {
         self.set_property(
             graph,
             MaterialPropertyEdges::MainTexture.to_string(),
@@ -96,10 +96,10 @@ impl MaterialProperty {
         );
     }
 
-    pub fn shade_texture(&self, graph: &Graph) -> Option<TextureInfo> {
+    pub fn shade_texture(&self, graph: &Graph) -> Option<Texture> {
         self.find_property(graph, &MaterialPropertyEdges::ShadeTexture.to_string())
     }
-    pub fn set_shade_texture(&self, graph: &mut Graph, texture: Option<TextureInfo>) {
+    pub fn set_shade_texture(&self, graph: &mut Graph, texture: Option<Texture>) {
         self.set_property(
             graph,
             MaterialPropertyEdges::ShadeTexture.to_string(),
@@ -107,24 +107,24 @@ impl MaterialProperty {
         );
     }
 
-    pub fn bump_map(&self, graph: &Graph) -> Option<TextureInfo> {
+    pub fn bump_map(&self, graph: &Graph) -> Option<Texture> {
         self.find_property(graph, &MaterialPropertyEdges::BumpMap.to_string())
     }
-    pub fn set_bump_map(&self, graph: &mut Graph, texture: Option<TextureInfo>) {
+    pub fn set_bump_map(&self, graph: &mut Graph, texture: Option<Texture>) {
         self.set_property(graph, MaterialPropertyEdges::BumpMap.to_string(), texture);
     }
 
-    pub fn sphere_add(&self, graph: &Graph) -> Option<TextureInfo> {
+    pub fn sphere_add(&self, graph: &Graph) -> Option<Texture> {
         self.find_property(graph, &MaterialPropertyEdges::SphereAdd.to_string())
     }
-    pub fn set_sphere_add_texture(&self, graph: &mut Graph, texture: Option<TextureInfo>) {
+    pub fn set_sphere_add_texture(&self, graph: &mut Graph, texture: Option<Texture>) {
         self.set_property(graph, MaterialPropertyEdges::SphereAdd.to_string(), texture);
     }
 
-    pub fn emission_map(&self, graph: &Graph) -> Option<TextureInfo> {
+    pub fn emission_map(&self, graph: &Graph) -> Option<Texture> {
         self.find_property(graph, &MaterialPropertyEdges::EmissionMap.to_string())
     }
-    pub fn set_emission_map(&self, graph: &mut Graph, texture: Option<TextureInfo>) {
+    pub fn set_emission_map(&self, graph: &mut Graph, texture: Option<Texture>) {
         self.set_property(
             graph,
             MaterialPropertyEdges::EmissionMap.to_string(),
