@@ -17,4 +17,4 @@ bevy_shader_mtoon.workspace = true
 gltf_kun.workspace = true
 gltf_kun_vrm.workspace = true
 serde.workspace = true
-thiserror = "1.0.57"
+thiserror.workspace = true

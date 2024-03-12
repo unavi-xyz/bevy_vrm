@@ -2096,6 +2096,7 @@ dependencies = [
  "serde",
  "serde_json",
  "serde_vrm",
+ "thiserror",
  "tracing",
 ]
 

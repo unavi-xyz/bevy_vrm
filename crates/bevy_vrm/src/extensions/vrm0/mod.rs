@@ -33,5 +33,12 @@ impl Extension for BevyVrm {
 impl RootExtensionImport<GltfDocument> for BevyVrm {
     fn import_root(context: &mut ImportContext, ext: Self) {
         let ext = ext.0;
+
+        for material_property in ext.material_properties(context.graph) {
+            let material = match material_property.material(context.graph) {
+                Some(material) => material,
+                None => continue,
+            };
+        }
     }
 }

@@ -20,6 +20,7 @@ gltf_kun = { version = "0.0.9", default-features = false }
 gltf_kun_vrm = { path = "crates/gltf_kun_vrm", version = "0.0.8" }
 serde = { version = "1.0.197", features = ["derive"] }
 serde_vrm = { path = "crates/serde_vrm", version = "0.0.8" }
+thiserror = "1.0.57"
 
 [profile.dev]
 opt-level = 1

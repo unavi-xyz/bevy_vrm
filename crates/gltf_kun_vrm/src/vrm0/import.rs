@@ -3,7 +3,7 @@ use gltf_kun::{
     graph::{gltf::GltfDocument, ByteNode, Graph},
     io::format::gltf::GltfFormat,
 };
-use tracing::warn;
+use thiserror::Error;
 
 use super::{
     bind::{Bind, BindWeight},
@@ -15,6 +15,22 @@ use super::{
     weight::{FirstPerson, Humanoid, Meta, VrmWeight},
     Vrm, EXTENSION_NAME,
 };
+
+#[derive(Debug, Error)]
+pub enum VrmImportError {
+    #[error("Material not found: {0}")]
+    MaterialNotFound(usize),
+    #[error("Node not found: {0}")]
+    NodeNotFound(usize),
+    #[error("Texture not found: {0}")]
+    TextureNotFound(usize),
+    #[error("Bone not found: {0}")]
+    BoneNotFound(usize),
+    #[error("Bone group not found: {0}")]
+    BoneGroupNotFound(usize),
+    #[error("Collider group not found: {0}")]
+    ColliderGroupNotFound(usize),
+}
 
 impl ExtensionImport<GltfDocument, GltfFormat> for Vrm {
     fn import(
@@ -36,49 +52,67 @@ impl ExtensionImport<GltfDocument, GltfFormat> for Vrm {
 
         let vrm = Vrm::new(graph);
 
-        for material_property_json in ext.material_properties.unwrap_or_default() {
+        for (i, material_property_json) in ext
+            .material_properties
+            .unwrap_or_default()
+            .into_iter()
+            .enumerate()
+        {
+            let material = doc
+                .materials(graph)
+                .get(i)
+                .copied()
+                .ok_or_else(|| Box::new(VrmImportError::MaterialNotFound(i)))?;
+
             let material_property = MaterialProperty::new(graph);
             vrm.add_material_property(graph, material_property);
 
+            material_property.set_material(graph, Some(material));
+
             if let Some(texture_properties) = material_property_json.texture {
                 if let Some(idx) = texture_properties.main_tex {
-                    if let Some(texture) = doc.textures(graph).get(idx as usize) {
-                        material_property.set_main_texture(graph, Some(*texture));
-                    } else {
-                        warn!("VRM main texture not found: {}", idx);
-                    }
+                    doc.textures(graph)
+                        .get(idx as usize)
+                        .map(|texture| {
+                            material_property.set_main_texture(graph, Some(*texture));
+                        })
+                        .ok_or_else(|| Box::new(VrmImportError::TextureNotFound(idx as usize)))?;
                 }
 
                 if let Some(idx) = texture_properties.shade_texture {
-                    if let Some(texture) = doc.textures(graph).get(idx as usize) {
-                        material_property.set_shade_texture(graph, Some(*texture));
-                    } else {
-                        warn!("VRM shade color texture not found: {}", idx);
-                    }
+                    doc.textures(graph)
+                        .get(idx as usize)
+                        .map(|texture| {
+                            material_property.set_shade_texture(graph, Some(*texture));
+                        })
+                        .ok_or_else(|| Box::new(VrmImportError::TextureNotFound(idx as usize)))?;
                 }
 
                 if let Some(idx) = texture_properties.sphere_add {
-                    if let Some(texture) = doc.textures(graph).get(idx as usize) {
-                        material_property.set_sphere_add_texture(graph, Some(*texture));
-                    } else {
-                        warn!("VRM sphere add texture not found: {}", idx);
-                    }
+                    doc.textures(graph)
+                        .get(idx as usize)
+                        .map(|texture| {
+                            material_property.set_sphere_add_texture(graph, Some(*texture));
+                        })
+                        .ok_or_else(|| Box::new(VrmImportError::TextureNotFound(idx as usize)))?;
                 }
 
                 if let Some(idx) = texture_properties.bump_map {
-                    if let Some(texture) = doc.textures(graph).get(idx as usize) {
-                        material_property.set_bump_map(graph, Some(*texture));
-                    } else {
-                        warn!("VRM bump map texture not found: {}", idx);
-                    }
+                    doc.textures(graph)
+                        .get(idx as usize)
+                        .map(|texture| {
+                            material_property.set_bump_map(graph, Some(*texture));
+                        })
+                        .ok_or_else(|| Box::new(VrmImportError::TextureNotFound(idx as usize)))?;
                 }
 
                 if let Some(idx) = texture_properties.emission_map {
-                    if let Some(texture) = doc.textures(graph).get(idx as usize) {
-                        material_property.set_emission_map(graph, Some(*texture));
-                    } else {
-                        warn!("VRM emission map texture not found: {}", idx);
-                    }
+                    doc.textures(graph)
+                        .get(idx as usize)
+                        .map(|texture| {
+                            material_property.set_emission_map(graph, Some(*texture));
+                        })
+                        .ok_or_else(|| Box::new(VrmImportError::TextureNotFound(idx as usize)))?;
                 }
             }
 
@@ -95,98 +129,96 @@ impl ExtensionImport<GltfDocument, GltfFormat> for Vrm {
             material_property.write(graph, &weight);
         }
 
-        let meta = ext
-            .meta
-            .map(|meta| {
-                if let Some(idx) = meta.texture {
-                    if let Some(texture) = doc.textures(graph).get(idx as usize) {
+        let meta = if let Some(meta) = ext.meta {
+            if let Some(idx) = meta.texture {
+                doc.textures(graph)
+                    .get(idx as usize)
+                    .map(|texture| {
                         vrm.set_thumbnail(graph, Some(*texture));
-                    } else {
-                        warn!("VRM thumbnail texture not found: {}", idx);
-                    }
-                }
+                    })
+                    .ok_or_else(|| Box::new(VrmImportError::TextureNotFound(idx as usize)))?;
+            }
 
-                Meta {
-                    title: meta.title,
-                    version: meta.version,
-                    author: meta.author,
-                    reference: meta.reference,
-                    license_name: meta.license_name,
-                    allowed_user_name: meta.allowed_user_name,
-                    sexual_usage_name: meta.sexual_usage_name,
-                    other_license_url: meta.other_license_url,
-                    violent_usage_name: meta.violent_usage_name,
-                    contact_information: meta.contact_information,
-                    other_permission_url: meta.other_permission_url,
-                    commercial_usage_name: meta.commercial_usage_name,
-                }
-            })
-            .unwrap_or_default();
+            Meta {
+                title: meta.title,
+                version: meta.version,
+                author: meta.author,
+                reference: meta.reference,
+                license_name: meta.license_name,
+                allowed_user_name: meta.allowed_user_name,
+                sexual_usage_name: meta.sexual_usage_name,
+                other_license_url: meta.other_license_url,
+                violent_usage_name: meta.violent_usage_name,
+                contact_information: meta.contact_information,
+                other_permission_url: meta.other_permission_url,
+                commercial_usage_name: meta.commercial_usage_name,
+            }
+        } else {
+            Meta::default()
+        };
 
         let mut graph_bones = Vec::new();
 
-        let humanoid = ext
-            .humanoid
-            .map(|humanoid| {
-                let bones = humanoid.human_bones.unwrap_or_default();
+        let humanoid = if let Some(humanoid) = ext.humanoid {
+            let bones = humanoid.human_bones.unwrap_or_default();
 
-                for bone_json in bones {
-                    let bone = Bone::new(graph);
-                    graph_bones.push(bone);
-                    vrm.add_human_bone(graph, bone);
+            for bone_json in bones {
+                let bone = Bone::new(graph);
+                graph_bones.push(bone);
+                vrm.add_human_bone(graph, bone);
 
-                    if let Some(node_idx) = bone_json.node {
-                        if let Some(node) = doc.nodes(graph).get(node_idx as usize) {
+                if let Some(node_idx) = bone_json.node {
+                    doc.nodes(graph)
+                        .get(node_idx as usize)
+                        .map(|node| {
                             bone.set_node(graph, Some(*node));
-                        } else {
-                            warn!("VRM humanoid bone node not found: {}", node_idx);
-                        }
-                    }
-
-                    let weight = BoneWeight {
-                        name: bone_json.bone,
-                        use_default_values: bone_json.use_default_values,
-                    };
-
-                    bone.write(graph, &weight)
+                        })
+                        .ok_or_else(|| Box::new(VrmImportError::BoneNotFound(node_idx as usize)))?;
                 }
 
-                Humanoid {
-                    arm_stretch: humanoid.arm_stretch,
-                    leg_stretch: humanoid.leg_stretch,
-                    feet_spacing: humanoid.feet_spacing,
-                    upper_arm_twist: humanoid.upper_arm_twist,
-                    lower_arm_twist: humanoid.lower_arm_twist,
-                    upper_leg_twist: humanoid.upper_leg_twist,
-                    lower_leg_twist: humanoid.lower_leg_twist,
-                    has_translation_dof: humanoid.has_translation_dof,
-                }
-            })
-            .unwrap_or_default();
+                let weight = BoneWeight {
+                    name: bone_json.bone,
+                    use_default_values: bone_json.use_default_values,
+                };
 
-        let first_person = ext
-            .first_person
-            .map(|first_person| {
-                if let Some(bone_idx) = first_person.first_person_bone {
-                    if let Some(bone) = graph_bones.get(bone_idx as usize) {
+                bone.write(graph, &weight)
+            }
+
+            Humanoid {
+                arm_stretch: humanoid.arm_stretch,
+                leg_stretch: humanoid.leg_stretch,
+                feet_spacing: humanoid.feet_spacing,
+                upper_arm_twist: humanoid.upper_arm_twist,
+                lower_arm_twist: humanoid.lower_arm_twist,
+                upper_leg_twist: humanoid.upper_leg_twist,
+                lower_leg_twist: humanoid.lower_leg_twist,
+                has_translation_dof: humanoid.has_translation_dof,
+            }
+        } else {
+            Humanoid::default()
+        };
+
+        let first_person = if let Some(first_person) = ext.first_person {
+            if let Some(bone_idx) = first_person.first_person_bone {
+                graph_bones
+                    .get(bone_idx as usize)
+                    .map(|bone| {
                         vrm.set_first_person_bone(graph, Some(*bone));
-                    } else {
-                        warn!("VRM first person bone not found: {}", bone_idx);
-                    }
-                }
+                    })
+                    .ok_or_else(|| Box::new(VrmImportError::BoneNotFound(bone_idx as usize)))?;
+            }
 
-                FirstPerson {
-                    look_at_type_name: first_person.look_at_type_name,
-                    look_at_vertical_up: first_person.look_at_vertical_up,
-                    look_at_vertical_down: first_person.look_at_vertical_down,
-                    first_person_bone_offset: first_person
-                        .first_person_bone_offset
-                        .unwrap_or_default(),
-                    look_at_horizontal_inner: first_person.look_at_horizontal_inner,
-                    look_at_horizontal_outer: first_person.look_at_horizontal_outer,
-                }
-            })
-            .unwrap_or_default();
+            FirstPerson {
+                look_at_type_name: first_person.look_at_type_name,
+                look_at_vertical_up: first_person.look_at_vertical_up,
+                look_at_vertical_down: first_person.look_at_vertical_down,
+                first_person_bone_offset: first_person.first_person_bone_offset.unwrap_or_default(),
+                look_at_horizontal_inner: first_person.look_at_horizontal_inner,
+                look_at_horizontal_outer: first_person.look_at_horizontal_outer,
+            }
+        } else {
+            FirstPerson::default()
+        };
 
         if let Some(blend_shape_master) = ext.blend_shape_master {
             let blend_shape_groups = blend_shape_master.blend_shape_groups.unwrap_or_default();
@@ -237,11 +269,12 @@ impl ExtensionImport<GltfDocument, GltfFormat> for Vrm {
                 graph_collider_groups.push(collider_group);
 
                 if let Some(node_idx) = collider_group_json.node {
-                    if let Some(node) = doc.nodes(graph).get(node_idx as usize) {
-                        collider_group.set_node(graph, Some(*node));
-                    } else {
-                        warn!("VRM collider group node not found: {}", node_idx);
-                    }
+                    doc.nodes(graph)
+                        .get(node_idx as usize)
+                        .map(|node| {
+                            collider_group.set_node(graph, Some(*node));
+                        })
+                        .ok_or_else(|| Box::new(VrmImportError::BoneNotFound(node_idx as usize)))?;
                 }
 
                 let weight = ColliderGroupWeight {
@@ -259,26 +292,27 @@ impl ExtensionImport<GltfDocument, GltfFormat> for Vrm {
                 let bones = bone_group_json.bones.unwrap_or_default();
 
                 for bone_idx in bones {
-                    if let Some(bone) = graph_bones.get(bone_idx as usize) {
-                        bone_group.add_bone(graph, *bone);
-                    } else {
-                        warn!("VRM bone group bone not found: {}", bone_idx);
-                    }
+                    graph_bones
+                        .get(bone_idx as usize)
+                        .map(|bone| {
+                            bone_group.add_bone(graph, *bone);
+                        })
+                        .ok_or_else(|| Box::new(VrmImportError::BoneNotFound(bone_idx as usize)))?;
                 }
 
                 let bone_collider_group_idxs = bone_group_json.collider_groups.unwrap_or_default();
 
                 for collider_group_idx in bone_collider_group_idxs {
-                    if let Some(collider_group) =
-                        graph_collider_groups.get(collider_group_idx as usize)
-                    {
-                        bone_group.add_collider_group(graph, *collider_group);
-                    } else {
-                        warn!(
-                            "VRM bone group collider group not found: {}",
-                            collider_group_idx
-                        );
-                    }
+                    graph_collider_groups
+                        .get(collider_group_idx as usize)
+                        .map(|collider_group| {
+                            bone_group.add_collider_group(graph, *collider_group);
+                        })
+                        .ok_or_else(|| {
+                            Box::new(VrmImportError::ColliderGroupNotFound(
+                                collider_group_idx as usize,
+                            ))
+                        })?;
                 }
 
                 let weight = BoneGroupWeight {

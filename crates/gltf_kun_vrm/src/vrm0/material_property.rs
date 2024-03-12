@@ -1,9 +1,14 @@
-use gltf_kun::graph::{gltf::TextureInfo, ByteNode, Graph, NodeIndex, OtherEdgeHelpers, Weight};
+use gltf_kun::graph::{
+    gltf::{Material, TextureInfo},
+    ByteNode, Graph, NodeIndex, OtherEdgeHelpers, Weight,
+};
 use serde::{Deserialize, Serialize};
 use serde_vrm::vrm0::{FloatProperties, KeywordMap, Shader, TagMap, VectorProperties};
 
 #[derive(Copy, Clone, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
 pub enum MaterialPropertyEdges {
+    #[serde(rename = "VRM/MaterialProperty/Material")]
+    Material,
     #[serde(rename = "VRM/MaterialProperty/MainTexture")]
     MainTexture,
     #[serde(rename = "VRM/MaterialProperty/ShadeTexture")]
@@ -71,6 +76,13 @@ impl MaterialProperty {
         let weight = &MaterialPropertyWeight::default();
         let node = graph.add_node(Weight::Bytes(weight.into()));
         Self(node)
+    }
+
+    pub fn material(&self, graph: &Graph) -> Option<Material> {
+        self.find_property(graph, &MaterialPropertyEdges::Material.to_string())
+    }
+    pub fn set_material(&self, graph: &mut Graph, material: Option<Material>) {
+        self.set_property(graph, MaterialPropertyEdges::Material.to_string(), material);
     }
 
     pub fn main_texture(&self, graph: &Graph) -> Option<TextureInfo> {
