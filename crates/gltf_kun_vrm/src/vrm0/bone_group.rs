@@ -1,8 +1,8 @@
-use gltf_kun::graph::{ByteNode, Graph, NodeIndex, OtherEdgeHelpers, Weight};
+use gltf_kun::graph::{gltf::Node, ByteNode, Graph, NodeIndex, OtherEdgeHelpers, Weight};
 use serde::{Deserialize, Serialize};
 use serde_vrm::vrm0::Vec3;
 
-use super::{bone::Bone, collider_group::ColliderGroup};
+use super::collider_group::ColliderGroup;
 
 #[derive(Copy, Clone, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
 pub enum BoneGroupEdges {
@@ -68,13 +68,13 @@ impl BoneGroup {
         Self(graph.add_node(Weight::Bytes(weight.into())))
     }
 
-    pub fn bones(&self, graph: &Graph) -> Vec<Bone> {
+    pub fn bones(&self, graph: &Graph) -> Vec<Node> {
         self.find_properties(graph, &BoneGroupEdges::Bone.to_string())
     }
-    pub fn add_bone(&self, graph: &mut Graph, bone: Bone) {
+    pub fn add_bone(&self, graph: &mut Graph, bone: Node) {
         self.add_property(graph, BoneGroupEdges::Bone.to_string(), bone);
     }
-    pub fn remove_bone(&self, graph: &mut Graph, bone: Bone) {
+    pub fn remove_bone(&self, graph: &mut Graph, bone: Node) {
         self.remove_property(graph, &BoneGroupEdges::Bone.to_string(), bone);
     }
 

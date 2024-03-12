@@ -173,7 +173,7 @@ impl ExtensionImport<GltfDocument, GltfFormat> for Vrm {
                         .map(|node| {
                             bone.set_node(graph, Some(*node));
                         })
-                        .ok_or_else(|| Box::new(VrmImportError::BoneNotFound(node_idx as usize)))?;
+                        .ok_or_else(|| Box::new(VrmImportError::NodeNotFound(node_idx as usize)))?;
                 }
 
                 let weight = BoneWeight {
@@ -274,7 +274,7 @@ impl ExtensionImport<GltfDocument, GltfFormat> for Vrm {
                         .map(|node| {
                             collider_group.set_node(graph, Some(*node));
                         })
-                        .ok_or_else(|| Box::new(VrmImportError::BoneNotFound(node_idx as usize)))?;
+                        .ok_or_else(|| Box::new(VrmImportError::NodeNotFound(node_idx as usize)))?;
                 }
 
                 let weight = ColliderGroupWeight {
@@ -292,12 +292,12 @@ impl ExtensionImport<GltfDocument, GltfFormat> for Vrm {
                 let bones = bone_group_json.bones.unwrap_or_default();
 
                 for bone_idx in bones {
-                    graph_bones
+                    doc.nodes(graph)
                         .get(bone_idx as usize)
-                        .map(|bone| {
-                            bone_group.add_bone(graph, *bone);
+                        .map(|node| {
+                            bone_group.add_bone(graph, *node);
                         })
-                        .ok_or_else(|| Box::new(VrmImportError::BoneNotFound(bone_idx as usize)))?;
+                        .ok_or_else(|| Box::new(VrmImportError::NodeNotFound(bone_idx as usize)))?;
                 }
 
                 let bone_collider_group_idxs = bone_group_json.collider_groups.unwrap_or_default();
