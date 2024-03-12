@@ -16,7 +16,7 @@ type_complexity = "allow"
 [workspace.dependencies]
 bevy = "0.13.0"
 bevy_shader_mtoon = { path = "crates/bevy_shader_mtoon", version = "0.0.8" }
-gltf_kun = { version = "0.0.8", default-features = false }
+gltf_kun = { version = "0.0.9", default-features = false }
 gltf_kun_vrm = { path = "crates/gltf_kun_vrm", version = "0.0.8" }
 serde = { version = "1.0.197", features = ["derive"] }
 serde_vrm = { path = "crates/serde_vrm", version = "0.0.8" }
@@ -32,5 +32,3 @@ lto = true
 
 [patch.crates-io]
 bevy = { git = "https://github.com/eero-lehtinen/bevy.git", branch = "v0.13.0-nvidia-fix" }
-bevy_gltf_kun = { git = "https://github.com/unavi-xyz/gltf_kun.git" }
-gltf_kun = { git = "https://github.com/unavi-xyz/gltf_kun.git" }

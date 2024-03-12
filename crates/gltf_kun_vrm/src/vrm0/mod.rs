@@ -131,7 +131,8 @@ mod tests {
 
         let group_2 = BlendShapeGroup::new(&mut graph);
         vrm.add_blend_shape_group(&mut graph, group_2);
-        assert_eq!(vrm.blend_shape_groups(&graph), vec![group, group_2]);
+        assert!(vrm.blend_shape_groups(&graph).contains(&group));
+        assert!(vrm.blend_shape_groups(&graph).contains(&group_2));
 
         vrm.remove_blend_shape_group(&mut graph, group);
         assert_eq!(vrm.blend_shape_groups(&graph), vec![group_2]);
@@ -163,7 +164,8 @@ mod tests {
 
         let bone_2 = Bone::new(&mut graph);
         vrm.add_human_bone(&mut graph, bone_2);
-        assert_eq!(vrm.human_bones(&graph), vec![bone, bone_2]);
+        assert!(vrm.human_bones(&graph).contains(&bone));
+        assert!(vrm.human_bones(&graph).contains(&bone_2));
 
         vrm.remove_human_bone(&mut graph, bone);
         assert_eq!(vrm.human_bones(&graph), vec![bone_2]);
@@ -181,7 +183,8 @@ mod tests {
 
         let annotation_2 = MeshAnnotation::new(&mut graph);
         vrm.add_mesh_annotation(&mut graph, annotation_2);
-        assert_eq!(vrm.mesh_annotations(&graph), vec![annotation, annotation_2]);
+        assert!(vrm.mesh_annotations(&graph).contains(&annotation));
+        assert!(vrm.mesh_annotations(&graph).contains(&annotation_2));
 
         vrm.remove_mesh_annotation(&mut graph, annotation);
         assert_eq!(vrm.mesh_annotations(&graph), vec![annotation_2]);

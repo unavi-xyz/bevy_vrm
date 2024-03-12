@@ -5,13 +5,18 @@ use bevy::{
     prelude::*,
     utils::BoxedFuture,
 };
-use bevy_gltf_kun::import::gltf::loader::{GltfError, GltfLoader};
+use bevy_gltf_kun::import::gltf::{
+    loader::{GltfError, GltfLoader},
+    GltfKun,
+};
 use thiserror::Error;
 
-use crate::{extensions::VrmExtensions, Vrm};
+use crate::extensions::VrmExtensions;
 
-// mod vrm;
-// mod vrm0;
+#[derive(Asset, TypePath, Debug)]
+pub struct Vrm {
+    pub gltf: GltfKun,
+}
 
 #[derive(Default)]
 pub struct VrmLoader(pub GltfLoader<VrmExtensions>);
@@ -34,9 +39,8 @@ impl AssetLoader for VrmLoader {
         load_context: &'a mut LoadContext,
     ) -> BoxedFuture<'a, Result<Self::Asset, Self::Error>> {
         Box::pin(async move {
-            let doc = self.0.load(reader, settings, load_context).await?;
-
-            todo!()
+            let gltf = self.0.load(reader, settings, load_context).await?;
+            Ok(Vrm { gltf })
         })
     }
 
@@ -44,39 +48,3 @@ impl AssetLoader for VrmLoader {
         &["vrm"]
     }
 }
-
-// #[derive(Default, Debug, Clone, DeJson)]
-// pub struct RootExtensions {
-//     #[nserde(rename = "VRM")]
-//     pub vrm0: Option<super::extensions::vrm0::Vrm>,
-//     #[nserde(rename = "VRMC_vrm")]
-//     pub vrmc_vrm: Option<super::extensions::vrmc_vrm::VrmcVrm>,
-// }
-
-// #[derive(Debug, Default, Clone, Copy, DeJson)]
-// pub struct Extensions;
-//
-// async fn load_vrm<'a, 'b>(
-//     gltf: bevy::gltf::Gltf,
-//     bytes: &'a [u8],
-//     load_context: &'a mut LoadContext<'b>,
-// ) -> Result<Vrm, VrmError> {
-//     let doc = GlbIO::import_slice(bytes)?;
-//
-//     let mut vrm = Vrm {
-//         gltf,
-//         mtoon_materials: default(),
-//         mtoon_markers: default(),
-//         extensions: default(),
-//     };
-//
-//     if let Ok(()) = vrm0::load_gltf(&mut vrm, &gltf_file, load_context) {
-//         info!("VRM 0.0 loaded");
-//     } else if let Ok(()) = vrm::load_gltf(&mut vrm, &gltf_file, load_context) {
-//         info!("VRM 1.0 loaded");
-//     } else {
-//         error!("VRM extension not found");
-//     };
-//
-//     Ok(vrm)
-// }
