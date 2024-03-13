@@ -118,11 +118,11 @@ impl ExtensionImport<GltfDocument, GltfFormat> for Vrm {
 
             let weight = MaterialPropertyWeight {
                 name: material_property_json.name,
-                float: material_property_json.float,
+                float: material_property_json.float.unwrap_or_default(),
                 shader: material_property_json.shader,
-                vector: material_property_json.vector,
-                tag_map: material_property_json.tag_map,
-                keyword_map: material_property_json.keyword_map,
+                vector: material_property_json.vector.unwrap_or_default(),
+                tag_map: material_property_json.tag_map.unwrap_or_default(),
+                keyword_map: material_property_json.keyword_map.unwrap_or_default(),
                 render_queue: material_property_json.render_queue,
             };
 
@@ -297,7 +297,7 @@ impl ExtensionImport<GltfDocument, GltfFormat> for Vrm {
                         .map(|node| {
                             bone_group.add_bone(graph, *node);
                         })
-                        .ok_or_else(|| Box::new(VrmImportError::NodeNotFound(bone_idx as usize)))?;
+                        .ok_or_else(|| Box::new(VrmImportError::BoneNotFound(bone_idx as usize)))?;
                 }
 
                 let bone_collider_group_idxs = bone_group_json.collider_groups.unwrap_or_default();

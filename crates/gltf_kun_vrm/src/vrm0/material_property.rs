@@ -32,10 +32,10 @@ pub struct MaterialPropertyWeight {
     pub name: Option<String>,
     pub render_queue: Option<i32>,
     pub shader: Option<Shader>,
-    pub float: Option<FloatProperties>,
-    pub vector: Option<VectorProperties>,
-    pub keyword_map: Option<KeywordMap>,
-    pub tag_map: Option<TagMap>,
+    pub float: FloatProperties,
+    pub vector: VectorProperties,
+    pub keyword_map: KeywordMap,
+    pub tag_map: TagMap,
 }
 
 impl From<&Vec<u8>> for MaterialPropertyWeight {
