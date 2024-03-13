@@ -1,4 +1,4 @@
-use bevy::ecs::world::EntityWorldMut;
+use bevy::prelude::*;
 use bevy_gltf_kun::import::{extensions::BevyImportExtensions, gltf::document::ImportContext};
 use gltf_kun::{
     extensions::ExtensionImport,
@@ -37,7 +37,7 @@ impl BevyImportExtensions<GltfDocument> for VrmExtensions {
         entity: &mut EntityWorldMut,
         primitive: Primitive,
     ) {
-        if let Some(ext) = primitive.get_extension::<Vrm>(context.graph) {
+        if let Some(ext) = context.doc.get_extension::<Vrm>(context.graph) {
             import_primitive_material(context, entity, ext, primitive);
         }
     }

@@ -1,6 +1,6 @@
 use gltf_kun::{
     extensions::{Extension, ExtensionImport},
-    graph::{gltf::GltfDocument, ByteNode, Graph},
+    graph::{gltf::GltfDocument, ByteNode, Extensions, Graph},
     io::format::gltf::GltfFormat,
 };
 use thiserror::Error;
@@ -51,6 +51,7 @@ impl ExtensionImport<GltfDocument, GltfFormat> for Vrm {
         let ext: serde_vrm::vrm0::Vrm = serde_json::from_value(ext.clone())?;
 
         let vrm = Vrm::new(graph);
+        doc.add_extension(graph, vrm);
 
         for (i, material_property_json) in ext
             .material_properties
