@@ -2,7 +2,7 @@ use std::f32::consts::PI;
 
 use bevy::prelude::*;
 use bevy_shader_mtoon::{MtoonMainCamera, MtoonSun};
-use bevy_vrm::{VrmBundle, VrmPlugin};
+use bevy_vrm::VrmPlugin;
 
 fn main() {
     App::new()
@@ -36,12 +36,10 @@ fn setup(
     transform.rotate_y(PI);
 
     commands.spawn((
-        VrmBundle {
-            vrm: asset_server.load(PATH),
-            scene_bundle: SceneBundle {
-                transform,
-                ..default()
-            },
+        SceneBundle {
+            scene: asset_server.load(format!("{}#Scene0", PATH)),
+            transform,
+            ..default()
         },
         VrmTag,
     ));
@@ -52,7 +50,7 @@ fn setup(
         DirectionalLightBundle {
             directional_light: DirectionalLight {
                 shadows_enabled: true,
-                illuminance: 10_000.0,
+                illuminance: 1000.0,
                 ..default()
             },
             transform: Transform::from_xyz(0.0, 5.0, -5.0),
@@ -61,6 +59,7 @@ fn setup(
         MtoonSun,
     ));
 }
+
 fn rotate_vrm(time: Res<Time>, mut query: Query<&mut Transform, With<VrmTag>>) {
     for mut transform in query.iter_mut() {
         transform.rotate(Quat::from_rotation_y(time.delta_seconds() / 3.0));
