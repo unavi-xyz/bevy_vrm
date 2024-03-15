@@ -1,8 +1,10 @@
 use std::f32::consts::PI;
 
 use bevy::prelude::*;
+use bevy_gltf_kun::import::gltf::scene::GltfScene;
 use bevy_shader_mtoon::{MtoonMainCamera, MtoonSun};
-use bevy_vrm::{VrmBundle, VrmPlugin};
+use bevy_vrm::{loader::Vrm, VrmBundle, VrmPlugin};
+use serde_vrm::vrm0::BoneName;
 
 fn main() {
     App::new()
@@ -14,15 +16,12 @@ fn main() {
             VrmPlugin,
         ))
         .add_systems(Startup, setup)
-        .add_systems(Update, rotate_vrm)
+        .add_systems(Update, (rotate_vrm, move_arm))
         .run();
 }
 
 const MODELS: [&str; 3] = ["catbot.vrm", "cool_loops.vrm", "suzuha.vrm"];
 const PATH: &str = MODELS[2];
-
-#[derive(Component)]
-struct VrmTag;
 
 fn setup(
     mut commands: Commands,
@@ -35,16 +34,13 @@ fn setup(
     let mut transform = Transform::from_xyz(0.0, -1.0, -4.0);
     transform.rotate_y(PI);
 
-    commands.spawn((
-        VrmBundle {
-            vrm: asset_server.load(PATH.to_string()),
-            scene_bundle: SceneBundle {
-                transform,
-                ..default()
-            },
+    commands.spawn(VrmBundle {
+        vrm: asset_server.load(PATH.to_string()),
+        scene_bundle: SceneBundle {
+            transform,
+            ..default()
         },
-        VrmTag,
-    ));
+    });
 
     commands.spawn((Camera3dBundle::default(), MtoonMainCamera));
 
@@ -62,29 +58,48 @@ fn setup(
     ));
 }
 
-fn rotate_vrm(time: Res<Time>, mut query: Query<&mut Transform, With<VrmTag>>) {
+fn rotate_vrm(time: Res<Time>, mut query: Query<&mut Transform, With<Handle<Vrm>>>) {
     for mut transform in query.iter_mut() {
         transform.rotate(Quat::from_rotation_y(time.delta_seconds() / 3.0));
     }
 }
 
-// fn move_arm(
-//     time: Res<Time>,
-//     mut transforms: Query<&mut Transform, Without<bevy_vrm::HumanoidBones>>,
-//     humanoid_bones: Query<&bevy_vrm::HumanoidBones>,
-// ) {
-//     for humanoid_bones in humanoid_bones.iter() {
-//         transforms
-//             .get_mut(humanoid_bones.left_hand)
-//             .unwrap()
-//             .rotate(Quat::from_rotation_x(time.delta_seconds() * 1.5));
-//         transforms
-//             .get_mut(humanoid_bones.right_lower_leg)
-//             .unwrap()
-//             .rotate(Quat::from_rotation_z(time.delta_seconds() * 1.5));
-//     }
-// }
-//
+fn move_arm(
+    mut transforms: Query<&mut Transform>,
+    scenes: Res<Assets<GltfScene>>,
+    time: Res<Time>,
+    vrm: Query<&Handle<Vrm>>,
+    vrms: Res<Assets<Vrm>>,
+) {
+    for handle in vrm.iter() {
+        if let Some(vrm) = vrms.get(handle) {
+            let scene_handle = match &vrm.gltf.default_scene {
+                Some(handle) => handle,
+                None => match vrm.gltf.scenes.first() {
+                    Some(handle) => handle,
+                    None => continue,
+                },
+            };
+
+            let scene = match scenes.get(scene_handle) {
+                Some(scene) => scene,
+                None => continue,
+            };
+
+            let left_hand = match vrm.humanoid_bones.get(&BoneName::LeftHand) {
+                Some(left_hand) => left_hand,
+                None => continue,
+            };
+
+            let entity = scene.node_entities.get(left_hand).unwrap();
+
+            if let Ok(mut transform) = transforms.get_mut(*entity) {
+                transform.rotate(Quat::from_rotation_x(time.delta_seconds() * 1.5));
+            }
+        }
+    }
+}
+
 // fn draw_spring_bones(
 //     mut gizmos: Gizmos,
 //     spring_bones: Query<&SpringBones>,
