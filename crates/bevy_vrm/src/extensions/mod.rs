@@ -3,7 +3,7 @@ use bevy_gltf_kun::import::{extensions::BevyImportExtensions, gltf::document::Im
 use gltf_kun::{
     extensions::ExtensionImport,
     graph::{
-        gltf::{GltfDocument, Node, Primitive},
+        gltf::{GltfDocument, Node, Primitive, Scene},
         Extensions, Graph,
     },
     io::format::gltf::GltfFormat,
@@ -43,4 +43,5 @@ impl BevyImportExtensions<GltfDocument> for VrmExtensions {
     }
 
     fn import_root(_context: &mut ImportContext) {}
+    fn import_scene(_context: &mut ImportContext, _scene: Scene, _world: &mut World) {}
 }

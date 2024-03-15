@@ -45,14 +45,14 @@ pub struct Meta {
     pub other_license_url: Option<String>,
 }
 
-#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+#[derive(Clone, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
 pub enum AllowedUserName {
     Everyone,
     ExplicitlyLicensedPerson,
     OnlyAuthor,
 }
 
-#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+#[derive(Clone, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
 pub enum Allow {
     Allow,
     Disallow,
@@ -88,7 +88,7 @@ pub struct Bone {
     pub use_default_values: Option<bool>,
 }
 
-#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+#[derive(Clone, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
 pub enum BoneName {
     #[serde(rename = "hips")]
     Hips,
@@ -256,7 +256,7 @@ pub struct BlendShapeGroup {
     pub is_binary: Option<bool>,
 }
 
-#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+#[derive(Clone, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
 pub enum PresetName {
     #[serde(rename = "unknown")]
     Unknown,
@@ -376,7 +376,7 @@ pub struct MaterialProperty {
     pub tag_map: Option<TagMap>,
 }
 
-#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+#[derive(Clone, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
 pub enum Shader {
     #[serde(rename = "VRM_USE_GLTFSHADER")]
     Gltf,
@@ -437,7 +437,7 @@ pub struct TagMap {
     pub render_type: Option<RenderType>,
 }
 
-#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+#[derive(Clone, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
 pub enum RenderType {
     Opaque,
     Transparent,
