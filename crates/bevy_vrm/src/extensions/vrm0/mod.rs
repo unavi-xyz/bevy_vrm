@@ -92,25 +92,25 @@ fn load_mtoon_shader(
         shader.shading_toony_factor = value;
     }
 
-    if let Some(value) = weight.vector.color {
-        shader.base_color = Color::rgba_linear_from_array(value);
-    }
+    // if let Some(value) = weight.vector.color {
+    //     shader.base_color = Color::rgba_linear_from_array(value);
+    // }
 
     if let Some(value) = weight.vector.shade_color {
         shader.shade_color = Color::rgba_linear_from_array(value);
     }
 
-    if let Some(texture) = material_property.main_texture(context.graph) {
-        let index = context
-            .doc
-            .textures(context.graph)
-            .iter()
-            .position(|t| t.0 == texture.0)
-            .unwrap();
-        let label = texture_label(index);
-        let handle = context.load_context.get_label_handle(&label);
-        shader.base_color_texture = Some(handle);
-    }
+    // if let Some(texture) = material_property.main_texture(context.graph) {
+    //     let index = context
+    //         .doc
+    //         .textures(context.graph)
+    //         .iter()
+    //         .position(|t| t.0 == texture.0)
+    //         .unwrap();
+    //     let label = texture_label(index);
+    //     let handle = context.load_context.get_label_handle(&label);
+    //     shader.base_color_texture = Some(handle);
+    // }
 
     if let Some(texture) = material_property.shade_texture(context.graph) {
         let index = context

@@ -68,9 +68,8 @@ fn setup(
     });
 
     let mtoon = mtoon_materials.add(MtoonMaterial {
-        base: StandardMaterial::default(),
+        base: StandardMaterial::from(Color::BISQUE),
         extension: MtoonShader {
-            base_color: Color::BISQUE,
             shade_color: Color::SALMON,
             ..default()
         },

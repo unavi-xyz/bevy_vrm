@@ -908,6 +908,7 @@ version = "0.0.8"
 dependencies = [
  "bevy",
  "bevy_panorbit_camera",
+ "bitflags 2.4.2",
 ]
 
 [[package]]

@@ -12,6 +12,7 @@ workspace = true
 
 [dependencies]
 bevy.workspace = true
+bitflags = "2.4.2"
 
 [dev-dependencies]
 bevy = "0.13.0"
