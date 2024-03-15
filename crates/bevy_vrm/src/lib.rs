@@ -7,6 +7,7 @@ mod auto_scene;
 pub mod extensions;
 mod humanoid_bones;
 pub mod loader;
+mod spring_bones;
 
 pub mod mtoon {
     pub use bevy_shader_mtoon::*;
@@ -24,8 +25,9 @@ impl Plugin for VrmPlugin {
             .add_systems(
                 Update,
                 (
-                    humanoid_bones::set_humanoid_bones,
                     auto_scene::set_vrm_scene,
+                    humanoid_bones::set_humanoid_bones,
+                    spring_bones::set_spring_bones,
                 ),
             );
     }
@@ -36,6 +38,7 @@ pub struct VrmBundle {
     pub auto_scene: AutoScene,
     pub humanoid_bones: HumanoidBones,
     pub scene_bundle: SceneBundle,
+    pub spring_bones: SpringBones,
     pub vrm: Handle<Vrm>,
 }
 
@@ -45,3 +48,16 @@ pub struct AutoScene;
 
 #[derive(Component, Default)]
 pub struct HumanoidBones(pub HashMap<BoneName, Entity>);
+
+#[derive(Component, Default)]
+pub struct SpringBones(pub Vec<SpringBone>);
+
+pub struct SpringBone {
+    pub bones: Vec<Entity>,
+    pub center: f32,
+    pub drag_force: f32,
+    pub gravity_dir: Vec3,
+    pub gravity_power: f32,
+    pub hit_radius: f32,
+    pub stiffiness: f32,
+}

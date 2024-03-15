@@ -289,6 +289,7 @@ impl ExtensionImport<GltfDocument, GltfFormat> for Vrm {
 
             for bone_group_json in bone_groups {
                 let bone_group = BoneGroup::new(graph);
+                vrm.add_bone_group(graph, bone_group);
 
                 let bones = bone_group_json.bones.unwrap_or_default();
 

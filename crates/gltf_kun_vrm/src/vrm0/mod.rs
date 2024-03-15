@@ -5,8 +5,8 @@ use gltf_kun::{
 use serde::{Deserialize, Serialize};
 
 use self::{
-    blend_shape_group::BlendShapeGroup, bone::Bone, material_property::MaterialProperty,
-    mesh_annotation::MeshAnnotation, weight::VrmWeight,
+    blend_shape_group::BlendShapeGroup, bone::Bone, bone_group::BoneGroup,
+    material_property::MaterialProperty, mesh_annotation::MeshAnnotation, weight::VrmWeight,
 };
 
 pub mod bind;
@@ -25,6 +25,8 @@ pub const EXTENSION_NAME: &str = "VRM";
 pub enum VrmEdge {
     #[serde(rename = "VRM/BlendShapeGroup")]
     BlendShapeGroup,
+    #[serde(rename = "VRM/BoneGroup")]
+    BoneGroup,
     #[serde(rename = "VRM/FirstPersonBone")]
     FirstPersonBone,
     #[serde(rename = "VRM/HumanBone")]
@@ -76,6 +78,16 @@ impl Vrm {
     }
     pub fn remove_blend_shape_group(&self, graph: &mut Graph, group: BlendShapeGroup) {
         self.remove_property(graph, &VrmEdge::BlendShapeGroup.to_string(), group);
+    }
+
+    pub fn bone_groups(&self, graph: &Graph) -> Vec<BoneGroup> {
+        self.find_properties(graph, &VrmEdge::BoneGroup.to_string())
+    }
+    pub fn add_bone_group(&self, graph: &mut Graph, group: BoneGroup) {
+        self.add_property(graph, VrmEdge::BoneGroup.to_string(), group);
+    }
+    pub fn remove_bone_group(&self, graph: &mut Graph, group: BoneGroup) {
+        self.remove_property(graph, &VrmEdge::BoneGroup.to_string(), group);
     }
 
     pub fn first_person_bone(&self, graph: &Graph) -> Option<Bone> {
@@ -145,6 +157,24 @@ mod tests {
 
         vrm.remove_blend_shape_group(&mut graph, group);
         assert_eq!(vrm.blend_shape_groups(&graph), vec![group_2]);
+    }
+
+    #[test]
+    fn bone_groups() {
+        let mut graph = Graph::new();
+
+        let vrm = Vrm::new(&mut graph);
+        let group = BoneGroup::new(&mut graph);
+
+        vrm.add_bone_group(&mut graph, group);
+        assert_eq!(vrm.bone_groups(&graph), vec![group]);
+
+        let group_2 = BoneGroup::new(&mut graph);
+        vrm.add_bone_group(&mut graph, group_2);
+        assert_eq!(vrm.bone_groups(&graph), vec![group, group_2]);
+
+        vrm.remove_bone_group(&mut graph, group);
+        assert_eq!(vrm.bone_groups(&graph), vec![group_2]);
     }
 
     #[test]
