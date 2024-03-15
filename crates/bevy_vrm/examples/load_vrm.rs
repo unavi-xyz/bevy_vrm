@@ -1,6 +1,7 @@
 use std::f32::consts::PI;
 
 use bevy::prelude::*;
+use bevy_panorbit_camera::{PanOrbitCamera, PanOrbitCameraPlugin};
 use bevy_shader_mtoon::{MtoonMainCamera, MtoonSun};
 use bevy_vrm::{BoneName, HumanoidBones, SpringBones, VrmBundle, VrmPlugin};
 
@@ -11,6 +12,7 @@ fn main() {
                 file_path: "../../assets".to_string(),
                 ..default()
             }),
+            PanOrbitCameraPlugin,
             VrmPlugin,
         ))
         .add_systems(Startup, setup)
@@ -29,28 +31,34 @@ fn setup(
     let (config, _) = config.config_mut::<DefaultGizmoConfigGroup>();
     config.depth_bias = -1.0;
 
-    let mut transform = Transform::from_xyz(0.0, -1.0, -4.0);
-    transform.rotate_y(PI);
-
     commands.spawn(VrmBundle {
         vrm: asset_server.load(PATH.to_string()),
         scene_bundle: SceneBundle {
-            transform,
-            ..default()
+            transform: Transform::from_rotation(Quat::from_rotation_y(-PI)),
+            ..Default::default()
         },
         ..default()
     });
 
-    commands.spawn((Camera3dBundle::default(), MtoonMainCamera));
+    commands.spawn((
+        Camera3dBundle {
+            transform: Transform::from_xyz(0.0, 1.0, 3.0),
+            ..Default::default()
+        },
+        MtoonMainCamera,
+        PanOrbitCamera {
+            focus: Vec3::new(0.0, 1.0, 0.0),
+            ..Default::default()
+        },
+    ));
 
     commands.spawn((
         DirectionalLightBundle {
             directional_light: DirectionalLight {
-                shadows_enabled: true,
                 illuminance: 1000.0,
                 ..default()
             },
-            transform: Transform::from_xyz(0.0, 5.0, -5.0),
+            transform: Transform::from_xyz(2.0, 8.0, 5.0),
             ..default()
         },
         MtoonSun,

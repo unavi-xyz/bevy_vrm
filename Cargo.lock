@@ -761,6 +761,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "bevy_panorbit_camera"
+version = "0.16.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c2ae36af26f6c75067cba3fac09fbd4cbe7fc565492cc6064338a9e0063363db"
+dependencies = [
+ "bevy",
+]
+
+[[package]]
 name = "bevy_pbr"
 version = "0.13.0"
 source = "git+https://github.com/eero-lehtinen/bevy.git?branch=v0.13.0-nvidia-fix#ee0ca309be8c4edd2452c5adcf86a74db5d4ba7e"
@@ -1045,6 +1054,7 @@ version = "0.0.8"
 dependencies = [
  "bevy",
  "bevy_gltf_kun",
+ "bevy_panorbit_camera",
  "bevy_shader_mtoon",
  "gltf_kun",
  "gltf_kun_vrm",

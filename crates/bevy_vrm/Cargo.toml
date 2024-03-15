@@ -22,3 +22,4 @@ thiserror.workspace = true
 
 [dev-dependencies]
 bevy = "0.13.0"
+bevy_panorbit_camera = "0.16.1"
