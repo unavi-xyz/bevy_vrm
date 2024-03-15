@@ -15,6 +15,7 @@ type_complexity = "allow"
 
 [workspace.dependencies]
 bevy = { version = "0.13.0", default-features = false, features = ["animation", "bevy_asset", "bevy_scene", "bevy_pbr"] }
+bevy_panorbit_camera = "0.16.1"
 bevy_shader_mtoon = { path = "crates/bevy_shader_mtoon", version = "0.0.8" }
 gltf_kun = { version = "0.0.11", default-features = false }
 gltf_kun_vrm = { path = "crates/gltf_kun_vrm", version = "0.0.8" }

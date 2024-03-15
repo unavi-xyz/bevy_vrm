@@ -907,6 +907,7 @@ name = "bevy_shader_mtoon"
 version = "0.0.8"
 dependencies = [
  "bevy",
+ "bevy_panorbit_camera",
 ]
 
 [[package]]

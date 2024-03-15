@@ -8,12 +8,15 @@ use bevy::{
     },
 };
 
+use bevy_panorbit_camera::{PanOrbitCamera, PanOrbitCameraPlugin};
 use bevy_shader_mtoon::{MtoonMainCamera, MtoonMaterial, MtoonPlugin, MtoonShader, MtoonSun};
 
 fn main() {
     App::new()
+        .insert_resource(ClearColor(Color::rgb(0.1, 0.1, 0.1)))
         .add_plugins((
             DefaultPlugins.set(ImagePlugin::default_nearest()),
+            PanOrbitCameraPlugin,
             MtoonPlugin,
         ))
         .add_systems(Startup, setup)
@@ -30,8 +33,11 @@ fn setup(
 ) {
     commands.spawn((
         Camera3dBundle {
-            transform: Transform::from_xyz(0.0, 10.0, 15.0)
-                .looking_at(Vec3::new(0.0, 1.0, 0.0), Vec3::Y),
+            transform: Transform::from_xyz(0.0, 10.0, 15.0),
+            ..default()
+        },
+        PanOrbitCamera {
+            focus: Vec3::new(0.0, 1.0, 0.0),
             ..default()
         },
         MtoonMainCamera,
@@ -41,10 +47,10 @@ fn setup(
         DirectionalLightBundle {
             directional_light: DirectionalLight {
                 shadows_enabled: true,
-                illuminance: 10_000.,
+                illuminance: 1000.,
                 ..default()
             },
-            transform: Transform::from_xyz(2.0, 2.0, 2.0),
+            transform: Transform::from_xyz(2.0, 1.0, 2.0),
             ..default()
         },
         MtoonSun,
@@ -110,6 +116,7 @@ fn setup(
     }
 
     commands.spawn(PbrBundle {
+        transform: Transform::from_scale(Vec3::splat(30.0)),
         mesh: meshes.add(Plane3d::default()),
         material: materials.add(StandardMaterial::from(Color::SILVER)),
         ..default()
