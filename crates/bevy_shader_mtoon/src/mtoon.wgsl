@@ -18,7 +18,6 @@
 
 struct MtoonMaterialUniform {
     ambient_color: vec4<f32>,
-    base_color: vec4<f32>,
     flags: u32,
     gl_equalization_factor: f32,
     light_color: vec4<f32>,
@@ -46,7 +45,7 @@ var<uniform> material: MtoonMaterialUniform;
 @group(2) @binding(107) var rim_multiply_texture: texture_2d<f32>;
 @group(2) @binding(108) var rim_multiply_sampler: sampler;
 
-const MTOON_FLAGS_SHADE_SHIFT_TEXTURE: u32 = 1u;
+const MTOON_FLAGS_SHADING_SHIFT_TEXTURE: u32 = 1u;
 const MTOON_FLAGS_SHADE_COLOR_TEXTURE: u32 = 2u;
 const MTOON_FLAGS_MATCAP_TEXTURE: u32 = 4u;
 const MTOON_FLAGS_RIM_MULTIPLY_TEXTURE: u32 = 8u;
@@ -86,7 +85,7 @@ fn fragment (
     var shading = dot(normal, material.light_dir);
     shading = shading + material.shading_shift_factor;
 
-    if (material.flags & MTOON_FLAGS_SHADE_SHIFT_TEXTURE) != 0u {
+    if (material.flags & MTOON_FLAGS_SHADING_SHIFT_TEXTURE) != 0u {
         // TODO: Convert texture sample to same type as `shading`
         // shading = shading + textureSample(shading_shift_texture, shading_shift_sampler, in.uv);
     }

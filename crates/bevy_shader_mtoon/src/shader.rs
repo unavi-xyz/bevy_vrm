@@ -75,6 +75,7 @@ impl Default for MtoonShader {
 #[derive(Clone, Default, ShaderType)]
 pub struct MtoonShaderUniform {
     pub ambient_color: Vec4,
+    pub flags: u32,
     pub gl_equalization_factor: f32,
     pub light_color: Vec4,
     pub light_dir: Vec3,
@@ -87,8 +88,6 @@ pub struct MtoonShaderUniform {
     pub shading_shift_factor: f32,
     pub shading_toony_factor: f32,
     pub view_dir: Vec3,
-
-    pub flags: u32,
 }
 
 impl AsBindGroupShaderType<MtoonShaderUniform> for MtoonShader {
@@ -96,7 +95,7 @@ impl AsBindGroupShaderType<MtoonShaderUniform> for MtoonShader {
         let mut flags = MtoonMaterialFlags::empty();
 
         if self.shade_shift_texture.is_some() {
-            flags |= MtoonMaterialFlags::SHADE_SHIFT_TEXTURE;
+            flags |= MtoonMaterialFlags::SHADING_SHIFT_TEXTURE;
         }
         if self.shade_color_texture.is_some() {
             flags |= MtoonMaterialFlags::SHADE_COLOR_TEXTURE;
@@ -110,6 +109,7 @@ impl AsBindGroupShaderType<MtoonShaderUniform> for MtoonShader {
 
         MtoonShaderUniform {
             ambient_color: self.ambient_color.as_linear_rgba_f32().into(),
+            flags: flags.bits(),
             gl_equalization_factor: self.gl_equalization_factor,
             light_color: self.light_color.as_linear_rgba_f32().into(),
             light_dir: self.light_dir,
@@ -122,7 +122,6 @@ impl AsBindGroupShaderType<MtoonShaderUniform> for MtoonShader {
             shading_shift_factor: self.shading_shift_factor,
             shading_toony_factor: self.shading_toony_factor,
             view_dir: self.view_dir,
-            flags: flags.bits(),
         }
     }
 }
@@ -140,7 +139,7 @@ impl MaterialExtension for MtoonShader {
 bitflags::bitflags! {
     #[repr(transparent)]
     pub struct MtoonMaterialFlags: u32 {
-        const SHADE_SHIFT_TEXTURE = 1 << 0;
+        const SHADING_SHIFT_TEXTURE = 1 << 0;
         const SHADE_COLOR_TEXTURE = 1 << 1;
         const MATCAP_TEXTURE = 1 << 2;
         const RIM_MULTIPLY_TEXTURE = 1 << 3;
