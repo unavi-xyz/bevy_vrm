@@ -33,7 +33,7 @@ fn setup(
 ) {
     commands.spawn((
         Camera3dBundle {
-            transform: Transform::from_xyz(0.0, 10.0, 15.0),
+            transform: Transform::from_xyz(0.0, 8.0, 14.0),
             ..default()
         },
         PanOrbitCamera {
@@ -47,19 +47,21 @@ fn setup(
         DirectionalLightBundle {
             directional_light: DirectionalLight {
                 shadows_enabled: true,
-                illuminance: 1000.,
+                illuminance: 5000.0,
                 ..default()
             },
-            transform: Transform::from_xyz(2.0, 1.0, 2.0),
+            transform: Transform::from_xyz(1.0, 4.0, 2.0),
             ..default()
         },
         MtoonSun,
     ));
 
     let mtoon_textured = mtoon_materials.add(MtoonMaterial {
-        base: StandardMaterial::default(),
-        extension: MtoonShader {
+        base: StandardMaterial {
             base_color_texture: Some(images.add(uv_debug_texture())),
+            ..default()
+        },
+        extension: MtoonShader {
             shading_shift_factor: 0.5,
             ..default()
         },
@@ -94,7 +96,7 @@ fn setup(
             material: mtoon_textured.clone(),
             transform: Transform::from_xyz(
                 -X_EXTENT / 2. + i as f32 / (num_shapes - 1) as f32 * X_EXTENT,
-                2.0,
+                1.0,
                 3.0,
             )
             .with_rotation(Quat::from_rotation_x(-PI / 4.)),
@@ -107,7 +109,7 @@ fn setup(
             material: mtoon.clone(),
             transform: Transform::from_xyz(
                 -X_EXTENT / 2. + i as f32 / (num_shapes - 1) as f32 * X_EXTENT,
-                2.0,
+                1.0,
                 -3.0,
             )
             .with_rotation(Quat::from_rotation_x(-PI / 4.0)),
@@ -116,14 +118,14 @@ fn setup(
     }
 
     commands.spawn(PbrBundle {
-        transform: Transform::from_scale(Vec3::splat(30.0)),
+        material: materials.add(StandardMaterial::default()),
         mesh: meshes.add(Plane3d::default()),
-        material: materials.add(StandardMaterial::from(Color::SILVER)),
+        transform: Transform::from_scale(Vec3::splat(30.0)),
         ..default()
     });
 }
 
-fn rotate(time: Res<Time>, mut query: Query<&mut Transform, With<Handle<MtoonShader>>>) {
+fn rotate(time: Res<Time>, mut query: Query<&mut Transform, With<Handle<MtoonMaterial>>>) {
     for mut transform in query.iter_mut() {
         transform.rotate(Quat::from_rotation_y(time.delta_seconds() / 2.0));
     }
