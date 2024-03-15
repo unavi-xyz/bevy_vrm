@@ -1,3 +1,6 @@
+//! [Bevy](https://bevyengine.org/) plugin for loading [VRM](https://vrm.dev/en/) avatars.
+//! Aims to support both the VRM 0.0 and VRM 1.0 standards.
+
 use bevy::{prelude::*, utils::HashMap};
 use bevy_gltf_kun::import::gltf::GltfAssetPlugin;
 use bevy_shader_mtoon::MtoonPlugin;

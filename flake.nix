@@ -59,7 +59,7 @@
 
         commonShell = {
           checks = self.checks.${localSystem};
-          packages = with pkgs; [ cargo-watch rust-analyzer ];
+          packages = with pkgs; [ cargo-rdme cargo-watch rust-analyzer ];
 
           LD_LIBRARY_PATH = pkgs.lib.makeLibraryPath commonArgs.buildInputs;
         };
@@ -95,6 +95,18 @@
         });
       in {
         checks = { inherit bevy_vrm bevy_shader_mtoon cargoClippy cargoDoc; };
+
+        apps = {
+          generate-readme = flake-utils.lib.mkApp {
+            drv = pkgs.writeShellScriptBin "generate-readme" ''
+              cd crates
+
+              for folder in */; do
+                (cd $folder && cargo rdme)
+              done
+            '';
+          };
+        };
 
         packages = {
           bevy_shader_mtoon = bevy_shader_mtoon;
