@@ -8,7 +8,7 @@ use bevy::{
     },
 };
 
-use bevy_shader_mtoon::{MtoonMainCamera, MtoonMaterial, MtoonPlugin, MtoonSun};
+use bevy_shader_mtoon::{MtoonMainCamera, MtoonMaterial, MtoonPlugin, MtoonShader, MtoonSun};
 
 fn main() {
     App::new()
@@ -51,15 +51,21 @@ fn setup(
     ));
 
     let mtoon_textured = mtoon_materials.add(MtoonMaterial {
-        base_color_texture: Some(images.add(uv_debug_texture())),
-        shading_shift_factor: 0.5,
-        ..default()
+        base: StandardMaterial::default(),
+        extension: MtoonShader {
+            base_color_texture: Some(images.add(uv_debug_texture())),
+            shading_shift_factor: 0.5,
+            ..default()
+        },
     });
 
     let mtoon = mtoon_materials.add(MtoonMaterial {
-        base_color: Color::BISQUE,
-        shade_color: Color::SALMON,
-        ..default()
+        base: StandardMaterial::default(),
+        extension: MtoonShader {
+            base_color: Color::BISQUE,
+            shade_color: Color::SALMON,
+            ..default()
+        },
     });
 
     let shapes = [
@@ -110,7 +116,7 @@ fn setup(
     });
 }
 
-fn rotate(time: Res<Time>, mut query: Query<&mut Transform, With<Handle<MtoonMaterial>>>) {
+fn rotate(time: Res<Time>, mut query: Query<&mut Transform, With<Handle<MtoonShader>>>) {
     for mut transform in query.iter_mut() {
         transform.rotate(Quat::from_rotation_y(time.delta_seconds() / 2.0));
     }

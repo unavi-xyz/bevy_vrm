@@ -42,7 +42,7 @@ fn setup(
 
     commands.spawn((
         Camera3dBundle {
-            transform: Transform::from_xyz(0.0, 1.0, 3.0),
+            transform: Transform::from_xyz(2.0, 2.0, 3.0),
             ..Default::default()
         },
         MtoonMainCamera,

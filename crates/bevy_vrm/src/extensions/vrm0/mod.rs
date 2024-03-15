@@ -1,7 +1,10 @@
 use bevy::{asset::LoadedAsset, prelude::*};
 use bevy_gltf_kun::import::gltf::{document::ImportContext, texture::texture_label};
-use bevy_shader_mtoon::MtoonMaterial;
-use gltf_kun::graph::{gltf::Primitive, ByteNode};
+use bevy_shader_mtoon::{MtoonMaterial, MtoonShader};
+use gltf_kun::graph::{
+    gltf::{material::AlphaMode as GltfAlphaMode, Primitive},
+    ByteNode, GraphNodeWeight,
+};
 use gltf_kun_vrm::vrm0::{material_property::MaterialProperty, Vrm};
 use serde_vrm::vrm0::Shader;
 
@@ -40,7 +43,17 @@ pub fn import_primitive_material(
                         .load_context
                         .get_label_handle::<MtoonMaterial>(&label)
                 } else {
-                    load_mtoon_material(context, *material_property, label)
+                    let shader = load_mtoon_shader(context, *material_property);
+
+                    let mtoon = MtoonMaterial {
+                        base: StandardMaterial::default(),
+                        extension: shader,
+                    };
+
+                    context.load_context.add_loaded_labeled_asset(
+                        label,
+                        LoadedAsset::new_with_dependencies(mtoon, None),
+                    )
                 };
 
                 entity.remove::<Handle<StandardMaterial>>().insert(handle);
@@ -53,29 +66,38 @@ pub fn import_primitive_material(
     }
 }
 
-fn load_mtoon_material(
+fn load_mtoon_shader(
     context: &mut ImportContext,
     material_property: MaterialProperty,
-    label: String,
-) -> Handle<MtoonMaterial> {
+) -> MtoonShader {
+    let mut shader = MtoonShader::default();
+
+    if let Some(material) = material_property.material(context.graph) {
+        let weight = material.get(context.graph);
+
+        shader.alpha_mode = match weight.alpha_mode {
+            GltfAlphaMode::Opaque => AlphaMode::Opaque,
+            GltfAlphaMode::Mask => AlphaMode::Mask(weight.alpha_cutoff.0),
+            GltfAlphaMode::Blend => AlphaMode::Blend,
+        };
+    }
+
     let weight = material_property.read(context.graph);
 
-    let mut mtoon = MtoonMaterial::default();
-
     if let Some(value) = weight.float.shade_shift {
-        mtoon.shading_shift_factor = value;
+        shader.shading_shift_factor = value;
     }
 
     if let Some(value) = weight.float.shade_toony {
-        mtoon.shading_toony_factor = value;
+        shader.shading_toony_factor = value;
     }
 
     if let Some(value) = weight.vector.color {
-        mtoon.base_color = Color::rgba_linear_from_array(value);
+        shader.base_color = Color::rgba_linear_from_array(value);
     }
 
     if let Some(value) = weight.vector.shade_color {
-        mtoon.shade_color = Color::rgba_linear_from_array(value);
+        shader.shade_color = Color::rgba_linear_from_array(value);
     }
 
     if let Some(texture) = material_property.main_texture(context.graph) {
@@ -87,7 +109,7 @@ fn load_mtoon_material(
             .unwrap();
         let label = texture_label(index);
         let handle = context.load_context.get_label_handle(&label);
-        mtoon.base_color_texture = Some(handle);
+        shader.base_color_texture = Some(handle);
     }
 
     if let Some(texture) = material_property.shade_texture(context.graph) {
@@ -99,12 +121,10 @@ fn load_mtoon_material(
             .unwrap();
         let label = texture_label(index);
         let handle = context.load_context.get_label_handle(&label);
-        mtoon.shade_color_texture = Some(handle);
+        shader.shade_color_texture = Some(handle);
     }
 
-    context
-        .load_context
-        .add_loaded_labeled_asset(label, LoadedAsset::new_with_dependencies(mtoon, None))
+    shader
 }
 
 fn mtoon_label(index: usize) -> String {
