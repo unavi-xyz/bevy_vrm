@@ -16,7 +16,7 @@ fn main() {
             VrmPlugin,
         ))
         .add_systems(Startup, setup)
-        .add_systems(Update, (rotate_vrm, move_arm))
+        .add_systems(Update, move_arm)
         .run();
 }
 
@@ -40,6 +40,7 @@ fn setup(
             transform,
             ..default()
         },
+        ..default()
     });
 
     commands.spawn((Camera3dBundle::default(), MtoonMainCamera));
@@ -56,12 +57,6 @@ fn setup(
         },
         MtoonSun,
     ));
-}
-
-fn rotate_vrm(time: Res<Time>, mut query: Query<&mut Transform, With<Handle<Vrm>>>) {
-    for mut transform in query.iter_mut() {
-        transform.rotate(Quat::from_rotation_y(time.delta_seconds() / 3.0));
-    }
 }
 
 fn move_arm(

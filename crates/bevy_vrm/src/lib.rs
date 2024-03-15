@@ -23,14 +23,19 @@ impl Plugin for VrmPlugin {
 
 #[derive(Bundle, Default)]
 pub struct VrmBundle {
+    pub auto_scene: AutoScene,
     pub scene_bundle: SceneBundle,
     pub vrm: Handle<Vrm>,
 }
 
+/// Automatically sets the scene to the loaded VRM's default scene.
+#[derive(Component, Default)]
+pub struct AutoScene;
+
 fn set_vrm_scene(
     gltf_scenes: Res<Assets<GltfScene>>,
     mut commands: Commands,
-    scenes: Query<(Entity, &mut Handle<Scene>, &Handle<Vrm>)>,
+    scenes: Query<(Entity, &mut Handle<Scene>, &Handle<Vrm>), With<AutoScene>>,
     vrm: Res<Assets<Vrm>>,
 ) {
     for (entity, scene_handle, vrm_handle) in scenes.iter() {
