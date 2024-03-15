@@ -1,14 +1,18 @@
-use bevy::prelude::*;
-use bevy_gltf_kun::import::gltf::{scene::GltfScene, GltfAssetPlugin, GltfKun};
+use bevy::{prelude::*, utils::HashMap};
+use bevy_gltf_kun::import::gltf::{scene::GltfScene, GltfAssetPlugin};
 use bevy_shader_mtoon::MtoonPlugin;
+use humanoid_bones::set_humanoid_bones;
 use loader::{Vrm, VrmLoader};
 
 pub mod extensions;
+mod humanoid_bones;
 pub mod loader;
 
 pub mod mtoon {
     pub use bevy_shader_mtoon::*;
 }
+
+pub use serde_vrm::vrm0::BoneName;
 
 pub struct VrmPlugin;
 
@@ -17,13 +21,14 @@ impl Plugin for VrmPlugin {
         app.add_plugins((GltfAssetPlugin, MtoonPlugin))
             .init_asset::<Vrm>()
             .init_asset_loader::<VrmLoader>()
-            .add_systems(Update, set_vrm_scene);
+            .add_systems(Update, (set_humanoid_bones, set_vrm_scene));
     }
 }
 
 #[derive(Bundle, Default)]
 pub struct VrmBundle {
     pub auto_scene: AutoScene,
+    pub humanoid_bones: HumanoidBones,
     pub scene_bundle: SceneBundle,
     pub vrm: Handle<Vrm>,
 }
@@ -64,3 +69,6 @@ fn set_vrm_scene(
         commands.entity(entity).insert(vrm_scene.clone());
     }
 }
+
+#[derive(Component, Default)]
+pub struct HumanoidBones(pub HashMap<BoneName, Entity>);

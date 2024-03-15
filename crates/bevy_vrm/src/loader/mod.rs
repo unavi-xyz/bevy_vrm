@@ -13,14 +13,9 @@ use thiserror::Error;
 
 use crate::extensions::VrmExtensions;
 
-use self::humanoid_bones::{load_humanoid_bones, HumanoidBones};
-
-mod humanoid_bones;
-
 #[derive(Asset, TypePath, Debug)]
 pub struct Vrm {
     pub gltf: GltfKun,
-    pub humanoid_bones: HumanoidBones,
 }
 
 #[derive(Default)]
@@ -45,12 +40,7 @@ impl AssetLoader for VrmLoader {
     ) -> BoxedFuture<'a, Result<Self::Asset, Self::Error>> {
         Box::pin(async move {
             let gltf = self.0.load(reader, settings, load_context).await?;
-            let humanoid_bones = load_humanoid_bones(&gltf).unwrap_or_default();
-
-            Ok(Vrm {
-                gltf,
-                humanoid_bones,
-            })
+            Ok(Vrm { gltf })
         })
     }
 

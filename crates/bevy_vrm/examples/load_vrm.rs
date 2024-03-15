@@ -1,10 +1,8 @@
 use std::f32::consts::PI;
 
 use bevy::prelude::*;
-use bevy_gltf_kun::import::gltf::scene::GltfScene;
 use bevy_shader_mtoon::{MtoonMainCamera, MtoonSun};
-use bevy_vrm::{loader::Vrm, VrmBundle, VrmPlugin};
-use serde_vrm::vrm0::BoneName;
+use bevy_vrm::{loader::Vrm, BoneName, HumanoidBones, VrmBundle, VrmPlugin};
 
 fn main() {
     App::new()
@@ -16,7 +14,7 @@ fn main() {
             VrmPlugin,
         ))
         .add_systems(Startup, setup)
-        .add_systems(Update, move_arm)
+        .add_systems(Update, move_leg)
         .run();
 }
 
@@ -59,38 +57,20 @@ fn setup(
     ));
 }
 
-fn move_arm(
+fn move_leg(
     mut transforms: Query<&mut Transform>,
-    scenes: Res<Assets<GltfScene>>,
     time: Res<Time>,
-    vrm: Query<&Handle<Vrm>>,
-    vrms: Res<Assets<Vrm>>,
+    vrm: Query<&HumanoidBones, With<Handle<Vrm>>>,
 ) {
-    for handle in vrm.iter() {
-        if let Some(vrm) = vrms.get(handle) {
-            let scene_handle = match &vrm.gltf.default_scene {
-                Some(handle) => handle,
-                None => match vrm.gltf.scenes.first() {
-                    Some(handle) => handle,
-                    None => continue,
-                },
-            };
+    for humanoid in vrm.iter() {
+        let leg = match humanoid.0.get(&BoneName::RightUpperLeg) {
+            Some(leg) => leg,
+            None => continue,
+        };
 
-            let scene = match scenes.get(scene_handle) {
-                Some(scene) => scene,
-                None => continue,
-            };
-
-            let left_hand = match vrm.humanoid_bones.get(&BoneName::LeftHand) {
-                Some(left_hand) => left_hand,
-                None => continue,
-            };
-
-            let entity = scene.node_entities.get(left_hand).unwrap();
-
-            if let Ok(mut transform) = transforms.get_mut(*entity) {
-                transform.rotate(Quat::from_rotation_x(time.delta_seconds() * 1.5));
-            }
+        if let Ok(mut transform) = transforms.get_mut(*leg) {
+            let sin = time.elapsed_seconds().sin();
+            transform.rotation = Quat::from_rotation_x(sin);
         }
     }
 }

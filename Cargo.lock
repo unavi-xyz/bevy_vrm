@@ -641,7 +641,7 @@ dependencies = [
 [[package]]
 name = "bevy_gltf_kun"
 version = "0.0.10"
-source = "git+https://github.com/unavi-xyz/gltf_kun.git#d2bd3c48d9f2906692bf355b720e90cf797b3abd"
+source = "git+https://github.com/unavi-xyz/gltf_kun.git#b84d773cedfb4c13e8989bb39032f3f3bf0e07c1"
 dependencies = [
  "bevy",
  "glam",
@@ -2028,7 +2028,7 @@ dependencies = [
 [[package]]
 name = "gltf_kun"
 version = "0.0.10"
-source = "git+https://github.com/unavi-xyz/gltf_kun.git#d2bd3c48d9f2906692bf355b720e90cf797b3abd"
+source = "git+https://github.com/unavi-xyz/gltf_kun.git#b84d773cedfb4c13e8989bb39032f3f3bf0e07c1"
 dependencies = [
  "base64 0.22.0",
  "byteorder",
