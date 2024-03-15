@@ -2,7 +2,7 @@ use std::f32::consts::PI;
 
 use bevy::prelude::*;
 use bevy_shader_mtoon::{MtoonMainCamera, MtoonSun};
-use bevy_vrm::VrmPlugin;
+use bevy_vrm::{VrmBundle, VrmPlugin};
 
 fn main() {
     App::new()
@@ -36,10 +36,12 @@ fn setup(
     transform.rotate_y(PI);
 
     commands.spawn((
-        SceneBundle {
-            scene: asset_server.load(format!("{}#Scene0", PATH)),
-            transform,
-            ..default()
+        VrmBundle {
+            vrm: asset_server.load(PATH.to_string()),
+            scene_bundle: SceneBundle {
+                transform,
+                ..default()
+            },
         },
         VrmTag,
     ));
