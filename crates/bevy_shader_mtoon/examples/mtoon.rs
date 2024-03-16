@@ -50,7 +50,7 @@ fn setup(
     commands.spawn((
         DirectionalLightBundle {
             directional_light: DirectionalLight {
-                illuminance: 5000.0,
+                illuminance: 10_000.0,
                 shadows_enabled: true,
                 ..default()
             },
@@ -117,7 +117,7 @@ fn setup(
         });
     }
 
-    // Spawn a big shape to test shadows.
+    // Big shape to test shadows.
     commands.spawn(MaterialMeshBundle {
         mesh: meshes.add(Torus::default()),
         material: mtoon_textured.clone(),
@@ -125,6 +125,7 @@ fn setup(
         ..default()
     });
 
+    // Ground
     commands.spawn(PbrBundle {
         material: materials.add(StandardMaterial::default()),
         mesh: meshes.add(Plane3d::default()),
@@ -154,11 +155,10 @@ fn ui(
     }
 
     Window::new("bevy_shader_mtoon").show(contexts.ctx_mut(), |ui| {
-        // No current effect on the shader.
-        // ui.add(
-        //     Slider::new(&mut settings.gl_equalization_factor, 0.0..=1.0)
-        //         .text("GL Equalization Factor"),
-        // );
+        ui.add(
+            Slider::new(&mut settings.gl_equalization_factor, 0.0..=1.0)
+                .text("GL Equalization Factor"),
+        );
 
         ui.add(
             Slider::new(&mut settings.parametric_rim_fresnel_power, 0.0..=10.0)

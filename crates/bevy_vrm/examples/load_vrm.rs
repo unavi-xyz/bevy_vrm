@@ -27,9 +27,11 @@ const MODELS: [&str; 3] = ["catbot.vrm", "cool_loops.vrm", "suzuha.vrm"];
 const PATH: &str = MODELS[2];
 
 fn setup(
+    asset_server: Res<AssetServer>,
     mut commands: Commands,
     mut config: ResMut<GizmoConfigStore>,
-    asset_server: Res<AssetServer>,
+    mut materials: ResMut<Assets<StandardMaterial>>,
+    mut meshes: ResMut<Assets<Mesh>>,
 ) {
     let (config, _) = config.config_mut::<DefaultGizmoConfigGroup>();
     config.depth_bias = -1.0;
@@ -57,7 +59,7 @@ fn setup(
     commands.spawn((
         DirectionalLightBundle {
             directional_light: DirectionalLight {
-                illuminance: 5000.0,
+                illuminance: 10_000.0,
                 shadows_enabled: true,
                 ..default()
             },
@@ -66,6 +68,13 @@ fn setup(
         },
         MtoonSun,
     ));
+
+    commands.spawn(PbrBundle {
+        material: materials.add(StandardMaterial::default()),
+        mesh: meshes.add(Plane3d::default()),
+        transform: Transform::from_scale(Vec3::splat(30.0)),
+        ..default()
+    });
 }
 
 fn move_leg(mut transforms: Query<&mut Transform>, time: Res<Time>, vrm: Query<&HumanoidBones>) {

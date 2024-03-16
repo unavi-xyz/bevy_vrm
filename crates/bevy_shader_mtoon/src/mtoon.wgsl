@@ -1,7 +1,8 @@
 #import bevy_pbr::{
     pbr_fragment::pbr_input_from_standard_material,
     pbr_functions::alpha_discard,
-    mesh_view_bindings as view_bindings,
+    mesh_view_bindings::view,
+    ambient::ambient_light,
 }
 
 #ifdef PREPASS_PIPELINE
@@ -49,7 +50,6 @@ const MTOON_FLAGS_MATCAP_TEXTURE: u32 = 4u;
 const MTOON_FLAGS_RIM_MULTIPLY_TEXTURE: u32 = 8u;
 
 const EPSILON: f32 = 0.00001;
-const WHITE: vec3<f32> = vec3<f32>(1.0, 1.0, 1.0);
 
 @fragment
 fn fragment (
@@ -91,13 +91,24 @@ fn fragment (
     var color = mix(base_color.rgb, shade_color, shading) * material.light_color;
 
     // Global illumination
-    // This isn't really what the spec says to do, but it gives us standard Bevy lighting features,
-    // such as ambient light and shadows.
     let pbr_lighting_color = apply_pbr_lighting(pbr_input);
-    color += pbr_lighting_color.rgb * base_color.rgb;
+    
+    let NdotV = max(dot(pbr_input.N, pbr_input.V), 0.0001);
+    let diffuse_color = base_color.rgb;
+    let F0 = base_color.rgb;
+    let perceptual_roughness = pbr_input.material.perceptual_roughness;
+    let diffuse_occlusion = pbr_input.diffuse_occlusion;
+    var uniform_gi = ambient_light(pbr_input.world_position, pbr_input.N, pbr_input.V, NdotV, diffuse_color, F0, perceptual_roughness, diffuse_occlusion);
+
+    uniform_gi *= base_color.rgb;
+    uniform_gi *= view.exposure;
+
+    let gi = mix(pbr_lighting_color.rgb, uniform_gi, material.gl_equalization_factor);
+
+    color += gi;
 
     // Rim lighting
-    var rim: vec3<f32> = vec3<f32>(0.0, 0.0, 0.0);
+    var rim = vec3(0.0);
 
     if (material.flags & MTOON_FLAGS_MATCAP_TEXTURE) != 0u {
         let world_view_x = normalize(vec3<f32>(pbr_input.V.z, 0.0, -pbr_input.V.x));
@@ -117,7 +128,7 @@ fn fragment (
         rim *= rim_multiply.rgb;
     }
 
-    rim *= mix(WHITE, pbr_lighting_color.rgb, material.rim_lighting_mix_factor);
+    rim *= mix(vec3(1.0), pbr_lighting_color.rgb, material.rim_lighting_mix_factor);
 
     color += rim;
 
