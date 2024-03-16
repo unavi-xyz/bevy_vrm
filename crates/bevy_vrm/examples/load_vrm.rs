@@ -1,5 +1,3 @@
-use std::f32::consts::PI;
-
 use bevy::prelude::*;
 use bevy_panorbit_camera::{PanOrbitCamera, PanOrbitCameraPlugin};
 use bevy_shader_mtoon::{MtoonMainCamera, MtoonSun};
@@ -33,16 +31,12 @@ fn setup(
 
     commands.spawn(VrmBundle {
         vrm: asset_server.load(PATH.to_string()),
-        scene_bundle: SceneBundle {
-            transform: Transform::from_rotation(Quat::from_rotation_y(-PI)),
-            ..Default::default()
-        },
         ..default()
     });
 
     commands.spawn((
         Camera3dBundle {
-            transform: Transform::from_xyz(2.0, 2.0, 3.0),
+            transform: Transform::from_xyz(2.0, 2.0, -3.0),
             ..Default::default()
         },
         MtoonMainCamera,
@@ -55,7 +49,7 @@ fn setup(
     commands.spawn((
         DirectionalLightBundle {
             directional_light: DirectionalLight {
-                illuminance: 1000.0,
+                illuminance: 5000.0,
                 ..default()
             },
             transform: Transform::from_xyz(2.0, 8.0, 5.0),

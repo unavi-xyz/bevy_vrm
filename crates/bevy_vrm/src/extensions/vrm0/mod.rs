@@ -1,10 +1,7 @@
 use bevy::{asset::LoadedAsset, prelude::*};
 use bevy_gltf_kun::import::gltf::{document::ImportContext, texture::texture_label};
 use bevy_shader_mtoon::{MtoonMaterial, MtoonShader};
-use gltf_kun::graph::{
-    gltf::{material::AlphaMode as GltfAlphaMode, Primitive},
-    ByteNode, GraphNodeWeight,
-};
+use gltf_kun::graph::{gltf::Primitive, ByteNode, GraphNodeWeight};
 use gltf_kun_vrm::vrm0::{material_property::MaterialProperty, Vrm};
 use serde_vrm::vrm0::Shader;
 
@@ -72,17 +69,21 @@ fn load_mtoon_shader(
 ) -> MtoonShader {
     let mut shader = MtoonShader::default();
 
-    if let Some(material) = material_property.material(context.graph) {
-        let weight = material.get(context.graph);
-
-        shader.alpha_mode = match weight.alpha_mode {
-            GltfAlphaMode::Opaque => AlphaMode::Opaque,
-            GltfAlphaMode::Mask => AlphaMode::Mask(weight.alpha_cutoff.0),
-            GltfAlphaMode::Blend => AlphaMode::Blend,
-        };
-    }
-
     let weight = material_property.read(context.graph);
+
+    if let Some(mut material) = material_property.material(context.graph) {
+        let m_weight = material.get_mut(context.graph);
+
+        // TODO: This doesn't actually change the material, since this function
+        //       is called after the material has been processed.
+        if let Some(value) = weight.vector.color {
+            m_weight.base_color_factor = value;
+        }
+
+        if let Some(texture) = material_property.main_texture(context.graph) {
+            material.set_base_color_texture(context.graph, Some(texture));
+        }
+    }
 
     if let Some(value) = weight.float.shade_shift {
         shader.shading_shift_factor = value;
@@ -92,25 +93,9 @@ fn load_mtoon_shader(
         shader.shading_toony_factor = value;
     }
 
-    // if let Some(value) = weight.vector.color {
-    //     shader.base_color = Color::rgba_linear_from_array(value);
-    // }
-
     if let Some(value) = weight.vector.shade_color {
         shader.shade_color = Color::rgba_linear_from_array(value);
     }
-
-    // if let Some(texture) = material_property.main_texture(context.graph) {
-    //     let index = context
-    //         .doc
-    //         .textures(context.graph)
-    //         .iter()
-    //         .position(|t| t.0 == texture.0)
-    //         .unwrap();
-    //     let label = texture_label(index);
-    //     let handle = context.load_context.get_label_handle(&label);
-    //     shader.base_color_texture = Some(handle);
-    // }
 
     if let Some(texture) = material_property.shade_texture(context.graph) {
         let index = context
