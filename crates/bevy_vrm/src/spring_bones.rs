@@ -87,7 +87,7 @@ pub fn set_spring_bones(
                     gravity_dir,
                     gravity_power: weight.gravity_power.unwrap_or_default(),
                     hit_radius: weight.hit_radius.unwrap_or_default(),
-                    stiffiness: weight.stiffiness.unwrap_or_default(),
+                    stiffness: weight.stiffiness.unwrap_or_default(),
                 });
             }
         }

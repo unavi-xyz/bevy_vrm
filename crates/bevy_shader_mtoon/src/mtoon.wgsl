@@ -19,7 +19,7 @@
 
 struct MtoonMaterialUniform {
     flags: u32,
-    gl_equalization_factor: f32,
+    gi_equalization_factor: f32,
     light_color: vec3<f32>,
     light_dir: vec3<f32>,
     matcap_factor: vec3<f32>,
@@ -93,17 +93,17 @@ fn fragment (
     // Global illumination
     let pbr_lighting_color = apply_pbr_lighting(pbr_input);
     
-    let NdotV = max(dot(pbr_input.N, pbr_input.V), 0.0001);
+    let n_dot_v = max(dot(pbr_input.N, pbr_input.V), 0.0001);
     let diffuse_color = base_color.rgb;
     let F0 = base_color.rgb;
     let perceptual_roughness = pbr_input.material.perceptual_roughness;
     let diffuse_occlusion = pbr_input.diffuse_occlusion;
-    var uniform_gi = ambient_light(pbr_input.world_position, pbr_input.N, pbr_input.V, NdotV, diffuse_color, F0, perceptual_roughness, diffuse_occlusion);
+    var uniform_gi = ambient_light(pbr_input.world_position, pbr_input.N, pbr_input.V, n_dot_v, diffuse_color, F0, perceptual_roughness, diffuse_occlusion);
 
     uniform_gi *= base_color.rgb;
     uniform_gi *= view.exposure;
 
-    let gi = mix(pbr_lighting_color.rgb, uniform_gi, material.gl_equalization_factor);
+    let gi = mix(pbr_lighting_color.rgb, uniform_gi, material.gi_equalization_factor);
 
     color += gi;
 

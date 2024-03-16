@@ -402,7 +402,7 @@ pub struct FloatProperties {
     #[serde(rename = "_Cutoff")]
     pub cutoff: Option<f32>,
     #[serde(rename = "_IndirectLightIntensity")]
-    pub indirect_light_insensity: Option<f32>,
+    pub indirect_light_intensity: Option<f32>,
     #[serde(rename = "_OutlineWidth")]
     pub outline_width: Option<f32>,
 }

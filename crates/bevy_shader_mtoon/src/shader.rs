@@ -15,7 +15,7 @@ pub type MtoonMaterial = bevy::pbr::ExtendedMaterial<StandardMaterial, MtoonShad
 #[uniform(100, MtoonShaderUniform)]
 #[reflect(PartialEq)]
 pub struct MtoonShader {
-    pub gl_equalization_factor: f32,
+    pub gi_equalization_factor: f32,
     pub light_color: Color,
     pub light_dir: Vec3,
     pub matcap_factor: Vec3,
@@ -23,7 +23,7 @@ pub struct MtoonShader {
     pub parametric_rim_fresnel_power: f32,
     pub parametric_rim_lift_factor: f32,
     pub rim_lighting_mix_factor: f32,
-    pub shade_color: Color,
+    pub shade_factor: Color,
     pub shading_shift_factor: f32,
     pub shading_toony_factor: f32,
     pub view_dir: Vec3,
@@ -35,7 +35,7 @@ pub struct MtoonShader {
     #[texture(103)]
     #[sampler(104)]
     #[dependency]
-    pub shade_color_texture: Option<Handle<Image>>,
+    pub shade_multiply_texture: Option<Handle<Image>>,
     #[texture(105)]
     #[sampler(106)]
     #[dependency]
@@ -49,8 +49,8 @@ pub struct MtoonShader {
 impl Default for MtoonShader {
     fn default() -> Self {
         Self {
-            shade_color: Color::BLACK,
-            gl_equalization_factor: 0.9,
+            shade_factor: Color::BLACK,
+            gi_equalization_factor: 0.9,
             light_color: Color::WHITE,
             light_dir: Vec3::Y,
             matcap_factor: Vec3::ZERO,
@@ -63,7 +63,7 @@ impl Default for MtoonShader {
             view_dir: Vec3::ZERO,
 
             shade_shift_texture: None,
-            shade_color_texture: None,
+            shade_multiply_texture: None,
             matcap_texture: None,
             rim_multiply_texture: None,
         }
@@ -73,7 +73,7 @@ impl Default for MtoonShader {
 #[derive(Clone, Default, ShaderType)]
 pub struct MtoonShaderUniform {
     pub flags: u32,
-    pub gl_equalization_factor: f32,
+    pub gi_equalization_factor: f32,
     pub light_color: Vec3,
     pub light_dir: Vec3,
     pub matcap_factor: Vec3,
@@ -94,7 +94,7 @@ impl AsBindGroupShaderType<MtoonShaderUniform> for MtoonShader {
         if self.shade_shift_texture.is_some() {
             flags |= MtoonMaterialFlags::SHADING_SHIFT_TEXTURE;
         }
-        if self.shade_color_texture.is_some() {
+        if self.shade_multiply_texture.is_some() {
             flags |= MtoonMaterialFlags::SHADE_COLOR_TEXTURE;
         }
         if self.matcap_texture.is_some() {
@@ -114,12 +114,12 @@ impl AsBindGroupShaderType<MtoonShaderUniform> for MtoonShader {
             parametric_rim_color[2],
         );
 
-        let shade_color = self.shade_color.as_linear_rgba_f32();
+        let shade_color = self.shade_factor.as_linear_rgba_f32();
         let shade_color = Vec3::new(shade_color[0], shade_color[1], shade_color[2]);
 
         MtoonShaderUniform {
             flags: flags.bits(),
-            gl_equalization_factor: self.gl_equalization_factor,
+            gi_equalization_factor: self.gi_equalization_factor,
             light_color,
             light_dir: self.light_dir,
             matcap_factor: self.matcap_factor,

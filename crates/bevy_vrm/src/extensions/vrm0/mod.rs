@@ -125,6 +125,26 @@ fn load_mtoon_shader(
         base.base_color_texture = Some(handle);
     }
 
+    if let Some(texture) = material_property.bump_map(context.graph) {
+        let index = context.doc.texture_index(context.graph, texture).unwrap();
+        let label = texture_label(index);
+        let handle = context.load_context.get_label_handle(&label);
+        base.normal_map_texture = Some(handle);
+
+        // TODO: Bump map scale
+    }
+
+    if let Some(texture) = material_property.emission_map(context.graph) {
+        let index = context.doc.texture_index(context.graph, texture).unwrap();
+        let label = texture_label(index);
+        let handle = context.load_context.get_label_handle(&label);
+        base.emissive_texture = Some(handle);
+    }
+
+    if let Some(value) = weight.float.indirect_light_intensity {
+        shader.gi_equalization_factor = value;
+    }
+
     if let Some(value) = weight.float.shade_shift {
         shader.shading_shift_factor = value;
     }
@@ -134,7 +154,7 @@ fn load_mtoon_shader(
     }
 
     if let Some(value) = weight.vector.shade_color {
-        shader.shade_color = Color::rgba_linear_from_array(value);
+        shader.shade_factor = Color::rgba_linear_from_array(value);
     }
 
     if let Some(texture) = material_property.shade_texture(context.graph) {
@@ -146,7 +166,7 @@ fn load_mtoon_shader(
             .unwrap();
         let label = texture_label(index);
         let handle = context.load_context.get_label_handle(&label);
-        shader.shade_color_texture = Some(handle);
+        shader.shade_multiply_texture = Some(handle);
     }
 
     shader

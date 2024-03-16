@@ -71,7 +71,7 @@ fn setup(
     let mtoon_plain = mtoon_materials.add(MtoonMaterial {
         base: StandardMaterial::from(Color::BISQUE),
         extension: MtoonShader {
-            shade_color: Color::SALMON,
+            shade_factor: Color::SALMON,
             ..default()
         },
     });
@@ -146,7 +146,7 @@ fn ui(
     mut settings: Local<MtoonShader>,
 ) {
     for (_, material) in mtoon_materials.iter_mut() {
-        material.extension.gl_equalization_factor = settings.gl_equalization_factor;
+        material.extension.gi_equalization_factor = settings.gi_equalization_factor;
         material.extension.parametric_rim_fresnel_power = settings.parametric_rim_fresnel_power;
         material.extension.parametric_rim_lift_factor = settings.parametric_rim_lift_factor;
         material.extension.rim_lighting_mix_factor = settings.rim_lighting_mix_factor;
@@ -156,7 +156,7 @@ fn ui(
 
     Window::new("bevy_shader_mtoon").show(contexts.ctx_mut(), |ui| {
         ui.add(
-            Slider::new(&mut settings.gl_equalization_factor, 0.0..=1.0)
+            Slider::new(&mut settings.gi_equalization_factor, 0.0..=1.0)
                 .text("GL Equalization Factor"),
         );
 

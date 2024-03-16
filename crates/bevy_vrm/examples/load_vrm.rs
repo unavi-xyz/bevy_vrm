@@ -38,16 +38,12 @@ fn setup(
 
     commands.spawn(VrmBundle {
         vrm: asset_server.load(PATH.to_string()),
-        scene_bundle: SceneBundle {
-            transform: Transform::from_rotation(Quat::from_rotation_y(PI)),
-            ..default()
-        },
         ..default()
     });
 
     commands.spawn((
         Camera3dBundle {
-            transform: Transform::from_xyz(1.0, 2.0, 3.0),
+            transform: Transform::from_xyz(1.0, 2.0, -3.0),
             ..Default::default()
         },
         PanOrbitCamera {
@@ -56,14 +52,17 @@ fn setup(
         },
     ));
 
+    let mut sun_transform = Transform::default();
+    sun_transform.rotate_x(-PI / 1.3);
+    sun_transform.rotate_y(PI / 6.0);
+
     commands.spawn((
         DirectionalLightBundle {
             directional_light: DirectionalLight {
                 illuminance: 10_000.0,
-                shadows_enabled: true,
                 ..default()
             },
-            transform: Transform::from_rotation(Quat::from_rotation_x(-PI / 3.0)),
+            transform: sun_transform,
             ..default()
         },
         MtoonSun,
@@ -100,11 +99,12 @@ fn draw_spring_bones(
         for spring_bone in spring_bones.0.iter() {
             for bone_entity in spring_bone.bones.iter() {
                 let position = transforms.get(*bone_entity).unwrap().translation();
+
                 gizmos.sphere(
                     position,
                     Quat::default(),
                     spring_bone.hit_radius,
-                    Color::rgb(10.0 / spring_bone.stiffiness, 0.2, 0.2),
+                    Color::rgb(spring_bone.stiffness, 1.0 - spring_bone.stiffness, 0.1),
                 );
             }
         }

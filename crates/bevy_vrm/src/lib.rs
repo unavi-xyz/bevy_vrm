@@ -62,5 +62,5 @@ pub struct SpringBone {
     pub gravity_dir: Vec3,
     pub gravity_power: f32,
     pub hit_radius: f32,
-    pub stiffiness: f32,
+    pub stiffness: f32,
 }
