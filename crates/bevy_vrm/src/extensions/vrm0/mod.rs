@@ -142,11 +142,11 @@ fn load_mtoon_shader(
     }
 
     if let Some(value) = weight.float.indirect_light_intensity {
-        shader.gi_equalization_factor = value;
+        shader.gi_equalization_factor = 1.0 - value;
     }
 
     if let Some(value) = weight.float.shade_shift {
-        shader.shading_shift_factor = value;
+        shader.shading_shift_factor = -value;
     }
 
     if let Some(value) = weight.float.shade_toony {
