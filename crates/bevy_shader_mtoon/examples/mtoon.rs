@@ -177,7 +177,8 @@ fn ui(
         );
 
         ui.add(
-            Slider::new(&mut settings.shading_shift_factor, 0.0..=1.0).text("Shading Shift Factor"),
+            Slider::new(&mut settings.shading_shift_factor, -1.0..=1.0)
+                .text("Shading Shift Factor"),
         );
 
         ui.add(
