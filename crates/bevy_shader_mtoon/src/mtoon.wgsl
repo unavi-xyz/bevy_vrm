@@ -96,8 +96,8 @@ fn fragment (
     let pbr_lighting_color = apply_pbr_lighting(pbr_input);
     
     let n_dot_v = max(dot(pbr_input.N, pbr_input.V), 0.0001);
-    let diffuse_color = color;
-    let F0 = color;
+    let diffuse_color = base_color.rgb;
+    let F0 = base_color.rgb;
     let perceptual_roughness = pbr_input.material.perceptual_roughness;
     let diffuse_occlusion = pbr_input.diffuse_occlusion;
     var uniform_gi = ambient_light(pbr_input.world_position, pbr_input.N, pbr_input.V, n_dot_v, diffuse_color, F0, perceptual_roughness, diffuse_occlusion);
