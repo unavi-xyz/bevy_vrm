@@ -3,14 +3,14 @@ use bevy_gltf_kun::import::{extensions::BevyImportExtensions, gltf::document::Im
 use gltf_kun::{
     extensions::ExtensionImport,
     graph::{
-        gltf::{GltfDocument, Node, Primitive, Scene},
+        gltf::{GltfDocument, Material, Node, Primitive, Scene},
         Extensions, Graph,
     },
     io::format::gltf::GltfFormat,
 };
 use gltf_kun_vrm::vrm0::Vrm;
 
-use self::vrm0::import_primitive_material;
+use self::vrm0::{import_material, import_primitive_material};
 
 pub mod vrm0;
 pub mod vrm1;
@@ -30,6 +30,16 @@ impl ExtensionImport<GltfDocument, GltfFormat> for VrmExtensions {
 }
 
 impl BevyImportExtensions<GltfDocument> for VrmExtensions {
+    fn import_material(
+        context: &mut ImportContext,
+        standard_material: &mut StandardMaterial,
+        material: Material,
+    ) {
+        if let Some(ext) = context.doc.get_extension::<Vrm>(context.graph) {
+            import_material(context, standard_material, material, ext);
+        }
+    }
+
     fn import_node(_context: &mut ImportContext, _entity: &mut EntityWorldMut, _node: Node) {}
 
     fn import_primitive(

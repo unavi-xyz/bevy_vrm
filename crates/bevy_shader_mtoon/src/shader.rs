@@ -50,17 +50,17 @@ impl Default for MtoonShader {
     fn default() -> Self {
         Self {
             shade_color: Color::BLACK,
-            light_dir: Vec3::Y,
-            shading_shift_factor: 0.0,
-            shading_toony_factor: 0.9,
-            light_color: Color::WHITE,
             gl_equalization_factor: 0.9,
-            view_dir: Vec3::ZERO,
+            light_color: Color::WHITE,
+            light_dir: Vec3::Y,
             matcap_factor: Vec4::ZERO,
             parametric_rim_color: Color::WHITE,
             parametric_rim_fresnel_power: 5.0,
             parametric_rim_lift_factor: 0.0,
             rim_lighting_mix_factor: 1.0,
+            shading_shift_factor: 0.0,
+            shading_toony_factor: 0.9,
+            view_dir: Vec3::ZERO,
 
             shade_shift_texture: None,
             shade_color_texture: None,
