@@ -118,6 +118,14 @@ fn setup(
         });
     }
 
+    // Spawn a big shape to test shadows.
+    commands.spawn(MaterialMeshBundle {
+        mesh: meshes.add(Torus::default()),
+        material: mtoon_textured.clone(),
+        transform: Transform::from_xyz(0.0, 5.0, 0.0).with_scale(Vec3::splat(4.0)),
+        ..default()
+    });
+
     commands.spawn(PbrBundle {
         material: materials.add(StandardMaterial::default()),
         mesh: meshes.add(Plane3d::default()),
@@ -147,10 +155,11 @@ fn ui(
     }
 
     Window::new("bevy_shader_mtoon").show(contexts.ctx_mut(), |ui| {
-        ui.add(
-            Slider::new(&mut settings.gl_equalization_factor, 0.0..=1.0)
-                .text("GL Equalization Factor"),
-        );
+        // No current effect on the shader.
+        // ui.add(
+        //     Slider::new(&mut settings.gl_equalization_factor, 0.0..=1.0)
+        //         .text("GL Equalization Factor"),
+        // );
 
         ui.add(
             Slider::new(&mut settings.parametric_rim_fresnel_power, 0.0..=10.0)

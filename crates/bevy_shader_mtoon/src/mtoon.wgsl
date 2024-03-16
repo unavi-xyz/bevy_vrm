@@ -17,7 +17,6 @@
 #endif
 
 struct MtoonMaterialUniform {
-    ambient_color: vec4<f32>,
     flags: u32,
     gl_equalization_factor: f32,
     light_color: vec4<f32>,
@@ -66,20 +65,11 @@ fn fragment (
 
 #else
 
-    // Remove texture
-    let base_color = pbr_input.material.base_color;
-    pbr_input.material.base_color = vec4<f32>(1.0, 1.0, 1.0, 1.0);
-
     var out: FragmentOutput;
-    out.color = apply_pbr_lighting(pbr_input);
+
+    let base_color = pbr_input.material.base_color;
 
     // Shading
-    var shade_color = material.shade_color;
-
-    if (material.flags & MTOON_FLAGS_SHADE_COLOR_TEXTURE) != 0u {
-        shade_color = shade_color * textureSample(shade_color_texture, shade_color_sampler, in.uv);
-    }
-
     let normal = normalize(in.world_normal);
 
     var shading = dot(normal, material.light_dir);
@@ -92,27 +82,24 @@ fn fragment (
 
     shading = 1.0 - linear_step(material.shading_toony_factor - 1.0, 1.0 - material.shading_toony_factor, shading);
 
+    var shade_color = material.shade_color;
+
+    if (material.flags & MTOON_FLAGS_SHADE_COLOR_TEXTURE) != 0u {
+        shade_color = shade_color * textureSample(shade_color_texture, shade_color_sampler, in.uv);
+    }
+
     var color = mix(base_color, shade_color, shading) * material.light_color;
 
     // Global illumination
-    let world_up = vec3<f32>(0.0, 1.0, 0.0);
-    let world_down = vec3<f32>(0.0, -1.0, 0.0);
-
-    let uniformed_gi = (raw_gi(world_up) + raw_gi(world_down)) / 2.0;
-    let passthrough_gi = raw_gi(normal);
-
-    let gi = mix(passthrough_gi, uniformed_gi, material.gl_equalization_factor);
-    let gi_vec4 = vec4<f32>(gi, 1.0);
-
-    //color = color + gi_vec4 * material.ambient_color;
+    // This isn't really what the spec says to do, but it gives us standard Bevy lighting features,
+    // such as ambient light and shadows.
+    let pbr_lighting_color = apply_pbr_lighting(pbr_input);
+    color += pbr_lighting_color * base_color;
 
     // TODO: Rim lighting
 
-    // Re-apply texture
-    out.color = out.color * color;
-    pbr_input.material.base_color = color;
-
-    out.color = main_pass_post_lighting_processing(pbr_input, out.color);
+    // Set output
+    out.color = main_pass_post_lighting_processing(pbr_input, color);
 
 #endif
 
@@ -121,10 +108,4 @@ fn fragment (
 
 fn linear_step(a: f32, b: f32, t: f32) -> f32 {
     return saturate((t - a) / (b - a));
-}
-
-// Returns the global illumination corresponding to a direction vector
-fn raw_gi(direction: vec3<f32>) -> vec3<f32> {
-    // TODO: Implement
-    return direction;
 }

@@ -15,7 +15,6 @@ pub type MtoonMaterial = bevy::pbr::ExtendedMaterial<StandardMaterial, MtoonShad
 #[uniform(100, MtoonShaderUniform)]
 #[reflect(PartialEq)]
 pub struct MtoonShader {
-    pub ambient_color: Color,
     pub gl_equalization_factor: f32,
     pub light_color: Color,
     pub light_dir: Vec3,
@@ -55,7 +54,6 @@ impl Default for MtoonShader {
             shading_shift_factor: 0.0,
             shading_toony_factor: 0.9,
             light_color: Color::WHITE,
-            ambient_color: Color::WHITE,
             gl_equalization_factor: 0.9,
             view_dir: Vec3::ZERO,
             matcap_factor: Vec4::ZERO,
@@ -74,7 +72,6 @@ impl Default for MtoonShader {
 
 #[derive(Clone, Default, ShaderType)]
 pub struct MtoonShaderUniform {
-    pub ambient_color: Vec4,
     pub flags: u32,
     pub gl_equalization_factor: f32,
     pub light_color: Vec4,
@@ -108,7 +105,6 @@ impl AsBindGroupShaderType<MtoonShaderUniform> for MtoonShader {
         }
 
         MtoonShaderUniform {
-            ambient_color: self.ambient_color.as_linear_rgba_f32().into(),
             flags: flags.bits(),
             gl_equalization_factor: self.gl_equalization_factor,
             light_color: self.light_color.as_linear_rgba_f32().into(),

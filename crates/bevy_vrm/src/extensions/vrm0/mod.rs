@@ -71,11 +71,10 @@ fn load_mtoon_shader(
 
     let weight = material_property.read(context.graph);
 
+    // TODO: This doesn't actually change the material, since this function is called after the material has been processed.
     if let Some(mut material) = material_property.material(context.graph) {
         let m_weight = material.get_mut(context.graph);
 
-        // TODO: This doesn't actually change the material, since this function
-        //       is called after the material has been processed.
         if let Some(value) = weight.vector.color {
             m_weight.base_color_factor = value;
         }
