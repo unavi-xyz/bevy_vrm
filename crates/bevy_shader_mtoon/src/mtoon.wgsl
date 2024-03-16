@@ -85,17 +85,19 @@ fn fragment (
     var shade_color = material.shade_color;
 
     if (material.flags & MTOON_FLAGS_SHADE_COLOR_TEXTURE) != 0u {
-        shade_color = shade_color * textureSample(shade_color_texture, shade_color_sampler, in.uv).rgb;
+        shade_color *= textureSample(shade_color_texture, shade_color_sampler, in.uv).rgb;
     }
 
-    var color = mix(base_color.rgb, shade_color, shading) * material.light_color;
+    var color = mix(base_color.rgb, shade_color, shading);
+    color *= material.light_color;
 
     // Global illumination
+    pbr_input.material.base_color = vec4<f32>(color, base_color.a);
     let pbr_lighting_color = apply_pbr_lighting(pbr_input);
     
     let n_dot_v = max(dot(pbr_input.N, pbr_input.V), 0.0001);
-    let diffuse_color = base_color.rgb;
-    let F0 = base_color.rgb;
+    let diffuse_color = color;
+    let F0 = color;
     let perceptual_roughness = pbr_input.material.perceptual_roughness;
     let diffuse_occlusion = pbr_input.diffuse_occlusion;
     var uniform_gi = ambient_light(pbr_input.world_position, pbr_input.N, pbr_input.V, n_dot_v, diffuse_color, F0, perceptual_roughness, diffuse_occlusion);
@@ -104,7 +106,6 @@ fn fragment (
     uniform_gi *= view.exposure;
 
     let gi = mix(pbr_lighting_color.rgb, uniform_gi, material.gi_equalization_factor);
-
     color += gi;
 
     // Rim lighting
