@@ -52,9 +52,10 @@ fn setup(
         DirectionalLightBundle {
             directional_light: DirectionalLight {
                 illuminance: 5000.0,
+                shadows_enabled: true,
                 ..default()
             },
-            transform: Transform::from_xyz(1.0, 4.0, 2.0),
+            transform: Transform::from_rotation(Quat::from_rotation_x(-PI / 3.0)),
             ..default()
         },
         MtoonSun,
@@ -65,13 +66,10 @@ fn setup(
             base_color_texture: Some(images.add(uv_debug_texture())),
             ..default()
         },
-        extension: MtoonShader {
-            shading_shift_factor: 0.5,
-            ..default()
-        },
+        extension: MtoonShader::default(),
     });
 
-    let mtoon = mtoon_materials.add(MtoonMaterial {
+    let mtoon_plain = mtoon_materials.add(MtoonMaterial {
         base: StandardMaterial::from(Color::BISQUE),
         extension: MtoonShader {
             shade_color: Color::SALMON,
@@ -98,20 +96,20 @@ fn setup(
             mesh: mesh.clone(),
             material: mtoon_textured.clone(),
             transform: Transform::from_xyz(
-                -X_EXTENT / 2. + i as f32 / (num_shapes - 1) as f32 * X_EXTENT,
+                -X_EXTENT / 2.0 + i as f32 / (num_shapes - 1) as f32 * X_EXTENT,
                 1.0,
                 3.0,
             )
-            .with_rotation(Quat::from_rotation_x(-PI / 4.)),
+            .with_rotation(Quat::from_rotation_x(-PI / 4.0)),
             ..default()
         });
 
         // Without texture
         commands.spawn(MaterialMeshBundle {
             mesh,
-            material: mtoon.clone(),
+            material: mtoon_plain.clone(),
             transform: Transform::from_xyz(
-                -X_EXTENT / 2. + i as f32 / (num_shapes - 1) as f32 * X_EXTENT,
+                -X_EXTENT / 2.0 + i as f32 / (num_shapes - 1) as f32 * X_EXTENT,
                 1.0,
                 -3.0,
             )
