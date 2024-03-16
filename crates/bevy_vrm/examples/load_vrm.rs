@@ -3,7 +3,7 @@ use std::f32::consts::PI;
 use bevy::prelude::*;
 use bevy_egui::EguiPlugin;
 use bevy_panorbit_camera::{PanOrbitCamera, PanOrbitCameraPlugin};
-use bevy_shader_mtoon::{MtoonMainCamera, MtoonSun};
+use bevy_shader_mtoon::MtoonSun;
 use bevy_vrm::{BoneName, HumanoidBones, SpringBones, VrmBundle, VrmPlugin};
 
 fn main() {
@@ -48,7 +48,6 @@ fn setup(
             transform: Transform::from_xyz(1.0, 2.0, 3.0),
             ..Default::default()
         },
-        MtoonMainCamera,
         PanOrbitCamera {
             focus: Vec3::new(0.0, 1.0, 0.0),
             ..Default::default()

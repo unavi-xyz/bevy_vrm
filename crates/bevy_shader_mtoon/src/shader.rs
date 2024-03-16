@@ -18,7 +18,7 @@ pub struct MtoonShader {
     pub gl_equalization_factor: f32,
     pub light_color: Color,
     pub light_dir: Vec3,
-    pub matcap_factor: Vec4,
+    pub matcap_factor: Vec3,
     pub parametric_rim_color: Color,
     pub parametric_rim_fresnel_power: f32,
     pub parametric_rim_lift_factor: f32,
@@ -53,7 +53,7 @@ impl Default for MtoonShader {
             gl_equalization_factor: 0.9,
             light_color: Color::WHITE,
             light_dir: Vec3::Y,
-            matcap_factor: Vec4::ZERO,
+            matcap_factor: Vec3::ZERO,
             parametric_rim_color: Color::WHITE,
             parametric_rim_fresnel_power: 5.0,
             parametric_rim_lift_factor: 0.0,
@@ -74,14 +74,14 @@ impl Default for MtoonShader {
 pub struct MtoonShaderUniform {
     pub flags: u32,
     pub gl_equalization_factor: f32,
-    pub light_color: Vec4,
+    pub light_color: Vec3,
     pub light_dir: Vec3,
-    pub matcap_factor: Vec4,
-    pub parametric_rim_color: Vec4,
+    pub matcap_factor: Vec3,
+    pub parametric_rim_color: Vec3,
     pub parametric_rim_fresnel_power: f32,
     pub parametric_rim_lift_factor: f32,
     pub rim_lighting_mix_factor: f32,
-    pub shade_color: Vec4,
+    pub shade_color: Vec3,
     pub shading_shift_factor: f32,
     pub shading_toony_factor: f32,
     pub view_dir: Vec3,
@@ -104,17 +104,30 @@ impl AsBindGroupShaderType<MtoonShaderUniform> for MtoonShader {
             flags |= MtoonMaterialFlags::RIM_MULTIPLY_TEXTURE;
         }
 
+        let light_color = self.light_color.as_linear_rgba_f32();
+        let light_color = Vec3::new(light_color[0], light_color[1], light_color[2]);
+
+        let parametric_rim_color = self.parametric_rim_color.as_linear_rgba_f32();
+        let parametric_rim_color = Vec3::new(
+            parametric_rim_color[0],
+            parametric_rim_color[1],
+            parametric_rim_color[2],
+        );
+
+        let shade_color = self.shade_color.as_linear_rgba_f32();
+        let shade_color = Vec3::new(shade_color[0], shade_color[1], shade_color[2]);
+
         MtoonShaderUniform {
             flags: flags.bits(),
             gl_equalization_factor: self.gl_equalization_factor,
-            light_color: self.light_color.as_linear_rgba_f32().into(),
+            light_color,
             light_dir: self.light_dir,
             matcap_factor: self.matcap_factor,
-            parametric_rim_color: self.parametric_rim_color.as_linear_rgba_f32().into(),
+            parametric_rim_color,
             parametric_rim_fresnel_power: self.parametric_rim_fresnel_power,
             parametric_rim_lift_factor: self.parametric_rim_lift_factor,
             rim_lighting_mix_factor: self.rim_lighting_mix_factor,
-            shade_color: self.shade_color.as_linear_rgba_f32().into(),
+            shade_color,
             shading_shift_factor: self.shading_shift_factor,
             shading_toony_factor: self.shading_toony_factor,
             view_dir: self.view_dir,

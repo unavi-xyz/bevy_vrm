@@ -13,7 +13,7 @@ use bevy_egui::{
     EguiContexts, EguiPlugin,
 };
 use bevy_panorbit_camera::{PanOrbitCamera, PanOrbitCameraPlugin};
-use bevy_shader_mtoon::{MtoonMainCamera, MtoonMaterial, MtoonPlugin, MtoonShader, MtoonSun};
+use bevy_shader_mtoon::{MtoonMaterial, MtoonPlugin, MtoonShader, MtoonSun};
 
 fn main() {
     App::new()
@@ -45,7 +45,6 @@ fn setup(
             focus: Vec3::new(0.0, 1.0, 0.0),
             ..default()
         },
-        MtoonMainCamera,
     ));
 
     commands.spawn((

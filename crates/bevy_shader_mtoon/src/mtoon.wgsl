@@ -19,17 +19,16 @@
 struct MtoonMaterialUniform {
     flags: u32,
     gl_equalization_factor: f32,
-    light_color: vec4<f32>,
+    light_color: vec3<f32>,
     light_dir: vec3<f32>,
-    matcap_factor: vec4<f32>,
-    parametric_rim_color: vec4<f32>,
+    matcap_factor: vec3<f32>,
+    parametric_rim_color: vec3<f32>,
     parametric_rim_fresnel_power: f32, 
     parametric_rim_lift_factor: f32,
     rim_lighting_mix_factor: f32,
-    shade_color: vec4<f32>,
+    shade_color: vec3<f32>,
     shading_shift_factor: f32,
     shading_toony_factor: f32,
-    view_dir: vec3<f32>,
 };
 
 @group(2) @binding(100)
@@ -48,6 +47,9 @@ const MTOON_FLAGS_SHADING_SHIFT_TEXTURE: u32 = 1u;
 const MTOON_FLAGS_SHADE_COLOR_TEXTURE: u32 = 2u;
 const MTOON_FLAGS_MATCAP_TEXTURE: u32 = 4u;
 const MTOON_FLAGS_RIM_MULTIPLY_TEXTURE: u32 = 8u;
+
+const EPSILON: f32 = 0.00001;
+const WHITE: vec3<f32> = vec3<f32>(1.0, 1.0, 1.0);
 
 @fragment
 fn fragment (
@@ -70,9 +72,7 @@ fn fragment (
     let base_color = pbr_input.material.base_color;
 
     // Shading
-    let normal = normalize(in.world_normal);
-
-    var shading = dot(normal, material.light_dir);
+    var shading = dot(pbr_input.N, material.light_dir);
     shading = shading + material.shading_shift_factor;
 
     if (material.flags & MTOON_FLAGS_SHADING_SHIFT_TEXTURE) != 0u {
@@ -85,21 +85,45 @@ fn fragment (
     var shade_color = material.shade_color;
 
     if (material.flags & MTOON_FLAGS_SHADE_COLOR_TEXTURE) != 0u {
-        shade_color = shade_color * textureSample(shade_color_texture, shade_color_sampler, in.uv);
+        shade_color = shade_color * textureSample(shade_color_texture, shade_color_sampler, in.uv).rgb;
     }
 
-    var color = mix(base_color, shade_color, shading) * material.light_color;
+    var color = mix(base_color.rgb, shade_color, shading) * material.light_color;
 
     // Global illumination
     // This isn't really what the spec says to do, but it gives us standard Bevy lighting features,
     // such as ambient light and shadows.
     let pbr_lighting_color = apply_pbr_lighting(pbr_input);
-    color += pbr_lighting_color * base_color;
+    color += pbr_lighting_color.rgb * base_color.rgb;
 
-    // TODO: Rim lighting
+    // Rim lighting
+    var rim: vec3<f32> = vec3<f32>(0.0, 0.0, 0.0);
+
+    if (material.flags & MTOON_FLAGS_MATCAP_TEXTURE) != 0u {
+        let world_view_x = normalize(vec3<f32>(pbr_input.V.z, 0.0, -pbr_input.V.x));
+        let world_view_y = cross(pbr_input.V, world_view_x);
+        let matcap_uv = vec2<f32>(dot(world_view_x, pbr_input.N), dot(world_view_y, pbr_input.N)) * 0.495 + 0.5;
+        let matcap_color = textureSample(matcap_texture, matcap_sampler, matcap_uv);
+        rim = material.matcap_factor * matcap_color.rgb;
+    }
+
+    var parametric_rim = saturate(1.0 - dot(pbr_input.N, pbr_input.V) + material.parametric_rim_lift_factor);
+    parametric_rim = pow(parametric_rim, max(material.parametric_rim_fresnel_power, EPSILON));
+
+    rim += parametric_rim * material.parametric_rim_color;
+
+    if (material.flags & MTOON_FLAGS_RIM_MULTIPLY_TEXTURE) != 0u {
+        let rim_multiply = textureSample(rim_multiply_texture, rim_multiply_sampler, in.uv);
+        rim *= rim_multiply.rgb;
+    }
+
+    rim *= mix(WHITE, pbr_lighting_color.rgb, material.rim_lighting_mix_factor);
+
+    color += rim;
 
     // Set output
-    out.color = main_pass_post_lighting_processing(pbr_input, color);
+    out.color = vec4<f32>(color, base_color.a);
+    out.color = main_pass_post_lighting_processing(pbr_input, out.color);
 
 #endif
 
