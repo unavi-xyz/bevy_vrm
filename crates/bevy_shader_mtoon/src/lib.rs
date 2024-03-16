@@ -91,8 +91,7 @@ fn sync_outline(
             OutlineMode::Screen => {
                 outline.visible = true;
 
-                // Outline width is a ratio of the screen height.
-                // Convert to pixels.
+                // Outline width is a ratio of screen height.
                 outline.width = material.extension.outline_width * max_height;
             }
             OutlineMode::World => {
@@ -108,7 +107,7 @@ fn sync_outline(
                     .min_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal))
                     .unwrap_or_default();
 
-                outline.width = (material.extension.outline_width * max_height) / distance;
+                outline.width = (material.extension.outline_width * max_height * 0.04) / distance;
             }
         }
 

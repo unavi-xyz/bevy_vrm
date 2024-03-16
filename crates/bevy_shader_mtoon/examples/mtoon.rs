@@ -82,7 +82,7 @@ fn setup(
             base: StandardMaterial::from(Color::BISQUE),
             extension: MtoonShader {
                 shade_factor: Color::SALMON,
-                outline_width: 0.02,
+                outline_width: 0.2,
                 outline_mode: OutlineMode::World,
                 ..default()
             },

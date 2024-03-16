@@ -1,6 +1,6 @@
 use bevy::{asset::LoadedAsset, prelude::*};
 use bevy_gltf_kun::import::gltf::document::ImportContext;
-use bevy_shader_mtoon::{MtoonMaterial, MtoonShader, OutlineSync};
+use bevy_shader_mtoon::{MtoonMaterial, MtoonShader, OutlineMode, OutlineSync};
 use gltf_kun::graph::{
     gltf::{Material, Primitive},
     ByteNode,
@@ -142,6 +142,22 @@ fn load_mtoon_shader(
         let label = texture_label(index);
         let handle = context.load_context.get_label_handle(&label);
         base.emissive_texture = Some(handle);
+    }
+
+    if let Some(value) = weight.float.outline_width {
+        shader.outline_width = value;
+    }
+
+    if let Some(value) = weight.vector.outline_color {
+        shader.outline_color = Color::rgba_linear_from_array(value);
+    }
+
+    if let Some(value) = weight.keyword_map.outline_width_world {
+        if value {
+            shader.outline_mode = OutlineMode::World;
+        } else {
+            shader.outline_mode = OutlineMode::Screen;
+        }
     }
 
     if let Some(value) = weight.float.indirect_light_intensity {
