@@ -1,7 +1,7 @@
 use std::f32::consts::PI;
 
 use bevy::prelude::*;
-use bevy_egui::EguiPlugin;
+use bevy_egui::{egui::Window, EguiContexts, EguiPlugin};
 use bevy_panorbit_camera::{PanOrbitCamera, PanOrbitCameraPlugin};
 use bevy_shader_mtoon::MtoonSun;
 use bevy_vrm::{BoneName, HumanoidBones, SpringBones, VrmBundle, VrmPlugin};
@@ -9,6 +9,7 @@ use bevy_vrm::{BoneName, HumanoidBones, SpringBones, VrmBundle, VrmPlugin};
 fn main() {
     App::new()
         .insert_resource(ClearColor(Color::rgb(0.1, 0.1, 0.1)))
+        .init_resource::<Settings>()
         .add_plugins((
             DefaultPlugins.set(AssetPlugin {
                 file_path: "../../assets".to_string(),
@@ -19,7 +20,7 @@ fn main() {
             VrmPlugin,
         ))
         .add_systems(Startup, setup)
-        .add_systems(Update, (draw_spring_bones, move_leg))
+        .add_systems(Update, (draw_spring_bones, move_leg, ui))
         .run();
 }
 
@@ -60,6 +61,7 @@ fn setup(
         DirectionalLightBundle {
             directional_light: DirectionalLight {
                 illuminance: 10_000.0,
+                shadows_enabled: true,
                 ..default()
             },
             transform: sun_transform,
@@ -76,14 +78,39 @@ fn setup(
     });
 }
 
-fn move_leg(mut transforms: Query<&mut Transform>, time: Res<Time>, vrm: Query<&HumanoidBones>) {
+#[derive(Default, Resource)]
+struct Settings {
+    show_gizmos: bool,
+    move_leg: bool,
+}
+
+fn move_leg(
+    mut original_transform: Local<Option<Transform>>,
+    mut transforms: Query<&mut Transform>,
+    settings: Res<Settings>,
+    time: Res<Time>,
+    vrm: Query<&HumanoidBones>,
+) {
     for humanoid in vrm.iter() {
         let leg = match humanoid.0.get(&BoneName::RightUpperLeg) {
             Some(leg) => leg,
             None => continue,
         };
 
+        if !settings.move_leg {
+            if let Some(original_transform) = original_transform.as_ref() {
+                if let Ok(mut transform) = transforms.get_mut(*leg) {
+                    *transform = *original_transform;
+                }
+            }
+            return;
+        }
+
         if let Ok(mut transform) = transforms.get_mut(*leg) {
+            if original_transform.is_none() {
+                *original_transform = Some(*transform);
+            }
+
             let sin = time.elapsed_seconds().sin();
             transform.rotation = Quat::from_rotation_x(sin);
         }
@@ -94,7 +121,12 @@ fn draw_spring_bones(
     mut gizmos: Gizmos,
     spring_bones: Query<&SpringBones>,
     transforms: Query<&GlobalTransform>,
+    settings: Res<Settings>,
 ) {
+    if !settings.show_gizmos {
+        return;
+    }
+
     for spring_bones in spring_bones.iter() {
         for spring_bone in spring_bones.0.iter() {
             for bone_entity in spring_bone.bones.iter() {
@@ -109,4 +141,11 @@ fn draw_spring_bones(
             }
         }
     }
+}
+
+fn ui(mut contexts: EguiContexts, mut settings: ResMut<Settings>) {
+    Window::new("bevy_vrm").show(contexts.ctx_mut(), |ui| {
+        ui.checkbox(&mut settings.show_gizmos, "Show spring bones");
+        ui.checkbox(&mut settings.move_leg, "Move leg bone");
+    });
 }
