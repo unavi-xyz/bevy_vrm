@@ -16,7 +16,8 @@ impl Plugin for MtoonPlugin {
     fn build(&self, app: &mut App) {
         load_internal_asset!(app, SHADER_HANDLE, "mtoon.wgsl", Shader::from_wgsl);
 
-        app.add_plugins((OutlinePlugin, MaterialPlugin::<MtoonMaterial>::default()))
+        app.register_type::<OutlineSync>()
+            .add_plugins((OutlinePlugin, MaterialPlugin::<MtoonMaterial>::default()))
             .add_systems(Update, (update_mtoon_shader, add_outline, sync_outline));
     }
 }
@@ -47,6 +48,7 @@ fn update_mtoon_shader(
 /// Syncs an Entity's outline with its [MtoonMaterial].
 /// Will add the outline if one is not present.
 #[derive(Component, Clone, Default, Reflect)]
+#[reflect(Component)]
 pub struct OutlineSync;
 
 fn add_outline(
