@@ -5,6 +5,7 @@ use bevy_vrm::{BoneName, HumanoidBones, SpringBones, VrmBundle, VrmPlugin};
 
 fn main() {
     App::new()
+        .insert_resource(ClearColor(Color::rgb(0.1, 0.1, 0.1)))
         .add_plugins((
             DefaultPlugins.set(AssetPlugin {
                 file_path: "../../assets".to_string(),

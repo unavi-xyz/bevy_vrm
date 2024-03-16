@@ -57,7 +57,7 @@ fn fragment (
 ) -> FragmentOutput {
     var pbr_input = pbr_input_from_standard_material(in, is_front);
 
-    // Discard alpha
+    // Alpha discard
     pbr_input.material.base_color = alpha_discard(pbr_input.material, pbr_input.material.base_color);
 
 #ifdef PREPASS_PIPELINE
@@ -94,6 +94,18 @@ fn fragment (
 
     var color = mix(base_color, shade_color, shading) * material.light_color;
 
+    // Global illumination
+    let world_up = vec3<f32>(0.0, 1.0, 0.0);
+    let world_down = vec3<f32>(0.0, -1.0, 0.0);
+
+    let uniformed_gi = (raw_gi(world_up) + raw_gi(world_down)) / 2.0;
+    let passthrough_gi = raw_gi(normal);
+
+    var gi = mix(passthrough_gi, uniformed_gi, material.gl_equalization_factor);
+    gi_vec4 = vec4<f32>(gi, 1.0);
+
+    color = color + gi_vec4 * material.ambient_color;
+
     // TODO: Rim lighting
 
     // Re-apply texture
@@ -109,4 +121,10 @@ fn fragment (
 
 fn linear_step(a: f32, b: f32, t: f32) -> f32 {
     return saturate((t - a) / (b - a));
+}
+
+// Returns the global illumination corresponding to a direction vector
+fn raw_gi(direction: vec3<f32>) -> vec3<f32> {
+    // TODO: Implement
+    return direction;
 }
