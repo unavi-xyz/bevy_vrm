@@ -22,4 +22,5 @@ thiserror.workspace = true
 
 [dev-dependencies]
 bevy = "0.13.0"
+bevy_egui.workspace = true
 bevy_panorbit_camera.workspace = true

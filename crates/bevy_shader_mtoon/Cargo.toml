@@ -16,5 +16,5 @@ bitflags = "2.4.2"
 
 [dev-dependencies]
 bevy = "0.13.0"
-bevy_egui = "0.25.0"
+bevy_egui.workspace = true
 bevy_panorbit_camera.workspace = true

@@ -1091,6 +1091,7 @@ name = "bevy_vrm"
 version = "0.0.8"
 dependencies = [
  "bevy",
+ "bevy_egui",
  "bevy_gltf_kun",
  "bevy_panorbit_camera",
  "bevy_shader_mtoon",

@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use bevy_egui::EguiPlugin;
 use bevy_panorbit_camera::{PanOrbitCamera, PanOrbitCameraPlugin};
 use bevy_shader_mtoon::{MtoonMainCamera, MtoonSun};
 use bevy_vrm::{BoneName, HumanoidBones, SpringBones, VrmBundle, VrmPlugin};
@@ -11,6 +12,7 @@ fn main() {
                 file_path: "../../assets".to_string(),
                 ..default()
             }),
+            EguiPlugin,
             PanOrbitCameraPlugin,
             VrmPlugin,
         ))
