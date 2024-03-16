@@ -134,95 +134,48 @@ fn rotate(time: Res<Time>, mut query: Query<&mut Transform, With<Handle<MtoonMat
     }
 }
 
-fn ui(mut contexts: EguiContexts, mut mtoon_materials: ResMut<Assets<MtoonMaterial>>) {
+fn ui(
+    mut contexts: EguiContexts,
+    mut mtoon_materials: ResMut<Assets<MtoonMaterial>>,
+    mut settings: Local<MtoonShader>,
+) {
+    for (_, material) in mtoon_materials.iter_mut() {
+        material.extension.gl_equalization_factor = settings.gl_equalization_factor;
+        material.extension.parametric_rim_fresnel_power = settings.parametric_rim_fresnel_power;
+        material.extension.parametric_rim_lift_factor = settings.parametric_rim_lift_factor;
+        material.extension.rim_lighting_mix_factor = settings.rim_lighting_mix_factor;
+        material.extension.shading_shift_factor = settings.shading_shift_factor;
+        material.extension.shading_toony_factor = settings.shading_toony_factor;
+    }
+
     Window::new("bevy_shader_mtoon").show(contexts.ctx_mut(), |ui| {
         ui.add(
-            Slider::new(
-                &mut mtoon_materials
-                    .iter_mut()
-                    .next()
-                    .unwrap()
-                    .1
-                    .extension
-                    .gl_equalization_factor,
-                0.0..=1.0,
-            )
-            .text("GL Equalization Factor"),
+            Slider::new(&mut settings.gl_equalization_factor, 0.0..=1.0)
+                .text("GL Equalization Factor"),
         );
 
         ui.add(
-            Slider::new(
-                &mut mtoon_materials
-                    .iter_mut()
-                    .next()
-                    .unwrap()
-                    .1
-                    .extension
-                    .parametric_rim_fresnel_power,
-                0.0..=10.0,
-            )
-            .text("Parametric Rim Fresnel Power"),
+            Slider::new(&mut settings.parametric_rim_fresnel_power, 0.0..=10.0)
+                .text("Parametric Rim Fresnel Power"),
         );
 
         ui.add(
-            Slider::new(
-                &mut mtoon_materials
-                    .iter_mut()
-                    .next()
-                    .unwrap()
-                    .1
-                    .extension
-                    .parametric_rim_lift_factor,
-                0.0..=1.0,
-            )
-            .text("Parametric Rim Lift Factor"),
+            Slider::new(&mut settings.parametric_rim_lift_factor, 0.0..=1.0)
+                .text("Parametric Rim Lift Factor"),
         );
 
         ui.add(
-            Slider::new(
-                &mut mtoon_materials
-                    .iter_mut()
-                    .next()
-                    .unwrap()
-                    .1
-                    .extension
-                    .rim_lighting_mix_factor,
-                0.0..=1.0,
-            )
-            .text("Rim Lighting Mix Factor"),
+            Slider::new(&mut settings.rim_lighting_mix_factor, 0.0..=1.0)
+                .text("Rim Lighting Mix Factor"),
         );
 
         ui.add(
-            Slider::new(
-                &mut mtoon_materials
-                    .iter_mut()
-                    .next()
-                    .unwrap()
-                    .1
-                    .extension
-                    .shading_shift_factor,
-                0.0..=1.0,
-            )
-            .text("Shading Shift Factor"),
+            Slider::new(&mut settings.shading_shift_factor, 0.0..=1.0).text("Shading Shift Factor"),
         );
 
         ui.add(
-            Slider::new(
-                &mut mtoon_materials
-                    .iter_mut()
-                    .next()
-                    .unwrap()
-                    .1
-                    .extension
-                    .shading_toony_factor,
-                0.0..=1.0,
-            )
-            .text("Shading Toony Factor"),
+            Slider::new(&mut settings.shading_toony_factor, 0.0..=1.0).text("Shading Toony Factor"),
         );
-
-        // pub matcap_factor: Vec4,
-        // pub parametric_rim_color: Vec4,
-        // pub shade_color: Vec4,
     });
 }
 
