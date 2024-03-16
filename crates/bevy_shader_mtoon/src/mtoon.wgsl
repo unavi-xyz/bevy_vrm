@@ -101,8 +101,8 @@ fn fragment (
     let uniformed_gi = (raw_gi(world_up) + raw_gi(world_down)) / 2.0;
     let passthrough_gi = raw_gi(normal);
 
-    var gi = mix(passthrough_gi, uniformed_gi, material.gl_equalization_factor);
-    gi_vec4 = vec4<f32>(gi, 1.0);
+    let gi = mix(passthrough_gi, uniformed_gi, material.gl_equalization_factor);
+    let gi_vec4 = vec4<f32>(gi, 1.0);
 
     color = color + gi_vec4 * material.ambient_color;
 

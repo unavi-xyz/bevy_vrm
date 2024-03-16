@@ -8,6 +8,10 @@ use bevy::{
     },
 };
 
+use bevy_egui::{
+    egui::{Slider, Window},
+    EguiContexts, EguiPlugin,
+};
 use bevy_panorbit_camera::{PanOrbitCamera, PanOrbitCameraPlugin};
 use bevy_shader_mtoon::{MtoonMainCamera, MtoonMaterial, MtoonPlugin, MtoonShader, MtoonSun};
 
@@ -16,11 +20,12 @@ fn main() {
         .insert_resource(ClearColor(Color::rgb(0.1, 0.1, 0.1)))
         .add_plugins((
             DefaultPlugins.set(ImagePlugin::default_nearest()),
-            PanOrbitCameraPlugin,
+            EguiPlugin,
             MtoonPlugin,
+            PanOrbitCameraPlugin,
         ))
         .add_systems(Startup, setup)
-        .add_systems(Update, rotate)
+        .add_systems(Update, (rotate, ui))
         .run();
 }
 
@@ -127,6 +132,98 @@ fn rotate(time: Res<Time>, mut query: Query<&mut Transform, With<Handle<MtoonMat
     for mut transform in query.iter_mut() {
         transform.rotate(Quat::from_rotation_y(time.delta_seconds() / 2.0));
     }
+}
+
+fn ui(mut contexts: EguiContexts, mut mtoon_materials: ResMut<Assets<MtoonMaterial>>) {
+    Window::new("bevy_shader_mtoon").show(contexts.ctx_mut(), |ui| {
+        ui.add(
+            Slider::new(
+                &mut mtoon_materials
+                    .iter_mut()
+                    .next()
+                    .unwrap()
+                    .1
+                    .extension
+                    .gl_equalization_factor,
+                0.0..=1.0,
+            )
+            .text("GL Equalization Factor"),
+        );
+
+        ui.add(
+            Slider::new(
+                &mut mtoon_materials
+                    .iter_mut()
+                    .next()
+                    .unwrap()
+                    .1
+                    .extension
+                    .parametric_rim_fresnel_power,
+                0.0..=10.0,
+            )
+            .text("Parametric Rim Fresnel Power"),
+        );
+
+        ui.add(
+            Slider::new(
+                &mut mtoon_materials
+                    .iter_mut()
+                    .next()
+                    .unwrap()
+                    .1
+                    .extension
+                    .parametric_rim_lift_factor,
+                0.0..=1.0,
+            )
+            .text("Parametric Rim Lift Factor"),
+        );
+
+        ui.add(
+            Slider::new(
+                &mut mtoon_materials
+                    .iter_mut()
+                    .next()
+                    .unwrap()
+                    .1
+                    .extension
+                    .rim_lighting_mix_factor,
+                0.0..=1.0,
+            )
+            .text("Rim Lighting Mix Factor"),
+        );
+
+        ui.add(
+            Slider::new(
+                &mut mtoon_materials
+                    .iter_mut()
+                    .next()
+                    .unwrap()
+                    .1
+                    .extension
+                    .shading_shift_factor,
+                0.0..=1.0,
+            )
+            .text("Shading Shift Factor"),
+        );
+
+        ui.add(
+            Slider::new(
+                &mut mtoon_materials
+                    .iter_mut()
+                    .next()
+                    .unwrap()
+                    .1
+                    .extension
+                    .shading_toony_factor,
+                0.0..=1.0,
+            )
+            .text("Shading Toony Factor"),
+        );
+
+        // pub matcap_factor: Vec4,
+        // pub parametric_rim_color: Vec4,
+        // pub shade_color: Vec4,
+    });
 }
 
 fn uv_debug_texture() -> Image {
