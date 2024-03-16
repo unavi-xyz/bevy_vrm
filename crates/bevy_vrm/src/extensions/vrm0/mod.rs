@@ -1,6 +1,6 @@
 use bevy::{asset::LoadedAsset, prelude::*};
 use bevy_gltf_kun::import::gltf::document::ImportContext;
-use bevy_shader_mtoon::{MtoonMaterial, MtoonShader};
+use bevy_shader_mtoon::{MtoonMaterial, MtoonShader, OutlineSync};
 use gltf_kun::graph::{
     gltf::{Material, Primitive},
     ByteNode,
@@ -88,6 +88,7 @@ pub fn import_primitive_material(
                 let label = mtoon_label(i);
 
                 if !context.load_context.has_labeled_asset(label.clone()) {
+                    warn!("MToon material not found for property {}", i);
                     continue;
                 }
 
@@ -95,7 +96,9 @@ pub fn import_primitive_material(
                     .load_context
                     .get_label_handle::<MtoonMaterial>(&label);
 
-                entity.remove::<Handle<StandardMaterial>>().insert(handle);
+                entity
+                    .remove::<Handle<StandardMaterial>>()
+                    .insert((handle, OutlineSync));
             }
             Some(other) => {
                 warn!("Unsupported shader: {:?}", other);

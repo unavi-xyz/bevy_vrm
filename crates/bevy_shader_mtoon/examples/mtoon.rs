@@ -13,7 +13,9 @@ use bevy_egui::{
     EguiContexts, EguiPlugin,
 };
 use bevy_panorbit_camera::{PanOrbitCamera, PanOrbitCameraPlugin};
-use bevy_shader_mtoon::{MtoonMaterial, MtoonPlugin, MtoonShader, MtoonSun};
+use bevy_shader_mtoon::{
+    MtoonBundle, MtoonMaterial, MtoonPlugin, MtoonShader, MtoonSun, OutlineMode,
+};
 
 fn main() {
     App::new()
@@ -60,21 +62,33 @@ fn setup(
         MtoonSun,
     ));
 
-    let mtoon_textured = mtoon_materials.add(MtoonMaterial {
-        base: StandardMaterial {
-            base_color_texture: Some(images.add(uv_debug_texture())),
-            ..default()
-        },
-        extension: MtoonShader::default(),
-    });
+    let mtoon_textured = MtoonBundle {
+        mtoon: mtoon_materials.add(MtoonMaterial {
+            base: StandardMaterial {
+                base_color_texture: Some(images.add(uv_debug_texture())),
+                ..default()
+            },
+            extension: MtoonShader {
+                outline_width: 0.002,
+                outline_mode: OutlineMode::Screen,
+                ..default()
+            },
+        }),
+        ..default()
+    };
 
-    let mtoon_plain = mtoon_materials.add(MtoonMaterial {
-        base: StandardMaterial::from(Color::BISQUE),
-        extension: MtoonShader {
-            shade_factor: Color::SALMON,
-            ..default()
-        },
-    });
+    let mtoon_plain = MtoonBundle {
+        mtoon: mtoon_materials.add(MtoonMaterial {
+            base: StandardMaterial::from(Color::BISQUE),
+            extension: MtoonShader {
+                shade_factor: Color::SALMON,
+                outline_width: 0.02,
+                outline_mode: OutlineMode::World,
+                ..default()
+            },
+        }),
+        ..default()
+    };
 
     let shapes = [
         meshes.add(Cuboid::default()),
@@ -91,39 +105,45 @@ fn setup(
 
     for (i, mesh) in shapes.into_iter().enumerate() {
         // Texture
-        commands.spawn(MaterialMeshBundle {
-            mesh: mesh.clone(),
-            material: mtoon_textured.clone(),
-            transform: Transform::from_xyz(
-                -X_EXTENT / 2.0 + i as f32 / (num_shapes - 1) as f32 * X_EXTENT,
-                1.0,
-                3.0,
-            )
-            .with_rotation(Quat::from_rotation_x(-PI / 4.0)),
-            ..default()
-        });
+        commands.spawn((
+            mesh.clone(),
+            mtoon_textured.clone(),
+            SpatialBundle {
+                transform: Transform::from_xyz(
+                    -X_EXTENT / 2.0 + i as f32 / (num_shapes - 1) as f32 * X_EXTENT,
+                    1.0,
+                    3.0,
+                )
+                .with_rotation(Quat::from_rotation_x(-PI / 4.0)),
+                ..default()
+            },
+        ));
 
         // Without texture
-        commands.spawn(MaterialMeshBundle {
+        commands.spawn((
             mesh,
-            material: mtoon_plain.clone(),
-            transform: Transform::from_xyz(
-                -X_EXTENT / 2.0 + i as f32 / (num_shapes - 1) as f32 * X_EXTENT,
-                1.0,
-                -3.0,
-            )
-            .with_rotation(Quat::from_rotation_x(-PI / 4.0)),
-            ..default()
-        });
+            mtoon_plain.clone(),
+            SpatialBundle {
+                transform: Transform::from_xyz(
+                    -X_EXTENT / 2.0 + i as f32 / (num_shapes - 1) as f32 * X_EXTENT,
+                    1.0,
+                    -3.0,
+                )
+                .with_rotation(Quat::from_rotation_x(-PI / 4.0)),
+                ..default()
+            },
+        ));
     }
 
     // Big shape to test shadows.
-    commands.spawn(MaterialMeshBundle {
-        mesh: meshes.add(Torus::default()),
-        material: mtoon_textured.clone(),
-        transform: Transform::from_xyz(0.0, 5.0, 0.0).with_scale(Vec3::splat(4.0)),
-        ..default()
-    });
+    commands.spawn((
+        meshes.add(Torus::default()),
+        mtoon_textured.clone(),
+        SpatialBundle {
+            transform: Transform::from_xyz(0.0, 5.0, 0.0).with_scale(Vec3::splat(4.25)),
+            ..default()
+        },
+    ));
 
     // Ground
     commands.spawn(PbrBundle {

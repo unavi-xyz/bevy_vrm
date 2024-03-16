@@ -15,6 +15,10 @@ pub type MtoonMaterial = bevy::pbr::ExtendedMaterial<StandardMaterial, MtoonShad
 #[uniform(100, MtoonShaderUniform)]
 #[reflect(PartialEq)]
 pub struct MtoonShader {
+    pub outline_color: Color,
+    pub outline_mode: OutlineMode,
+    pub outline_width: f32,
+
     pub gi_equalization_factor: f32,
     pub light_color: Color,
     pub light_dir: Vec3,
@@ -46,9 +50,21 @@ pub struct MtoonShader {
     pub rim_multiply_texture: Option<Handle<Image>>,
 }
 
+#[derive(Debug, Default, Clone, PartialEq, Reflect)]
+pub enum OutlineMode {
+    #[default]
+    None,
+    Screen,
+    World,
+}
+
 impl Default for MtoonShader {
     fn default() -> Self {
         Self {
+            outline_color: Color::rgba(0.0, 0.0, 0.0, 1.0),
+            outline_mode: OutlineMode::None,
+            outline_width: 0.0,
+
             shade_factor: Color::BLACK,
             gi_equalization_factor: 0.9,
             light_color: Color::WHITE,
