@@ -46,7 +46,6 @@ fn setup(
     commands.spawn((
         DirectionalLightBundle {
             directional_light: DirectionalLight {
-                shadows_enabled: true,
                 illuminance: 5000.0,
                 ..default()
             },

@@ -92,11 +92,13 @@ fn fragment (
 
     shading = 1.0 - linear_step(material.shading_toony_factor - 1.0, 1.0 - material.shading_toony_factor, shading);
 
+    var color = mix(base_color, shade_color, shading) * material.light_color;
+
     // TODO: Rim lighting
 
     // Re-apply texture
-    out.color = out.color * base_color;
-    pbr_input.material.base_color = base_color;
+    out.color = out.color * color;
+    pbr_input.material.base_color = color;
 
     out.color = main_pass_post_lighting_processing(pbr_input, out.color);
 
