@@ -983,7 +983,7 @@ dependencies = [
 
 [[package]]
 name = "bevy_shader_mtoon"
-version = "0.0.8"
+version = "0.0.9"
 dependencies = [
  "bevy",
  "bevy_egui",
@@ -1142,7 +1142,7 @@ dependencies = [
 
 [[package]]
 name = "bevy_vrm"
-version = "0.0.8"
+version = "0.0.9"
 dependencies = [
  "bevy",
  "bevy_egui",
@@ -2223,7 +2223,7 @@ dependencies = [
 
 [[package]]
 name = "gltf_kun_vrm"
-version = "0.0.8"
+version = "0.0.9"
 dependencies = [
  "gltf_kun",
  "serde",
@@ -3668,7 +3668,7 @@ dependencies = [
 
 [[package]]
 name = "serde_vrm"
-version = "0.0.8"
+version = "0.0.9"
 dependencies = [
  "serde",
 ]
