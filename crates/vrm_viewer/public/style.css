@@ -1,0 +1,12 @@
+body {
+  background-color: rgb(25.5, 25.5, 25.5);
+  font-family: "Roboto", sans-serif;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+
+canvas {
+  height: 100vh !important;
+  width: 100vw !important;
+}

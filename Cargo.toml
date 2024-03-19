@@ -15,6 +15,7 @@ type_complexity = "allow"
 
 [workspace.dependencies]
 bevy_shader_mtoon = { path = "crates/bevy_shader_mtoon", version = "0.0.9" }
+bevy_vrm = { path = "crates/bevy_vrm", version = "0.0.9" }
 gltf_kun_vrm = { path = "crates/gltf_kun_vrm", version = "0.0.9" }
 serde_vrm = { path = "crates/serde_vrm", version = "0.0.9" }
 
@@ -33,3 +34,6 @@ opt-level = 3
 
 [profile.release]
 lto = true
+
+[patches.crates-io]
+bevy = { git = "https://github.com/eero-lehtinen/bevy", branch = "v0.13.1-nvidia-fix" }

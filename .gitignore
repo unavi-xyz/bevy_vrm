@@ -1,2 +1,3 @@
-target
-result
+/target
+/result
+/crates/vrm_viewer/dist

@@ -1,0 +1,21 @@
+[package]
+name = "vrm_viewer"
+publish = false
+version.workspace = true
+license.workspace = true
+repository.workspace = true
+edition.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+bevy.workspace = true
+bevy_egui.workspace = true
+bevy_panorbit_camera.workspace = true
+bevy_vrm.workspace = true
+
+[target.'cfg(target_family = "wasm")'.dependencies]
+bevy_blob_loader = "0.0.4"
+bevy_web_file_drop = "0.0.3"
+wasm-bindgen = "=0.2.91"
