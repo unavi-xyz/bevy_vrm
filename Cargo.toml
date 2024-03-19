@@ -18,7 +18,7 @@ bevy = { version = "0.13.0", default-features = false, features = ["animation", 
 bevy_egui = "0.25.0"
 bevy_panorbit_camera = { version = "0.16.1", features = ["bevy_egui"] }
 bevy_shader_mtoon = { path = "crates/bevy_shader_mtoon", version = "0.0.8" }
-gltf_kun = { version = "0.0.11", default-features = false }
+gltf_kun = { version = "0.0.12", default-features = false }
 gltf_kun_vrm = { path = "crates/gltf_kun_vrm", version = "0.0.8" }
 serde = { version = "1.0.197", features = ["derive"] }
 serde_vrm = { path = "crates/serde_vrm", version = "0.0.8" }
@@ -32,8 +32,3 @@ opt-level = 3
 
 [profile.release]
 lto = true
-
-[patch.crates-io]
-bevy = { git = "https://github.com/eero-lehtinen/bevy.git", branch = "v0.13.0-nvidia-fix" }
-bevy_gltf_kun = { git = "https://github.com/unavi-xyz/gltf_kun.git" }
-gltf_kun = { git = "https://github.com/unavi-xyz/gltf_kun.git" }
