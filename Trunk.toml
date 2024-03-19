@@ -1,2 +1,3 @@
 [build]
 target = "crates/vrm_viewer/index.html"
+public_url = "bevy_vrm"

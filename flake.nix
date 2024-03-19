@@ -142,8 +142,6 @@
           pname = "vrm_viewer_web";
           cargoExtraArgs = "--locked -p vrm_viewer";
           trunkIndexPath = "./crates/vrm_viewer/index.html";
-          trunkExtraBuildArgs =
-            "--public-url https://unavi-xyz.github.io/bevy_vrm/";
           wasm-bindgen-cli = pkgs.wasm-bindgen-cli;
         });
       in {
