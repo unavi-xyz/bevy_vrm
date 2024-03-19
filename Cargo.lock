@@ -374,8 +374,7 @@ checksum = "9475866fec1451be56a3c2400fd081ff546538961565ccb5b7142cbd22bc7a51"
 [[package]]
 name = "bevy"
 version = "0.13.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ea370412c322af887c9115442d8f2ec991b652f163a1d8920ecaf08cae63f2bc"
+source = "git+https://github.com/eero-lehtinen/bevy?branch=v0.13.1-nvidia-fix#a9c1e06898b4448e297d905793e82dfd7b93d190"
 dependencies = [
  "bevy_internal",
 ]
@@ -383,8 +382,7 @@ dependencies = [
 [[package]]
 name = "bevy_a11y"
 version = "0.13.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6192db480a04d4a0ad5d89a2fbd78ccca5ce902829a49ec2d1dbc213222ed8b1"
+source = "git+https://github.com/eero-lehtinen/bevy?branch=v0.13.1-nvidia-fix#a9c1e06898b4448e297d905793e82dfd7b93d190"
 dependencies = [
  "accesskit",
  "bevy_app",
@@ -395,8 +393,7 @@ dependencies = [
 [[package]]
 name = "bevy_animation"
 version = "0.13.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bef3bbaf9233c428d8dd4b66a41b5381e41c67da860d9dc2118a8e6610ec874c"
+source = "git+https://github.com/eero-lehtinen/bevy?branch=v0.13.1-nvidia-fix#a9c1e06898b4448e297d905793e82dfd7b93d190"
 dependencies = [
  "bevy_app",
  "bevy_asset",
@@ -414,8 +411,7 @@ dependencies = [
 [[package]]
 name = "bevy_app"
 version = "0.13.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b508824497f3a3a2fab8398dc3944a4d4adddcc30ee25cd6d45b0a57336549ce"
+source = "git+https://github.com/eero-lehtinen/bevy?branch=v0.13.1-nvidia-fix#a9c1e06898b4448e297d905793e82dfd7b93d190"
 dependencies = [
  "bevy_derive",
  "bevy_ecs",
@@ -430,8 +426,7 @@ dependencies = [
 [[package]]
 name = "bevy_asset"
 version = "0.13.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ccf224b57fb65e1cde921afe0b343c2d595531dbf882c41abad01bbc665a05c4"
+source = "git+https://github.com/eero-lehtinen/bevy?branch=v0.13.1-nvidia-fix#a9c1e06898b4448e297d905793e82dfd7b93d190"
 dependencies = [
  "async-broadcast",
  "async-fs",
@@ -462,8 +457,7 @@ dependencies = [
 [[package]]
 name = "bevy_asset_macros"
 version = "0.13.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "684c855651e7734740b76ada0e7daed116c46d393f9031cc45c4fe9ad5829548"
+source = "git+https://github.com/eero-lehtinen/bevy?branch=v0.13.1-nvidia-fix#a9c1e06898b4448e297d905793e82dfd7b93d190"
 dependencies = [
  "bevy_macro_utils",
  "proc-macro2",
@@ -474,8 +468,7 @@ dependencies = [
 [[package]]
 name = "bevy_audio"
 version = "0.13.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0af1796b7e56c2f49de5be72fb2aadb8f9310d6173d70040fd2eff1c7cb29009"
+source = "git+https://github.com/eero-lehtinen/bevy?branch=v0.13.1-nvidia-fix#a9c1e06898b4448e297d905793e82dfd7b93d190"
 dependencies = [
  "bevy_app",
  "bevy_asset",
@@ -506,8 +499,7 @@ dependencies = [
 [[package]]
 name = "bevy_core"
 version = "0.13.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e1a8f4722fb978d308b6311f3dd61f6885165055ad05ce3dfc1b2fd001bb017e"
+source = "git+https://github.com/eero-lehtinen/bevy?branch=v0.13.1-nvidia-fix#a9c1e06898b4448e297d905793e82dfd7b93d190"
 dependencies = [
  "bevy_app",
  "bevy_ecs",
@@ -521,8 +513,7 @@ dependencies = [
 [[package]]
 name = "bevy_core_pipeline"
 version = "0.13.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "568659c43c8f1805f434b5fc0f8e700c263391403f899312bb0e4bc8d8b9ca70"
+source = "git+https://github.com/eero-lehtinen/bevy?branch=v0.13.1-nvidia-fix#a9c1e06898b4448e297d905793e82dfd7b93d190"
 dependencies = [
  "bevy_app",
  "bevy_asset",
@@ -543,8 +534,7 @@ dependencies = [
 [[package]]
 name = "bevy_derive"
 version = "0.13.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7de77523d154e220a740e568a89f52fac7de481374bdecbbbeb283a37580ba34"
+source = "git+https://github.com/eero-lehtinen/bevy?branch=v0.13.1-nvidia-fix#a9c1e06898b4448e297d905793e82dfd7b93d190"
 dependencies = [
  "bevy_macro_utils",
  "quote",
@@ -554,8 +544,7 @@ dependencies = [
 [[package]]
 name = "bevy_diagnostic"
 version = "0.13.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9b5b031eeafc17bed997313ca15c8e4ed8b97fe2e9ef48e980833e4bf5cfa0e7"
+source = "git+https://github.com/eero-lehtinen/bevy?branch=v0.13.1-nvidia-fix#a9c1e06898b4448e297d905793e82dfd7b93d190"
 dependencies = [
  "bevy_app",
  "bevy_core",
@@ -570,8 +559,7 @@ dependencies = [
 [[package]]
 name = "bevy_ecs"
 version = "0.13.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0a027175613f630a51273c0f8ae909dd54ea3ce72eb573f456056553f79918ac"
+source = "git+https://github.com/eero-lehtinen/bevy?branch=v0.13.1-nvidia-fix#a9c1e06898b4448e297d905793e82dfd7b93d190"
 dependencies = [
  "async-channel",
  "bevy_ecs_macros",
@@ -590,8 +578,7 @@ dependencies = [
 [[package]]
 name = "bevy_ecs_macros"
 version = "0.13.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "55dbbb6300f08cef5983497970db8545d3cbda6ee4f410a6c6742b7b6bbfd3af"
+source = "git+https://github.com/eero-lehtinen/bevy?branch=v0.13.1-nvidia-fix#a9c1e06898b4448e297d905793e82dfd7b93d190"
 dependencies = [
  "bevy_macro_utils",
  "proc-macro2",
@@ -616,8 +603,7 @@ dependencies = [
 [[package]]
 name = "bevy_encase_derive"
 version = "0.13.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "df72ac1273fcdb8105736c42815442ae1291f1f577e34cb7e9d18f732103e2f0"
+source = "git+https://github.com/eero-lehtinen/bevy?branch=v0.13.1-nvidia-fix#a9c1e06898b4448e297d905793e82dfd7b93d190"
 dependencies = [
  "bevy_macro_utils",
  "encase_derive_impl",
@@ -626,8 +612,7 @@ dependencies = [
 [[package]]
 name = "bevy_gilrs"
 version = "0.13.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "02146d8a92ac322717185005a17b488e74b2ec08ca3f9eb8a7cadb7f0486cb70"
+source = "git+https://github.com/eero-lehtinen/bevy?branch=v0.13.1-nvidia-fix#a9c1e06898b4448e297d905793e82dfd7b93d190"
 dependencies = [
  "bevy_app",
  "bevy_ecs",
@@ -642,8 +627,7 @@ dependencies = [
 [[package]]
 name = "bevy_gizmos"
 version = "0.13.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "66e9965860d505e2ea4144850904cefd8b528f59477061df8563194dc954ad58"
+source = "git+https://github.com/eero-lehtinen/bevy?branch=v0.13.1-nvidia-fix#a9c1e06898b4448e297d905793e82dfd7b93d190"
 dependencies = [
  "bevy_app",
  "bevy_asset",
@@ -664,8 +648,7 @@ dependencies = [
 [[package]]
 name = "bevy_gizmos_macros"
 version = "0.13.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a3e689be764256a5a0d1f01c5f1dbaa3439e98a1338bf88b496db184d28e00c9"
+source = "git+https://github.com/eero-lehtinen/bevy?branch=v0.13.1-nvidia-fix#a9c1e06898b4448e297d905793e82dfd7b93d190"
 dependencies = [
  "bevy_macro_utils",
  "proc-macro2",
@@ -676,8 +659,7 @@ dependencies = [
 [[package]]
 name = "bevy_gltf"
 version = "0.13.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5d0cd8fd1c1ce3a57ca96eaee05f406ad65865efd02606e5f288b5f7767d8c6f"
+source = "git+https://github.com/eero-lehtinen/bevy?branch=v0.13.1-nvidia-fix#a9c1e06898b4448e297d905793e82dfd7b93d190"
 dependencies = [
  "base64 0.21.7",
  "bevy_animation",
@@ -720,8 +702,7 @@ dependencies = [
 [[package]]
 name = "bevy_hierarchy"
 version = "0.13.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5b2999d1e5bb877b475c9b2d17643d5fb47fc4cc49ea48ba3ab5a6b00ed850a6"
+source = "git+https://github.com/eero-lehtinen/bevy?branch=v0.13.1-nvidia-fix#a9c1e06898b4448e297d905793e82dfd7b93d190"
 dependencies = [
  "bevy_app",
  "bevy_core",
@@ -734,8 +715,7 @@ dependencies = [
 [[package]]
 name = "bevy_input"
 version = "0.13.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7c22481e4290e2eca68b0c1f5f0a826f185d8f5e40e05c86bb6044dcfe3a04b3"
+source = "git+https://github.com/eero-lehtinen/bevy?branch=v0.13.1-nvidia-fix#a9c1e06898b4448e297d905793e82dfd7b93d190"
 dependencies = [
  "bevy_app",
  "bevy_ecs",
@@ -749,8 +729,7 @@ dependencies = [
 [[package]]
 name = "bevy_internal"
 version = "0.13.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3ac9275cc7f4bce41dff1e62b853933e242f9e5c076d89f06156cf743097d6a0"
+source = "git+https://github.com/eero-lehtinen/bevy?branch=v0.13.1-nvidia-fix#a9c1e06898b4448e297d905793e82dfd7b93d190"
 dependencies = [
  "bevy_a11y",
  "bevy_animation",
@@ -788,8 +767,7 @@ dependencies = [
 [[package]]
 name = "bevy_log"
 version = "0.13.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "20c7b4e2443654d68b6f8c54e5f1ce3a16c8a9af10f4832390dcae36c1323307"
+source = "git+https://github.com/eero-lehtinen/bevy?branch=v0.13.1-nvidia-fix#a9c1e06898b4448e297d905793e82dfd7b93d190"
 dependencies = [
  "android_log-sys",
  "bevy_app",
@@ -804,8 +782,7 @@ dependencies = [
 [[package]]
 name = "bevy_macro_utils"
 version = "0.13.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3bbbf88fc577a21ee9994feed2253ee9838b63fb976783b7a549edfbe07c6764"
+source = "git+https://github.com/eero-lehtinen/bevy?branch=v0.13.1-nvidia-fix#a9c1e06898b4448e297d905793e82dfd7b93d190"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -817,8 +794,7 @@ dependencies = [
 [[package]]
 name = "bevy_math"
 version = "0.13.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9d30721f36a0b5f9ad39deb140c50b85cbbaefebab8d10bd20d9de1c9572f968"
+source = "git+https://github.com/eero-lehtinen/bevy?branch=v0.13.1-nvidia-fix#a9c1e06898b4448e297d905793e82dfd7b93d190"
 dependencies = [
  "glam",
  "serde",
@@ -827,8 +803,7 @@ dependencies = [
 [[package]]
 name = "bevy_mikktspace"
 version = "0.13.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cc081a695c3513f09fdc640bf7f66cd73c47eb479da50312bf9710ee6927729d"
+source = "git+https://github.com/eero-lehtinen/bevy?branch=v0.13.1-nvidia-fix#a9c1e06898b4448e297d905793e82dfd7b93d190"
 dependencies = [
  "glam",
 ]
@@ -859,8 +834,7 @@ dependencies = [
 [[package]]
 name = "bevy_pbr"
 version = "0.13.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d90401eb58acb1c9627f11f75b076bfdeab2af9a4aea4540cb525efc5782b613"
+source = "git+https://github.com/eero-lehtinen/bevy?branch=v0.13.1-nvidia-fix#a9c1e06898b4448e297d905793e82dfd7b93d190"
 dependencies = [
  "bevy_app",
  "bevy_asset",
@@ -884,14 +858,12 @@ dependencies = [
 [[package]]
 name = "bevy_ptr"
 version = "0.13.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ea003584000ef02b73800cc7cb62ee74792fff431e6a8df36863c43bf56fb491"
+source = "git+https://github.com/eero-lehtinen/bevy?branch=v0.13.1-nvidia-fix#a9c1e06898b4448e297d905793e82dfd7b93d190"
 
 [[package]]
 name = "bevy_reflect"
 version = "0.13.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b1101dbd44ae35e5c66802e46cfba1182e49f6163c824bee380d4acab5b2f640"
+source = "git+https://github.com/eero-lehtinen/bevy?branch=v0.13.1-nvidia-fix#a9c1e06898b4448e297d905793e82dfd7b93d190"
 dependencies = [
  "bevy_math",
  "bevy_ptr",
@@ -908,8 +880,7 @@ dependencies = [
 [[package]]
 name = "bevy_reflect_derive"
 version = "0.13.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e2a8791d5841a6db862571f709d7ee70c2a5eb1634c3a4329817d04f0e307c2d"
+source = "git+https://github.com/eero-lehtinen/bevy?branch=v0.13.1-nvidia-fix#a9c1e06898b4448e297d905793e82dfd7b93d190"
 dependencies = [
  "bevy_macro_utils",
  "proc-macro2",
@@ -921,8 +892,7 @@ dependencies = [
 [[package]]
 name = "bevy_render"
 version = "0.13.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "75bbb48471f8cd06f5253e271f9b793695f5b821fc9d39a875497905578d9867"
+source = "git+https://github.com/eero-lehtinen/bevy?branch=v0.13.1-nvidia-fix#a9c1e06898b4448e297d905793e82dfd7b93d190"
 dependencies = [
  "async-channel",
  "bevy_app",
@@ -966,8 +936,7 @@ dependencies = [
 [[package]]
 name = "bevy_render_macros"
 version = "0.13.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ffd61a89e7a1b55c78a0aef1fcadd0247fe74a101c00f831791db73d63465051"
+source = "git+https://github.com/eero-lehtinen/bevy?branch=v0.13.1-nvidia-fix#a9c1e06898b4448e297d905793e82dfd7b93d190"
 dependencies = [
  "bevy_macro_utils",
  "proc-macro2",
@@ -978,8 +947,7 @@ dependencies = [
 [[package]]
 name = "bevy_scene"
 version = "0.13.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "368b989251241efb590976e309e4778ed9d04eb896c37ea6b874a374432a0b3e"
+source = "git+https://github.com/eero-lehtinen/bevy?branch=v0.13.1-nvidia-fix#a9c1e06898b4448e297d905793e82dfd7b93d190"
 dependencies = [
  "bevy_app",
  "bevy_asset",
@@ -1009,8 +977,7 @@ dependencies = [
 [[package]]
 name = "bevy_sprite"
 version = "0.13.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1f52d807086d2c92bc37ee770aa6dbb442b62cdc5665b9c6dd32629b8fae05e4"
+source = "git+https://github.com/eero-lehtinen/bevy?branch=v0.13.1-nvidia-fix#a9c1e06898b4448e297d905793e82dfd7b93d190"
 dependencies = [
  "bevy_app",
  "bevy_asset",
@@ -1035,8 +1002,7 @@ dependencies = [
 [[package]]
 name = "bevy_tasks"
 version = "0.13.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "40be36aeec06b8f0eb87894922c6a7fbd8f2a5c8e77dcb9dcbf77641046988c0"
+source = "git+https://github.com/eero-lehtinen/bevy?branch=v0.13.1-nvidia-fix#a9c1e06898b4448e297d905793e82dfd7b93d190"
 dependencies = [
  "async-channel",
  "async-executor",
@@ -1049,8 +1015,7 @@ dependencies = [
 [[package]]
 name = "bevy_text"
 version = "0.13.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "48f0e51919e13c0c39ecdffcf843e8a8d95fd8861023b02b3ee486d3fa4b6003"
+source = "git+https://github.com/eero-lehtinen/bevy?branch=v0.13.1-nvidia-fix#a9c1e06898b4448e297d905793e82dfd7b93d190"
 dependencies = [
  "ab_glyph",
  "bevy_app",
@@ -1071,8 +1036,7 @@ dependencies = [
 [[package]]
 name = "bevy_time"
 version = "0.13.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "06fc48cf59acd2b1c52e61787b5bb3db1a0f923cc6ccc68c0d8ab2b5894cfd28"
+source = "git+https://github.com/eero-lehtinen/bevy?branch=v0.13.1-nvidia-fix#a9c1e06898b4448e297d905793e82dfd7b93d190"
 dependencies = [
  "bevy_app",
  "bevy_ecs",
@@ -1085,8 +1049,7 @@ dependencies = [
 [[package]]
 name = "bevy_transform"
 version = "0.13.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b962ae4253f5413b64a839ab8e8d63bc3e3db45f41d06b6ddc7886acdcb5d0f5"
+source = "git+https://github.com/eero-lehtinen/bevy?branch=v0.13.1-nvidia-fix#a9c1e06898b4448e297d905793e82dfd7b93d190"
 dependencies = [
  "bevy_app",
  "bevy_ecs",
@@ -1099,8 +1062,7 @@ dependencies = [
 [[package]]
 name = "bevy_ui"
 version = "0.13.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b3449b963573a56b484cf4f8883f1b5b8eaccaaeda8f28a70c006e3291450f77"
+source = "git+https://github.com/eero-lehtinen/bevy?branch=v0.13.1-nvidia-fix#a9c1e06898b4448e297d905793e82dfd7b93d190"
 dependencies = [
  "bevy_a11y",
  "bevy_app",
@@ -1127,8 +1089,7 @@ dependencies = [
 [[package]]
 name = "bevy_utils"
 version = "0.13.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ac758c2e8509a4a260b7a91f920be3beee6ab9e76e388494240ac5d672779159"
+source = "git+https://github.com/eero-lehtinen/bevy?branch=v0.13.1-nvidia-fix#a9c1e06898b4448e297d905793e82dfd7b93d190"
 dependencies = [
  "ahash",
  "bevy_utils_proc_macros",
@@ -1146,8 +1107,7 @@ dependencies = [
 [[package]]
 name = "bevy_utils_proc_macros"
 version = "0.13.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "014c80f466ed01821a2e602d63cd5076915c1af5de5fa3c074cc4a9ca898ada7"
+source = "git+https://github.com/eero-lehtinen/bevy?branch=v0.13.1-nvidia-fix#a9c1e06898b4448e297d905793e82dfd7b93d190"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -1185,8 +1145,7 @@ dependencies = [
 [[package]]
 name = "bevy_window"
 version = "0.13.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fa0c2a1e580b3b0ad0c928a5e250c8375c6a8a70d8b0f483b23d3bf5b670cc1a"
+source = "git+https://github.com/eero-lehtinen/bevy?branch=v0.13.1-nvidia-fix#a9c1e06898b4448e297d905793e82dfd7b93d190"
 dependencies = [
  "bevy_a11y",
  "bevy_app",
@@ -1202,8 +1161,7 @@ dependencies = [
 [[package]]
 name = "bevy_winit"
 version = "0.13.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a2c408d459172758a4cfa37e3452d4ea0898101ec2b6d92aa3eb698511bef389"
+source = "git+https://github.com/eero-lehtinen/bevy?branch=v0.13.1-nvidia-fix#a9c1e06898b4448e297d905793e82dfd7b93d190"
 dependencies = [
  "accesskit_winit",
  "approx",

@@ -114,8 +114,19 @@
 
         vrm_viewer = craneLib.buildPackage (commonArgs // {
           inherit cargoArtifacts;
+
+          src = lib.cleanSourceWith {
+            src = ./.;
+            filter = path: type:
+              (lib.hasSuffix ".wgsl" path) || (lib.hasInfix "/assets/" path)
+              || (craneLib.filterCargoSources path type);
+          };
+
           pname = "vrm_viewer";
           cargoExtraArgs = "--locked -p vrm_viewer";
+          postInstall = ''
+            cp -r assets $out/bin/
+          '';
         });
 
         vrm_viewer_web = craneLib.buildTrunkPackage (commonArgs // {
