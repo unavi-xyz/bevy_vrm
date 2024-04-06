@@ -34,6 +34,3 @@ opt-level = 3
 
 [profile.release]
 lto = true
-
-[patch.crates-io]
-bevy = { git = "https://github.com/eero-lehtinen/bevy", branch = "v0.13.1-nvidia-fix" }
