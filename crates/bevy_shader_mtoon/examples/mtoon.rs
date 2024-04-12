@@ -14,7 +14,7 @@ use bevy_egui::{
 };
 use bevy_panorbit_camera::{PanOrbitCamera, PanOrbitCameraPlugin};
 use bevy_shader_mtoon::{
-    MtoonBundle, MtoonMaterial, MtoonPlugin, MtoonShader, MtoonSun, OutlineMode,
+    MtoonBundle, MtoonMaterial, MtoonMaterial, MtoonPlugin, MtoonSun, OutlineMode,
 };
 
 fn main() {
@@ -68,7 +68,7 @@ fn setup(
                 base_color_texture: Some(images.add(uv_debug_texture())),
                 ..default()
             },
-            extension: MtoonShader {
+            extension: MtoonMaterial {
                 outline_width: 0.002,
                 outline_mode: OutlineMode::Screen,
                 ..default()
@@ -80,7 +80,7 @@ fn setup(
     let mtoon_plain = MtoonBundle {
         mtoon: mtoon_materials.add(MtoonMaterial {
             base: StandardMaterial::from(Color::BISQUE),
-            extension: MtoonShader {
+            extension: MtoonMaterial {
                 shade_factor: Color::SALMON,
                 outline_width: 0.2,
                 outline_mode: OutlineMode::World,
@@ -163,7 +163,7 @@ fn rotate(time: Res<Time>, mut query: Query<&mut Transform, With<Handle<MtoonMat
 fn ui(
     mut contexts: EguiContexts,
     mut mtoon_materials: ResMut<Assets<MtoonMaterial>>,
-    mut settings: Local<MtoonShader>,
+    mut settings: Local<MtoonMaterial>,
 ) {
     for (_, material) in mtoon_materials.iter_mut() {
         material.extension.gi_equalization_factor = settings.gi_equalization_factor;

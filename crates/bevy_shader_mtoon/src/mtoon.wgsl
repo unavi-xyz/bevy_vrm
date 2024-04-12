@@ -1,6 +1,5 @@
 #import bevy_pbr::{
-    pbr_fragment::pbr_input_from_standard_material,
-    pbr_functions::alpha_discard,
+    pbr_fragment::pbr_input_from_vertex_output,
     mesh_view_bindings::view,
     ambient::ambient_light,
 }
@@ -18,6 +17,8 @@
 #endif
 
 struct MtoonMaterialUniform {
+    base_color: vec4<f32>,
+    emissive_factor: vec4<f32>,
     flags: u32,
     gi_equalization_factor: f32,
     light_color: vec3<f32>,
@@ -32,22 +33,30 @@ struct MtoonMaterialUniform {
     shading_toony_factor: f32,
 };
 
-@group(2) @binding(100)
+@group(2) @binding(0)
 var<uniform> material: MtoonMaterialUniform;
 
-@group(2) @binding(101) var shading_shift_texture: texture_2d<f32>;
-@group(2) @binding(102) var shading_shift_sampler: sampler;
-@group(2) @binding(103) var shade_color_texture: texture_2d<f32>;
-@group(2) @binding(104) var shade_color_sampler: sampler;
-@group(2) @binding(105) var matcap_texture: texture_2d<f32>;
-@group(2) @binding(106) var matcap_sampler: sampler;
-@group(2) @binding(107) var rim_multiply_texture: texture_2d<f32>;
-@group(2) @binding(108) var rim_multiply_sampler: sampler;
+@group(2) @binding(1) var base_color_texture: texture_2d<f32>;
+@group(2) @binding(2) var base_color_sampler: sampler;
+@group(2) @binding(3) var emissive_texture: texture_2d<f32>;
+@group(2) @binding(4) var emissive_sampler: sampler;
+@group(2) @binding(5) var matcap_texture: texture_2d<f32>;
+@group(2) @binding(6) var matcap_sampler: sampler;
+@group(2) @binding(7) var normal_map_texture: texture_2d<f32>;
+@group(2) @binding(8) var normal_map_sampler: sampler;
+@group(2) @binding(9) var rim_multiply_texture: texture_2d<f32>;
+@group(2) @binding(10) var rim_multiply_sampler: sampler;
+@group(2) @binding(11) var shade_color_texture: texture_2d<f32>;
+@group(2) @binding(12) var shade_color_sampler: sampler;
+@group(2) @binding(13) var shade_shift_texture: texture_2d<f32>;
+@group(2) @binding(14) var shade_shift_sampler: sampler;
 
-const MTOON_FLAGS_SHADING_SHIFT_TEXTURE: u32 = 1u;
-const MTOON_FLAGS_SHADE_COLOR_TEXTURE: u32 = 2u;
+const MTOON_FLAGS_BASE_COLOR_TEXTURE: u32 = 1u;
+const MTOON_FLAGS_EMISSIVE_TEXTURE: u32 = 2u;
 const MTOON_FLAGS_MATCAP_TEXTURE: u32 = 4u;
 const MTOON_FLAGS_RIM_MULTIPLY_TEXTURE: u32 = 8u;
+const MTOON_FLAGS_SHADE_COLOR_TEXTURE: u32 = 16u;
+const MTOON_FLAGS_SHADING_SHIFT_TEXTURE: u32 = 32u;
 
 const EPSILON: f32 = 0.00001;
 
@@ -56,10 +65,8 @@ fn fragment (
    in: VertexOutput,
    @builtin(front_facing) is_front: bool,
 ) -> FragmentOutput {
-    var pbr_input = pbr_input_from_standard_material(in, is_front);
-
-    // Alpha discard
-    pbr_input.material.base_color = alpha_discard(pbr_input.material, pbr_input.material.base_color);
+    let double_sided = true;
+    var pbr_input = pbr_input_from_vertex_output(in, is_front, double_sided);
 
 #ifdef PREPASS_PIPELINE
 
@@ -69,7 +76,24 @@ fn fragment (
 
     var out: FragmentOutput;
 
+    // Base color
+    pbr_input.material.base_color = material.base_color;
+
+    if (material.flags & MTOON_FLAGS_BASE_COLOR_TEXTURE) != 0u {
+        pbr_input.material.base_color *= textureSample(base_color_texture, base_color_sampler, in.uv);
+    }
+
     let base_color = pbr_input.material.base_color;
+
+    // Emissive
+    var emissive = material.emissive_factor;
+
+    if ((material.flags & MTOON_FLAGS_EMISSIVE_TEXTURE) != 0u) {
+      emissive = vec4<f32>(emissive.rgb * textureSampleBias(emissive_texture, emissive_sampler, in.uv, view.mip_bias).rgb, 1.0);
+    }
+
+
+    // Normal
 
     // Shading
     var shading = dot(pbr_input.N, material.light_dir);
@@ -77,7 +101,7 @@ fn fragment (
 
     if (material.flags & MTOON_FLAGS_SHADING_SHIFT_TEXTURE) != 0u {
         // TODO: Convert texture sample to same type as `shading`
-        // shading = shading + textureSample(shading_shift_texture, shading_shift_sampler, in.uv);
+        // shading = shading + textureSample(shade_shift_texture, shade_shift_sampler, in.uv);
     }
 
     shading = 1.0 - linear_step(material.shading_toony_factor - 1.0, 1.0 - material.shading_toony_factor, shading);

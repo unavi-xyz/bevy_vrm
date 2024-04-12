@@ -1,6 +1,6 @@
 use bevy::{asset::LoadedAsset, prelude::*};
 use bevy_gltf_kun::import::gltf::document::ImportContext;
-use bevy_shader_mtoon::{MtoonMaterial, MtoonShader, OutlineMode, OutlineSync};
+use bevy_shader_mtoon::{MtoonMaterial, OutlineMode, OutlineSync};
 use gltf_kun::graph::{
     gltf::{Material, Primitive},
     ByteNode,
@@ -8,12 +8,7 @@ use gltf_kun::graph::{
 use gltf_kun_vrm::vrm0::{material_property::MaterialProperty, Vrm};
 use serde_vrm::vrm0::Shader;
 
-pub fn import_material(
-    context: &mut ImportContext,
-    standard_material: &mut StandardMaterial,
-    material: Material,
-    ext: Vrm,
-) {
+pub fn import_material(context: &mut ImportContext, material: Material, ext: Vrm) {
     for (i, material_property) in ext.material_properties(context.graph).iter().enumerate() {
         let m = match material_property.material(context.graph) {
             Some(material) => material,
@@ -34,14 +29,7 @@ pub fn import_material(
                 let label = mtoon_label(i);
 
                 if !context.load_context.has_labeled_asset(label.clone()) {
-                    let mut base = standard_material.clone();
-
-                    let shader = load_mtoon_shader(context, &mut base, *material_property);
-
-                    let mtoon = MtoonMaterial {
-                        base,
-                        extension: shader,
-                    };
+                    let mtoon = load_mtoon_shader(context, *material_property);
 
                     context.load_context.add_loaded_labeled_asset(
                         label,
@@ -110,70 +98,75 @@ pub fn import_primitive_material(
 
 fn load_mtoon_shader(
     context: &mut ImportContext,
-    base: &mut StandardMaterial,
     material_property: MaterialProperty,
-) -> MtoonShader {
-    let mut shader = MtoonShader::default();
+) -> MtoonMaterial {
+    let mut mtoon = MtoonMaterial::default();
 
     let weight = material_property.read(context.graph);
 
     if let Some(value) = weight.vector.color {
-        base.base_color = Color::rgba_linear_from_array(value);
+        mtoon.base_color = Color::rgba_linear_from_array(value);
     }
 
     if let Some(texture) = material_property.main_texture(context.graph) {
         let index = context.doc.texture_index(context.graph, texture).unwrap();
         let label = texture_label(index);
         let handle = context.load_context.get_label_handle(&label);
-        base.base_color_texture = Some(handle);
+        mtoon.base_color_texture = Some(handle);
+    }
+
+    if let Some(value) = weight.float.normal_scale {
+        mtoon.normal_map_scale = value;
     }
 
     if let Some(texture) = material_property.bump_map(context.graph) {
         let index = context.doc.texture_index(context.graph, texture).unwrap();
         let label = texture_label(index);
         let handle = context.load_context.get_label_handle(&label);
-        base.normal_map_texture = Some(handle);
+        mtoon.normal_map_texture = Some(handle);
+    }
 
-        // TODO: Bump map scale
+    if let Some(value) = weight.vector.emissive_factor {
+        mtoon.emissive_factor = Color::rgba_linear_from_array(value);
     }
 
     if let Some(texture) = material_property.emission_map(context.graph) {
         let index = context.doc.texture_index(context.graph, texture).unwrap();
         let label = texture_label(index);
         let handle = context.load_context.get_label_handle(&label);
-        base.emissive_texture = Some(handle);
+        mtoon.emissive_texture = Some(handle);
     }
 
-    if let Some(value) = weight.float.outline_width {
-        shader.outline_width = value;
+    if let Some(value) = weight.float.outline_factor {
+        mtoon.outline_width = value;
     }
 
     if let Some(value) = weight.vector.outline_color {
-        shader.outline_color = Color::rgba_linear_from_array(value);
+        mtoon.outline_color = Color::rgba_linear_from_array(value);
     }
 
     if let Some(value) = weight.keyword_map.outline_width_world {
         if value {
-            shader.outline_mode = OutlineMode::World;
+            mtoon.outline_mode = OutlineMode::World;
         } else {
-            shader.outline_mode = OutlineMode::Screen;
+            mtoon.outline_mode = OutlineMode::Screen;
         }
     }
 
-    if let Some(value) = weight.float.indirect_light_intensity {
-        shader.gi_equalization_factor = 1.0 - value;
+    if let Some(value) = weight.float.gi_intensity_factor {
+        mtoon.gi_equalization_factor = 1.0 - value;
     }
 
     if let Some(value) = weight.float.shade_shift {
-        shader.shading_shift_factor = -value;
+        mtoon.shading_shift_factor = -value;
     }
 
     if let Some(value) = weight.float.shade_toony {
-        shader.shading_toony_factor = value;
+        mtoon.shading_toony_factor = value;
     }
 
     if let Some(value) = weight.vector.shade_color {
-        shader.shade_factor = Color::rgba_linear_from_array(value);
+        mtoon.shade_factor = Color::rgba_linear_from_array(value);
     }
 
     if let Some(texture) = material_property.shade_texture(context.graph) {
@@ -185,10 +178,10 @@ fn load_mtoon_shader(
             .unwrap();
         let label = texture_label(index);
         let handle = context.load_context.get_label_handle(&label);
-        shader.shade_multiply_texture = Some(handle);
+        mtoon.shade_multiply_texture = Some(handle);
     }
 
-    shader
+    mtoon
 }
 
 fn mtoon_label(index: usize) -> String {

@@ -71,7 +71,7 @@ impl ExtensionImport<GltfDocument, GltfFormat> for Vrm {
             material_property.set_material(graph, Some(material));
 
             if let Some(texture_properties) = material_property_json.texture {
-                if let Some(idx) = texture_properties.main_tex {
+                if let Some(idx) = texture_properties.base_color {
                     doc.textures(graph)
                         .get(idx as usize)
                         .map(|texture| {
@@ -80,7 +80,7 @@ impl ExtensionImport<GltfDocument, GltfFormat> for Vrm {
                         .ok_or_else(|| Box::new(VrmImportError::TextureNotFound(idx as usize)))?;
                 }
 
-                if let Some(idx) = texture_properties.shade_texture {
+                if let Some(idx) = texture_properties.shade {
                     doc.textures(graph)
                         .get(idx as usize)
                         .map(|texture| {
@@ -89,7 +89,7 @@ impl ExtensionImport<GltfDocument, GltfFormat> for Vrm {
                         .ok_or_else(|| Box::new(VrmImportError::TextureNotFound(idx as usize)))?;
                 }
 
-                if let Some(idx) = texture_properties.sphere_add {
+                if let Some(idx) = texture_properties.additive {
                     doc.textures(graph)
                         .get(idx as usize)
                         .map(|texture| {
@@ -98,7 +98,7 @@ impl ExtensionImport<GltfDocument, GltfFormat> for Vrm {
                         .ok_or_else(|| Box::new(VrmImportError::TextureNotFound(idx as usize)))?;
                 }
 
-                if let Some(idx) = texture_properties.bump_map {
+                if let Some(idx) = texture_properties.normal {
                     doc.textures(graph)
                         .get(idx as usize)
                         .map(|texture| {
@@ -107,7 +107,7 @@ impl ExtensionImport<GltfDocument, GltfFormat> for Vrm {
                         .ok_or_else(|| Box::new(VrmImportError::TextureNotFound(idx as usize)))?;
                 }
 
-                if let Some(idx) = texture_properties.emission_map {
+                if let Some(idx) = texture_properties.emissive {
                     doc.textures(graph)
                         .get(idx as usize)
                         .map(|texture| {

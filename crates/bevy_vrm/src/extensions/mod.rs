@@ -32,11 +32,11 @@ impl ExtensionImport<GltfDocument, GltfFormat> for VrmExtensions {
 impl BevyImportExtensions<GltfDocument> for VrmExtensions {
     fn import_material(
         context: &mut ImportContext,
-        standard_material: &mut StandardMaterial,
+        _standard_material: &mut StandardMaterial,
         material: Material,
     ) {
         if let Some(ext) = context.doc.get_extension::<Vrm>(context.graph) {
-            import_material(context, standard_material, material, ext);
+            import_material(context, material, ext);
         }
     }
 

@@ -5,7 +5,7 @@ use bevy::{asset::load_internal_asset, prelude::*};
 mod shader;
 
 use bevy_mod_outline::{OutlineBundle, OutlinePlugin, OutlineVolume};
-pub use shader::{MtoonMaterial, MtoonShader, OutlineMode};
+pub use shader::{MtoonMaterial, OutlineMode};
 
 const SHADER_HANDLE: Handle<Shader> = Handle::weak_from_u128(0x2d86c40a175b);
 
@@ -39,8 +39,8 @@ fn update_mtoon_shader(
 ) {
     for (_, mtoon) in mtoon.iter_mut() {
         if let Ok((transform, light)) = sun.get_single() {
-            mtoon.extension.light_dir = transform.back();
-            mtoon.extension.light_color = light.color;
+            mtoon.light_dir = transform.back();
+            mtoon.light_color = light.color;
         }
     }
 }
@@ -83,7 +83,7 @@ fn sync_outline(
             None => continue,
         };
 
-        match material.extension.outline_mode {
+        match material.outline_mode {
             OutlineMode::None => {
                 outline.visible = false;
                 continue;
@@ -92,7 +92,7 @@ fn sync_outline(
                 outline.visible = true;
 
                 // Outline width is a ratio of screen height.
-                outline.width = material.extension.outline_width * max_height;
+                outline.width = material.outline_width * max_height;
             }
             OutlineMode::World => {
                 outline.visible = true;
@@ -107,10 +107,10 @@ fn sync_outline(
                     .min_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal))
                     .unwrap_or_default();
 
-                outline.width = (material.extension.outline_width * max_height * 0.04) / distance;
+                outline.width = (material.outline_width * max_height * 0.04) / distance;
             }
         }
 
-        outline.colour = material.extension.outline_color;
+        outline.colour = material.outline_color;
     }
 }

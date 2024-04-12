@@ -402,33 +402,67 @@ pub struct FloatProperties {
     #[serde(rename = "_Cutoff")]
     pub cutoff: Option<f32>,
     #[serde(rename = "_IndirectLightIntensity")]
-    pub indirect_light_intensity: Option<f32>,
+    pub gi_intensity_factor: Option<f32>,
+    #[serde(rename = "_BumpScale")]
+    pub normal_scale: Option<f32>,
+    #[serde(rename = "_CullMode")]
+    pub double_sided: Option<f32>,
+    #[serde(rename = "_ReceiveShadowRate")]
+    pub shade_receive_multiply_factor: Option<f32>,
+    #[serde(rename = "_RimLightingMix")]
+    pub rim_lighting_mix_factor: Option<f32>,
+    #[serde(rename = "_RimFresnelPower")]
+    pub rim_fresnel_power_factor: Option<f32>,
+    #[serde(rename = "_RimLift")]
+    pub rim_lift_factor: Option<f32>,
     #[serde(rename = "_OutlineWidth")]
-    pub outline_width: Option<f32>,
+    pub outline_factor: Option<f32>,
+    #[serde(rename = "_OutlineWidthMode")]
+    pub outline_width_mode: Option<f32>,
+    #[serde(rename = "_OutlineScaledMaxDistance")]
+    pub outline_scaled_max_distance_factor: Option<f32>,
+    #[serde(rename = "_OutlineLightingMix")]
+    pub outline_lighting_mix_factor: Option<f32>,
+    #[serde(rename = "_UvAnimScrollX")]
+    pub uv_animation_scroll_x_speed_factor: Option<f32>,
+    #[serde(rename = "_UvAnimScrollY")]
+    pub uv_animation_scroll_y_speed_factor: Option<f32>,
+    #[serde(rename = "_UvAnimRotation")]
+    pub uv_animation_rotation_speed_factor: Option<f32>,
 }
 
 #[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
 pub struct TextureProperties {
     #[serde(rename = "_MainTex")]
-    pub main_tex: Option<u32>,
+    pub base_color: Option<u32>,
     #[serde(rename = "_ShadeTexture")]
-    pub shade_texture: Option<u32>,
+    pub shade: Option<u32>,
     #[serde(rename = "_BumpMap")]
-    pub bump_map: Option<u32>,
+    pub normal: Option<u32>,
     #[serde(rename = "_SphereAdd")]
-    pub sphere_add: Option<u32>,
+    pub additive: Option<u32>,
     #[serde(rename = "_EmissionMap")]
-    pub emission_map: Option<u32>,
+    pub emissive: Option<u32>,
+    #[serde(rename = "_RimTexture")]
+    pub rim_multiply: Option<u32>,
+    #[serde(rename = "_OutlineWidthTexture")]
+    pub outline_width_multiply_texture: Option<u32>,
+    #[serde(rename = "_UvAnimMaskTexture")]
+    pub uv_animation_mask_texture: Option<u32>,
 }
 
 #[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
 pub struct VectorProperties {
     #[serde(rename = "_Color")]
     pub color: Option<[f32; 4]>,
-    #[serde(rename = "_ShadeColor")]
-    pub shade_color: Option<[f32; 4]>,
+    #[serde(rename = "_EmissionColor")]
+    pub emissive_factor: Option<[f32; 4]>,
     #[serde(rename = "_OutlineColor")]
     pub outline_color: Option<[f32; 4]>,
+    #[serde(rename = "_ShadeColor")]
+    pub shade_color: Option<[f32; 4]>,
+    #[serde(rename = "_RimColor")]
+    pub rim_factor: Option<[f32; 4]>,
 }
 
 #[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
