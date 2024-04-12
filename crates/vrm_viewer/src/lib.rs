@@ -11,12 +11,22 @@ pub struct VrmViewerPlugin;
 
 impl Plugin for VrmViewerPlugin {
     fn build(&self, app: &mut App) {
+        #[cfg(target_family = "wasm")]
+        {
+            app.add_plugins(bevy_web_file_drop::WebFileDropPlugin);
+        }
+
         app.insert_resource(ClearColor(Color::rgb(0.1, 0.1, 0.1)))
-            .add_plugins((EguiPlugin, PanOrbitCameraPlugin, VrmPlugin))
+            .add_plugins((DefaultPlugins, EguiPlugin, PanOrbitCameraPlugin, VrmPlugin))
             .add_systems(Startup, setup)
             .add_systems(Update, (update_ui, read_dropped_files));
     }
 }
+
+#[cfg(target_family = "wasm")]
+const VRM_PATH: &str = "/bevy_vrm/assets/suzuha.vrm";
+#[cfg(not(target_family = "wasm"))]
+const VRM_PATH: &str = "suzuha.vrm";
 
 fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands.spawn((
@@ -51,7 +61,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
             transform,
             ..default()
         },
-        vrm: asset_server.load("suzuha.vrm"),
+        vrm: asset_server.load(VRM_PATH),
         ..default()
     });
 }
