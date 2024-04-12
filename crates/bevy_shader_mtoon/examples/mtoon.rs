@@ -13,9 +13,7 @@ use bevy_egui::{
     EguiContexts, EguiPlugin,
 };
 use bevy_panorbit_camera::{PanOrbitCamera, PanOrbitCameraPlugin};
-use bevy_shader_mtoon::{
-    MtoonBundle, MtoonMaterial, MtoonMaterial, MtoonPlugin, MtoonSun, OutlineMode,
-};
+use bevy_shader_mtoon::{MtoonBundle, MtoonMaterial, MtoonPlugin, MtoonSun, OutlineMode};
 
 fn main() {
     App::new()
@@ -64,28 +62,21 @@ fn setup(
 
     let mtoon_textured = MtoonBundle {
         mtoon: mtoon_materials.add(MtoonMaterial {
-            base: StandardMaterial {
-                base_color_texture: Some(images.add(uv_debug_texture())),
-                ..default()
-            },
-            extension: MtoonMaterial {
-                outline_width: 0.002,
-                outline_mode: OutlineMode::Screen,
-                ..default()
-            },
+            base_color_texture: Some(images.add(uv_debug_texture())),
+            outline_width: 0.002,
+            outline_mode: OutlineMode::Screen,
+            ..default()
         }),
         ..default()
     };
 
     let mtoon_plain = MtoonBundle {
         mtoon: mtoon_materials.add(MtoonMaterial {
-            base: StandardMaterial::from(Color::BISQUE),
-            extension: MtoonMaterial {
-                shade_factor: Color::SALMON,
-                outline_width: 0.2,
-                outline_mode: OutlineMode::World,
-                ..default()
-            },
+            base_color: Color::BISQUE,
+            shade_factor: Color::SALMON,
+            outline_width: 0.2,
+            outline_mode: OutlineMode::World,
+            ..default()
         }),
         ..default()
     };
@@ -166,12 +157,12 @@ fn ui(
     mut settings: Local<MtoonMaterial>,
 ) {
     for (_, material) in mtoon_materials.iter_mut() {
-        material.extension.gi_equalization_factor = settings.gi_equalization_factor;
-        material.extension.parametric_rim_fresnel_power = settings.parametric_rim_fresnel_power;
-        material.extension.parametric_rim_lift_factor = settings.parametric_rim_lift_factor;
-        material.extension.rim_lighting_mix_factor = settings.rim_lighting_mix_factor;
-        material.extension.shading_shift_factor = settings.shading_shift_factor;
-        material.extension.shading_toony_factor = settings.shading_toony_factor;
+        material.gi_equalization_factor = settings.gi_equalization_factor;
+        material.parametric_rim_fresnel_power = settings.parametric_rim_fresnel_power;
+        material.parametric_rim_lift_factor = settings.parametric_rim_lift_factor;
+        material.rim_lighting_mix_factor = settings.rim_lighting_mix_factor;
+        material.shading_shift_factor = settings.shading_shift_factor;
+        material.shading_toony_factor = settings.shading_toony_factor;
     }
 
     Window::new("bevy_shader_mtoon").show(contexts.ctx_mut(), |ui| {
