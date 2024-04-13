@@ -37,6 +37,7 @@ pub fn import_material(context: &mut ImportContext, material: Material, ext: Vrm
                     );
                 }
             }
+            Some(Shader::Gltf) => {}
             Some(other) => {
                 warn!("Unsupported shader: {:?}", other);
             }
@@ -103,6 +104,14 @@ fn load_mtoon_shader(
     let mut mtoon = MtoonMaterial::default();
 
     let weight = material_property.read(context.graph);
+
+    if let Some(value) = weight.float.double_sided {
+        mtoon.double_sided = value == 0.0;
+    }
+
+    if let Some(value) = weight.float.cutoff {
+        mtoon.alpha_mode = AlphaMode::Mask(value);
+    }
 
     if let Some(value) = weight.vector.color {
         mtoon.base_color = Color::rgba_linear_from_array(value);

@@ -2,13 +2,14 @@ use bevy::{
     prelude::*,
     render::{
         render_asset::RenderAssets,
-        render_resource::{AsBindGroup, AsBindGroupShaderType, ShaderRef, ShaderType},
+        render_resource::{AsBindGroup, AsBindGroupShaderType, Face, ShaderRef, ShaderType},
     },
 };
 
 use crate::SHADER_HANDLE;
 
 #[derive(Asset, AsBindGroup, PartialEq, Debug, Clone, Component, Reflect)]
+#[bind_group_data(MtoonMaterialKey)]
 #[uniform(0, MtoonShaderUniform)]
 #[reflect(PartialEq)]
 pub struct MtoonMaterial {
@@ -16,7 +17,9 @@ pub struct MtoonMaterial {
     pub outline_mode: OutlineMode,
     pub outline_width: f32,
 
+    pub alpha_mode: AlphaMode,
     pub base_color: Color,
+    pub double_sided: bool,
     pub emissive_factor: Color,
     pub gi_equalization_factor: f32,
     pub light_color: Color,
@@ -77,7 +80,9 @@ impl Default for MtoonMaterial {
             outline_mode: OutlineMode::None,
             outline_width: 0.0,
 
+            alpha_mode: AlphaMode::Opaque,
             base_color: Color::WHITE,
+            double_sided: false,
             emissive_factor: Color::BLACK,
             gi_equalization_factor: 0.9,
             light_color: Color::WHITE,
@@ -106,6 +111,7 @@ impl Default for MtoonMaterial {
 
 #[derive(Clone, Default, ShaderType)]
 pub struct MtoonShaderUniform {
+    pub alpha_cutoff: f32,
     pub base_color: Vec4,
     pub emissive_factor: Vec4,
     pub flags: u32,
@@ -131,8 +137,14 @@ impl AsBindGroupShaderType<MtoonShaderUniform> for MtoonMaterial {
         if self.base_color_texture.is_some() {
             flags |= MtoonMaterialFlags::BASE_COLOR_TEXTURE;
         }
+        if self.emissive_texture.is_some() {
+            flags |= MtoonMaterialFlags::EMISSIVE_TEXTURE;
+        }
         if self.matcap_texture.is_some() {
             flags |= MtoonMaterialFlags::MATCAP_TEXTURE;
+        }
+        if self.normal_map_texture.is_some() {
+            flags |= MtoonMaterialFlags::NORMAL_MAP_TEXTURE
         }
         if self.rim_multiply_texture.is_some() {
             flags |= MtoonMaterialFlags::RIM_MULTIPLY_TEXTURE;
@@ -143,6 +155,18 @@ impl AsBindGroupShaderType<MtoonShaderUniform> for MtoonMaterial {
         if self.shade_shift_texture.is_some() {
             flags |= MtoonMaterialFlags::SHADING_SHIFT_TEXTURE;
         }
+
+        let alpha_cutoff = match self.alpha_mode {
+            AlphaMode::Mask(value) => {
+                flags |= MtoonMaterialFlags::ALPHA_MODE_MASK;
+                value
+            }
+            AlphaMode::Opaque => {
+                flags |= MtoonMaterialFlags::ALPHA_MODE_OPAQUE;
+                0.0
+            }
+            _ => 0.0,
+        };
 
         let light_color = self.light_color.as_linear_rgba_f32();
         let light_color = Vec3::new(light_color[0], light_color[1], light_color[2]);
@@ -158,6 +182,7 @@ impl AsBindGroupShaderType<MtoonShaderUniform> for MtoonMaterial {
         let shade_color = Vec3::new(shade_color[0], shade_color[1], shade_color[2]);
 
         MtoonShaderUniform {
+            alpha_cutoff,
             base_color: self.base_color.as_linear_rgba_f32().into(),
             emissive_factor: self.emissive_factor.as_linear_rgba_f32().into(),
             flags: flags.bits(),
@@ -178,6 +203,23 @@ impl AsBindGroupShaderType<MtoonShaderUniform> for MtoonMaterial {
     }
 }
 
+#[derive(Clone, PartialEq, Eq, Hash)]
+pub struct MtoonMaterialKey {
+    cull_mode: Option<Face>,
+}
+
+impl From<&MtoonMaterial> for MtoonMaterialKey {
+    fn from(material: &MtoonMaterial) -> Self {
+        MtoonMaterialKey {
+            cull_mode: if material.double_sided {
+                None
+            } else {
+                Some(Face::Back)
+            },
+        }
+    }
+}
+
 impl Material for MtoonMaterial {
     fn fragment_shader() -> ShaderRef {
         SHADER_HANDLE.into()
@@ -186,16 +228,30 @@ impl Material for MtoonMaterial {
     fn deferred_fragment_shader() -> ShaderRef {
         SHADER_HANDLE.into()
     }
+
+    fn specialize(
+        _pipeline: &bevy::pbr::MaterialPipeline<Self>,
+        descriptor: &mut bevy::render::render_resource::RenderPipelineDescriptor,
+        _layout: &bevy::render::mesh::MeshVertexBufferLayout,
+        key: bevy::pbr::MaterialPipelineKey<Self>,
+    ) -> Result<(), bevy::render::render_resource::SpecializedMeshPipelineError> {
+        descriptor.primitive.cull_mode = key.bind_group_data.cull_mode;
+        Ok(())
+    }
 }
 
 bitflags::bitflags! {
     #[repr(transparent)]
     pub struct MtoonMaterialFlags: u32 {
-        const BASE_COLOR_TEXTURE = 1 << 0;
-        const EMISSIVE_TEXTURE = 1 << 1;
-        const MATCAP_TEXTURE = 1 << 2;
-        const RIM_MULTIPLY_TEXTURE = 1 << 3;
-        const SHADE_COLOR_TEXTURE = 1 << 4;
-        const SHADING_SHIFT_TEXTURE = 1 << 5;
+        const ALPHA_MODE_MASK= 1 << 0;
+        const ALPHA_MODE_OPAQUE = 1 << 1;
+        const BASE_COLOR_TEXTURE = 1 << 2;
+        const DOUBLE_SIDED = 1 << 3;
+        const EMISSIVE_TEXTURE = 1 << 4;
+        const MATCAP_TEXTURE = 1 << 5;
+        const NORMAL_MAP_TEXTURE = 1 << 6;
+        const RIM_MULTIPLY_TEXTURE = 1 << 7;
+        const SHADE_COLOR_TEXTURE = 1 << 8;
+        const SHADING_SHIFT_TEXTURE = 1 << 9;
     }
 }
