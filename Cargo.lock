@@ -997,7 +997,7 @@ dependencies = [
 
 [[package]]
 name = "bevy_shader_mtoon"
-version = "0.0.9"
+version = "0.0.10"
 dependencies = [
  "bevy",
  "bevy_egui",
@@ -1156,7 +1156,7 @@ dependencies = [
 
 [[package]]
 name = "bevy_vrm"
-version = "0.0.9"
+version = "0.0.10"
 dependencies = [
  "bevy",
  "bevy_egui",
@@ -2249,7 +2249,7 @@ dependencies = [
 
 [[package]]
 name = "gltf_kun_vrm"
-version = "0.0.9"
+version = "0.0.10"
 dependencies = [
  "gltf_kun",
  "serde",
@@ -3701,7 +3701,7 @@ dependencies = [
 
 [[package]]
 name = "serde_vrm"
-version = "0.0.9"
+version = "0.0.10"
 dependencies = [
  "serde",
 ]
@@ -4181,7 +4181,7 @@ checksum = "49874b5167b65d7193b8aba1567f5c7d93d001cafc34600cee003eda787e483f"
 
 [[package]]
 name = "vrm_viewer"
-version = "0.0.9"
+version = "0.0.10"
 dependencies = [
  "bevy",
  "bevy_blob_loader",

@@ -5,7 +5,7 @@ members = [
 ]
 
 [workspace.package]
-version = "0.0.9"
+version = "0.0.10"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/unavi-xyz/bevy_vrm"
 edition = "2021"
@@ -14,10 +14,10 @@ edition = "2021"
 type_complexity = "allow"
 
 [workspace.dependencies]
-bevy_shader_mtoon = { path = "crates/bevy_shader_mtoon", version = "0.0.9" }
-bevy_vrm = { path = "crates/bevy_vrm", version = "0.0.9" }
-gltf_kun_vrm = { path = "crates/gltf_kun_vrm", version = "0.0.9" }
-serde_vrm = { path = "crates/serde_vrm", version = "0.0.9" }
+bevy_shader_mtoon = { path = "crates/bevy_shader_mtoon", version = "0.0.10" }
+bevy_vrm = { path = "crates/bevy_vrm", version = "0.0.10" }
+gltf_kun_vrm = { path = "crates/gltf_kun_vrm", version = "0.0.10" }
+serde_vrm = { path = "crates/serde_vrm", version = "0.0.10" }
 
 bevy = { version = "0.13.0", default-features = false, features = ["animation", "bevy_asset", "bevy_scene", "bevy_pbr"] }
 bevy_egui = "0.25.0"
