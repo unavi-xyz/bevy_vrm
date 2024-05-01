@@ -23,7 +23,7 @@ bevy = { version = "0.13.0", default-features = false, features = ["animation", 
 bevy_egui = "0.25.0"
 bevy_panorbit_camera = { version = "0.16.1", features = ["bevy_egui"] }
 gltf_kun = { version = "0.0.12", default-features = false }
-serde = { version = "1.0.197", features = ["derive"] }
+serde = { version = "1.0.199", features = ["derive"] }
 thiserror = "1.0.57"
 
 [profile.dev]
