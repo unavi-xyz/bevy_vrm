@@ -3,9 +3,13 @@
 use std::f32::consts::PI;
 
 use bevy::prelude::*;
-use bevy_egui::{EguiContexts, EguiPlugin};
+use bevy_egui::EguiPlugin;
 use bevy_panorbit_camera::{PanOrbitCamera, PanOrbitCameraPlugin};
 use bevy_vrm::{loader::Vrm, mtoon::MtoonSun, VrmBundle, VrmPlugin};
+
+mod draw_spring_bones;
+mod move_leg;
+mod ui;
 
 pub struct VrmViewerPlugin;
 
@@ -17,10 +21,25 @@ impl Plugin for VrmViewerPlugin {
         }
 
         app.insert_resource(ClearColor(Color::rgb(0.1, 0.1, 0.1)))
+            .init_resource::<Settings>()
             .add_plugins((DefaultPlugins, EguiPlugin, PanOrbitCameraPlugin, VrmPlugin))
             .add_systems(Startup, setup)
-            .add_systems(Update, (update_ui, read_dropped_files));
+            .add_systems(
+                Update,
+                (
+                    draw_spring_bones::draw_spring_bones,
+                    move_leg::move_leg,
+                    read_dropped_files,
+                    ui::update_ui,
+                ),
+            );
     }
+}
+
+#[derive(Resource, Default)]
+struct Settings {
+    pub draw_spring_bones: bool,
+    pub move_leg: bool,
 }
 
 #[cfg(target_family = "wasm")]
@@ -63,34 +82,6 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
         },
         vrm: asset_server.load(VRM_PATH),
         ..default()
-    });
-}
-
-fn update_ui(mut contexts: EguiContexts) {
-    bevy_egui::egui::Window::new("VRM Viewer").show(contexts.ctx_mut(), |ui| {
-        ui.vertical(|ui| {
-            ui.horizontal(|ui| {
-                ui.spacing_mut().item_spacing.x = 0.0;
-
-                ui.label("Loads ");
-                ui.hyperlink_to("VRM", "https://vrm.dev/en");
-                ui.label(" avatars using ");
-                ui.hyperlink_to("bevy_vrm", "https://github.com/unavi-xyz/bevy_vrm");
-                ui.label(", a plugin for the ");
-                ui.hyperlink_to("Bevy", "https://bevyengine.org");
-                ui.label(" game engine.");
-            });
-
-            ui.label("Drop a .vrm file into the window to load it.");
-
-            ui.separator();
-
-            ui.vertical_centered(|ui| {
-                ui.horizontal(|ui| {
-                    ui.hyperlink_to("[github]", "https://github.com/unavi-xyz/bevy_vrm");
-                });
-            });
-        });
     });
 }
 
