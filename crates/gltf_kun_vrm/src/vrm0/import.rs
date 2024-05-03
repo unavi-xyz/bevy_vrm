@@ -201,8 +201,14 @@ impl ExtensionImport<GltfDocument, GltfFormat> for Vrm {
 
         let first_person = if let Some(first_person) = ext.first_person {
             if let Some(bone_idx) = first_person.first_person_bone {
-                graph_bones
+                doc.nodes(graph)
                     .get(bone_idx as usize)
+                    .and_then(|node| {
+                        graph_bones.iter().find(|bone| match bone.node(graph) {
+                            Some(n) => n == *node,
+                            None => false,
+                        })
+                    })
                     .map(|bone| {
                         vrm.set_first_person_bone(graph, Some(*bone));
                     })
