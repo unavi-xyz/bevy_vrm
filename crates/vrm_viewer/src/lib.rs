@@ -86,9 +86,10 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
 }
 
 fn read_dropped_files(
+    mut commands: Commands,
     mut events: EventReader<FileDragAndDrop>,
     asset_server: Res<AssetServer>,
-    mut vrms: Query<&mut Handle<Vrm>>,
+    mut vrms: Query<Entity, With<Handle<Vrm>>>,
 ) {
     for event in events.read() {
         if let FileDragAndDrop::DroppedFile { path_buf, .. } = event {
@@ -99,8 +100,20 @@ fn read_dropped_files(
 
             info!("DroppedFile: {}", path);
 
-            let mut vrm = vrms.single_mut();
-            *vrm = asset_server.load(path);
+            let entity = vrms.single_mut();
+            commands.entity(entity).despawn_recursive();
+
+            let mut transform = Transform::default();
+            transform.rotate_y(PI);
+
+            commands.spawn(VrmBundle {
+                scene_bundle: SceneBundle {
+                    transform,
+                    ..default()
+                },
+                vrm: asset_server.load(path),
+                ..default()
+            });
         }
     }
 }
