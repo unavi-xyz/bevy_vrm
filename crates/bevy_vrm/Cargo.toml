@@ -18,6 +18,7 @@ gltf_kun.workspace = true
 gltf_kun_vrm.workspace = true
 serde.workspace = true
 serde_vrm.workspace = true
+serde_vrm.features = ["bevy"]
 thiserror.workspace = true
 
 [dev-dependencies]

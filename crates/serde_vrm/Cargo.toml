@@ -9,3 +9,4 @@ edition.workspace = true
 
 [dependencies]
 serde.workspace = true
+bevy = { version = "0.13.2", optional = true }

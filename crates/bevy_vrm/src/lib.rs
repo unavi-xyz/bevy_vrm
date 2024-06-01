@@ -1,14 +1,13 @@
 //! [Bevy](https://bevyengine.org/) plugin for loading [VRM](https://vrm.dev/en/) avatars.
 //! Aims to support both the VRM 0.0 and VRM 1.0 standards.
 
-use bevy::{prelude::*, utils::HashMap};
+use bevy::{prelude::*};
 use bevy_gltf_kun::import::gltf::GltfAssetPlugin;
 use bevy_shader_mtoon::MtoonPlugin;
 use loader::{Vrm, VrmLoader};
 
 mod auto_scene;
 pub mod extensions;
-mod humanoid_bones;
 pub mod loader;
 mod spring_bones;
 
@@ -25,13 +24,10 @@ impl Plugin for VrmPlugin {
         app.add_plugins((GltfAssetPlugin, MtoonPlugin))
             .init_asset::<Vrm>()
             .init_asset_loader::<VrmLoader>()
+            .register_type::<BoneName>()
             .add_systems(
                 Update,
-                (
-                    auto_scene::set_vrm_scene,
-                    humanoid_bones::set_humanoid_bones,
-                    spring_bones::set_spring_bones,
-                ),
+                (auto_scene::set_vrm_scene, spring_bones::set_spring_bones),
             );
     }
 }
@@ -39,7 +35,6 @@ impl Plugin for VrmPlugin {
 #[derive(Bundle, Default)]
 pub struct VrmBundle {
     pub auto_scene: AutoScene,
-    pub humanoid_bones: HumanoidBones,
     pub scene_bundle: SceneBundle,
     pub spring_bones: SpringBones,
     pub vrm: Handle<Vrm>,
@@ -48,9 +43,6 @@ pub struct VrmBundle {
 /// Automatically sets the scene to the loaded VRM's default scene.
 #[derive(Component, Default)]
 pub struct AutoScene;
-
-#[derive(Component, Default)]
-pub struct HumanoidBones(pub HashMap<BoneName, Entity>);
 
 #[derive(Component, Default)]
 pub struct SpringBones(pub Vec<SpringBone>);
