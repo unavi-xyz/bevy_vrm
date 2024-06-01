@@ -5,7 +5,7 @@ use std::f32::consts::PI;
 use bevy::prelude::*;
 use bevy_egui::EguiPlugin;
 use bevy_panorbit_camera::{PanOrbitCamera, PanOrbitCameraPlugin};
-use bevy_vrm::{loader::Vrm, mtoon::MtoonSun, VrmBundle, VrmPlugin};
+use bevy_vrm::{loader::Vrm, mtoon::MtoonSun, VrmBundle, VrmPlugins};
 
 mod draw_spring_bones;
 mod move_leg;
@@ -22,7 +22,7 @@ impl Plugin for VrmViewerPlugin {
 
         app.insert_resource(ClearColor(Color::rgb(0.1, 0.1, 0.1)))
             .init_resource::<Settings>()
-            .add_plugins((DefaultPlugins, EguiPlugin, PanOrbitCameraPlugin, VrmPlugin))
+            .add_plugins((DefaultPlugins, EguiPlugin, PanOrbitCameraPlugin, VrmPlugins))
             .add_systems(Startup, setup)
             .add_systems(
                 Update,

@@ -1,3 +1,4 @@
+use crate::SpringBone;
 use bevy::ecs::system::RunSystemOnce;
 use bevy::prelude::*;
 use bevy_gltf_kun::import::{extensions::BevyImportExtensions, gltf::document::ImportContext};
@@ -78,6 +79,66 @@ impl BevyImportExtensions<GltfDocument> for VrmExtensions {
                 return;
             }
         };
+
+        let names: Vec<(Entity, Name)> = world.run_system_once_with(
+            (),
+            |names: Query<(Entity, &Name)>| -> Vec<(Entity, Name)> {
+                names
+                    .iter()
+                    .map(|(a, b)| (a, b.clone()))
+                    .collect::<Vec<_>>()
+            },
+        );
+
+        for bone_group in ext.bone_groups(graph) {
+            let bones = bone_group
+                .bones(graph)
+                .into_iter()
+                .filter_map(|node| {
+                    let node_handle = context.gltf.node_handles.get(&node).unwrap();
+
+                    let node_name = context.gltf.named_nodes.iter().find_map(|(name, node)| {
+                        if node == node_handle {
+                            Some(name.clone())
+                        } else {
+                            None
+                        }
+                    });
+
+                    let node_name = match node_name {
+                        Some(name) => name,
+                        None => return None,
+                    };
+
+                    names.iter().find_map(|(entity, name)| {
+                        if name.as_str() == node_name.as_str() {
+                            Some(entity)
+                        } else {
+                            None
+                        }
+                    })
+                })
+                .collect::<Vec<_>>();
+
+            let weight = bone_group.read(graph);
+
+            let gravity_dir = Vec3::new(
+                weight.gravity_dir.x,
+                weight.gravity_dir.y,
+                weight.gravity_dir.z,
+            );
+
+            for bone in bones {
+                world.entity_mut(*bone).insert(SpringBone {
+                    center: weight.center.unwrap_or_default(),
+                    drag_force: weight.drag_force.unwrap_or_default(),
+                    gravity_dir,
+                    gravity_power: weight.gravity_power.unwrap_or_default(),
+                    hit_radius: weight.hit_radius.unwrap_or_default(),
+                    stiffness: weight.stiffiness.unwrap_or_default(),
+                });
+            }
+        }
 
         for bone in ext.human_bones(graph) {
             let node = match bone.node(graph) {
