@@ -28,6 +28,7 @@ impl Plugin for VrmViewerPlugin {
                 Update,
                 (
                     draw_spring_bones::draw_spring_bones,
+                    draw_spring_bones::move_avatar,
                     move_leg::move_leg,
                     read_dropped_files,
                     ui::update_ui,
@@ -40,12 +41,13 @@ impl Plugin for VrmViewerPlugin {
 struct Settings {
     pub draw_spring_bones: bool,
     pub move_leg: bool,
+    pub move_avatar: bool,
 }
 
 #[cfg(target_family = "wasm")]
 const VRM_PATH: &str = "/bevy_vrm/assets/suzuha.vrm";
 #[cfg(not(target_family = "wasm"))]
-const VRM_PATH: &str = "suzuha.vrm";
+const VRM_PATH: &str = "alicia.vrm";
 
 fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands.spawn((

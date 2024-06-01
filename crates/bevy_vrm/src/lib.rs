@@ -2,6 +2,8 @@
 //! Aims to support both the VRM 0.0 and VRM 1.0 standards.
 
 use bevy::app::PluginGroupBuilder;
+use bevy::ecs::entity::MapEntities;
+use bevy::ecs::reflect::ReflectMapEntities;
 use bevy::prelude::*;
 use bevy_gltf_kun::import::gltf::GltfAssetPlugin;
 use bevy_shader_mtoon::MtoonPlugin;
@@ -52,9 +54,13 @@ pub struct VrmBundle {
 #[derive(Component, Default)]
 pub struct AutoScene;
 
-#[derive(Component, Reflect)]
-#[reflect(Component)]
+#[derive(Component, Default, Reflect)]
+#[reflect(Component, MapEntities)]
+pub struct SpringBones(pub Vec<SpringBone>);
+
+#[derive(Reflect)]
 pub struct SpringBone {
+    pub bones: Vec<Entity>,
     pub center: f32,
     pub drag_force: f32,
     pub gravity_dir: Vec3,
@@ -63,13 +69,29 @@ pub struct SpringBone {
     pub stiffness: f32,
 }
 
+impl MapEntities for SpringBone {
+    fn map_entities<M: EntityMapper>(&mut self, entity_mapper: &mut M) {
+        for bone in &mut self.bones {
+            *bone = entity_mapper.map_entity(*bone);
+        }
+    }
+}
+
+impl MapEntities for SpringBones {
+    fn map_entities<M: EntityMapper>(&mut self, entity_mapper: &mut M) {
+        for bones in &mut self.0 {
+            bones.map_entities(entity_mapper);
+        }
+    }
+}
+
 #[derive(Component, Reflect)]
 #[reflect(Component)]
 pub struct SpringBoneLogicState {
     pub prev_tail: Vec3,
     pub current_tail: Vec3,
     pub bone_axis: Vec3,
-    pub bone_length: Vec3,
-    pub initial_matrix: Mat4,
+    pub bone_length: f32,
+    pub initial_local_matrix: Mat4,
     pub initial_local_rotation: Quat,
 }

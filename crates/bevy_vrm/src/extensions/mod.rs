@@ -1,6 +1,7 @@
-use crate::SpringBone;
+use crate::{SpringBone, SpringBoneLogicState, SpringBones};
 use bevy::ecs::system::RunSystemOnce;
 use bevy::prelude::*;
+use bevy::transform::systems::{propagate_transforms, sync_simple_transforms};
 use bevy_gltf_kun::import::{extensions::BevyImportExtensions, gltf::document::ImportContext};
 use gltf_kun::graph::gltf::GltfWeight;
 use gltf_kun::graph::{ByteNode, Weight};
@@ -59,6 +60,9 @@ impl BevyImportExtensions<GltfDocument> for VrmExtensions {
 
     fn import_root(_context: &mut ImportContext) {}
     fn import_scene(context: &mut ImportContext, _scene: Scene, world: &mut World) {
+        world.run_system_once(sync_simple_transforms);
+        world.run_system_once(propagate_transforms);
+
         let graph = &context.graph;
 
         let doc = match graph.node_indices().find(|n| {
@@ -89,6 +93,8 @@ impl BevyImportExtensions<GltfDocument> for VrmExtensions {
                     .collect::<Vec<_>>()
             },
         );
+
+        let mut spring_bones = vec![];
 
         for bone_group in ext.bone_groups(graph) {
             let bones = bone_group
@@ -128,17 +134,46 @@ impl BevyImportExtensions<GltfDocument> for VrmExtensions {
                 weight.gravity_dir.z,
             );
 
-            for bone in bones {
-                world.entity_mut(*bone).insert(SpringBone {
-                    center: weight.center.unwrap_or_default(),
-                    drag_force: weight.drag_force.unwrap_or_default(),
-                    gravity_dir,
-                    gravity_power: weight.gravity_power.unwrap_or_default(),
-                    hit_radius: weight.hit_radius.unwrap_or_default(),
-                    stiffness: weight.stiffiness.unwrap_or_default(),
-                });
-            }
+            spring_bones.push(SpringBone {
+                bones: bones.clone().into_iter().map(|a| *a).collect(),
+                center: weight.center.unwrap_or_default(),
+                drag_force: weight.drag_force.unwrap_or_default(),
+                gravity_dir,
+                gravity_power: weight.gravity_power.unwrap_or_default(),
+                hit_radius: weight.hit_radius.unwrap_or_default(),
+                stiffness: weight.stiffiness.unwrap_or_default(),
+            });
         }
+
+        world.run_system_once_with(
+            spring_bones,
+            |In(spring_bones): In<Vec<SpringBone>>,
+             mut commands: Commands,
+             query: Query<Entity, Without<Parent>>| {
+                commands
+                    .entity(query.single())
+                    .insert(SpringBones(spring_bones));
+            },
+        );
+
+        world.run_system_once(
+            |mut spring_boness: Query<&mut SpringBones>, children: Query<&Children>| {
+                for mut spring_bones in spring_boness.iter_mut() {
+                    for spring_bone in spring_bones.0.iter_mut() {
+                        let bones = spring_bone.bones.clone();
+                        for bone in bones {
+                            for child in children.iter_descendants(bone) {
+                                if !spring_bone.bones.contains(&child) {
+                                    spring_bone.bones.push(child);
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+        );
+
+        world.run_system_once(add_springbone_logic_state);
 
         for bone in ext.human_bones(graph) {
             let node = match bone.node(graph) {
@@ -193,6 +228,79 @@ impl BevyImportExtensions<GltfDocument> for VrmExtensions {
                     commands.entity(node_entity).insert(bone_name);
                 },
             );
+        }
+    }
+}
+
+fn add_springbone_logic_state(
+    mut commands: Commands,
+    spring_boness: Query<(Entity, &SpringBones)>,
+    logic_states: Query<&mut SpringBoneLogicState>,
+    global_transforms: Query<&GlobalTransform>,
+    local_transforms: Query<&Transform>,
+    children: Query<&Children>,
+    names: Query<&Name>,
+) {
+    for (_skel_e, spring_bones) in spring_boness.iter() {
+        for spring_bone in spring_bones.0.iter() {
+            for (_i, bone) in spring_bone.bones.iter().enumerate() {
+                if !logic_states.contains(*bone) {
+                    let child = match children.get(*bone) {
+                        Ok(c) => c,
+                        Err(_) => {
+                            // Adds an extra spring bone below it to make it look even better.
+                            if let Ok(name) = names.get(*bone) {
+                                if name.as_str() == "donotaddmore" {
+                                    continue;
+                                }
+                            }
+                            let child = commands
+                                .spawn((
+                                    TransformBundle {
+                                        local: Transform::from_xyz(0.0, -0.07, 0.0),
+                                        global: Default::default(),
+                                    },
+                                    Name::new("donotaddmore"),
+                                ))
+                                .id();
+
+                            commands.entity(*bone).add_child(child);
+                            continue;
+                        }
+                    };
+                    let mut next_bone = None;
+                    for c in child.iter() {
+                        next_bone.replace(*c);
+                        break;
+                    }
+                    let next_bone = match next_bone {
+                        None => continue,
+                        Some(next_bone) => next_bone,
+                    };
+
+                    let global_this_bone = global_transforms.get(*bone).unwrap();
+
+                    let local_next_bone = local_transforms.get(next_bone).unwrap();
+
+                    let local_this_bone = local_transforms.get(*bone).unwrap();
+
+                    let bone_axis = local_next_bone.translation.normalize();
+
+                    let bone_length = local_next_bone.translation.length();
+
+                    let initial_local_matrix = local_this_bone.compute_matrix();
+                    let initial_local_rotation = local_this_bone.rotation;
+
+                    commands.entity(*bone).insert(SpringBoneLogicState {
+                        prev_tail: global_this_bone.translation(),
+                        current_tail: global_this_bone.translation(),
+                        bone_axis,
+                        bone_length,
+                        initial_local_matrix,
+                        initial_local_rotation,
+                    });
+                }
+            }
         }
     }
 }
