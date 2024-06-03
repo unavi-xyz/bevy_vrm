@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use bevy_vrm::{SpringBones};
+use bevy_vrm::SpringBones;
 
 use crate::Settings;
 

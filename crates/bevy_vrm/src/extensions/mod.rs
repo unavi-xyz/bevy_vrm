@@ -135,7 +135,7 @@ impl BevyImportExtensions<GltfDocument> for VrmExtensions {
             );
 
             spring_bones.push(SpringBone {
-                bones: bones.clone().into_iter().map(|a| *a).collect(),
+                bones: bones.clone().into_iter().copied().collect(),
                 center: weight.center.unwrap_or_default(),
                 drag_force: weight.drag_force.unwrap_or_default(),
                 gravity_dir,

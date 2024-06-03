@@ -1,5 +1,5 @@
-use bevy::prelude::*;
 use crate::{SpringBoneLogicState, SpringBones};
+use bevy::prelude::*;
 
 pub struct SpringBonePlugin;
 impl Plugin for SpringBonePlugin {
