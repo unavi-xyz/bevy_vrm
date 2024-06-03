@@ -1,5 +1,10 @@
+use crate::{SpringBone, SpringBoneLogicState, SpringBones};
+use bevy::ecs::system::RunSystemOnce;
 use bevy::prelude::*;
+use bevy::transform::systems::{propagate_transforms, sync_simple_transforms};
 use bevy_gltf_kun::import::{extensions::BevyImportExtensions, gltf::document::ImportContext};
+use gltf_kun::graph::gltf::GltfWeight;
+use gltf_kun::graph::{ByteNode, Weight};
 use gltf_kun::{
     extensions::ExtensionImport,
     graph::{
@@ -9,6 +14,7 @@ use gltf_kun::{
     io::format::gltf::GltfFormat,
 };
 use gltf_kun_vrm::vrm0::Vrm;
+use serde_vrm::vrm0::BoneName;
 
 use self::vrm0::{import_material, import_primitive_material};
 
@@ -53,5 +59,248 @@ impl BevyImportExtensions<GltfDocument> for VrmExtensions {
     }
 
     fn import_root(_context: &mut ImportContext) {}
-    fn import_scene(_context: &mut ImportContext, _scene: Scene, _world: &mut World) {}
+    fn import_scene(context: &mut ImportContext, _scene: Scene, world: &mut World) {
+        world.run_system_once(sync_simple_transforms);
+        world.run_system_once(propagate_transforms);
+
+        let graph = &context.graph;
+
+        let doc = match graph.node_indices().find(|n| {
+            let weight = graph.node_weight(*n);
+            matches!(weight, Some(Weight::Gltf(GltfWeight::Document)))
+        }) {
+            Some(doc) => GltfDocument(doc),
+            None => {
+                info!("failed to select gltf doc for vr0 loading");
+                return;
+            }
+        };
+
+        let ext = match doc.get_extension::<gltf_kun_vrm::vrm0::Vrm>(graph) {
+            Some(ext) => ext,
+            None => {
+                info!("failed to select vrm 0 extension for vrm");
+                return;
+            }
+        };
+
+        let names: Vec<(Entity, Name)> = world.run_system_once_with(
+            (),
+            |names: Query<(Entity, &Name)>| -> Vec<(Entity, Name)> {
+                names
+                    .iter()
+                    .map(|(a, b)| (a, b.clone()))
+                    .collect::<Vec<_>>()
+            },
+        );
+
+        let mut spring_bones = vec![];
+
+        for bone_group in ext.bone_groups(graph) {
+            let bones = bone_group
+                .bones(graph)
+                .into_iter()
+                .filter_map(|node| {
+                    let node_handle = context.gltf.node_handles.get(&node).unwrap();
+
+                    let node_name = context.gltf.named_nodes.iter().find_map(|(name, node)| {
+                        if node == node_handle {
+                            Some(name.clone())
+                        } else {
+                            None
+                        }
+                    });
+
+                    let node_name = match node_name {
+                        Some(name) => name,
+                        None => return None,
+                    };
+
+                    names.iter().find_map(|(entity, name)| {
+                        if name.as_str() == node_name.as_str() {
+                            Some(entity)
+                        } else {
+                            None
+                        }
+                    })
+                })
+                .collect::<Vec<_>>();
+
+            let weight = bone_group.read(graph);
+
+            let gravity_dir = Vec3::new(
+                weight.gravity_dir.x,
+                weight.gravity_dir.y,
+                weight.gravity_dir.z,
+            );
+
+            spring_bones.push(SpringBone {
+                bones: bones.clone().into_iter().map(|a| *a).collect(),
+                center: weight.center.unwrap_or_default(),
+                drag_force: weight.drag_force.unwrap_or_default(),
+                gravity_dir,
+                gravity_power: weight.gravity_power.unwrap_or_default(),
+                hit_radius: weight.hit_radius.unwrap_or_default(),
+                stiffness: weight.stiffiness.unwrap_or_default(),
+            });
+        }
+
+        world.run_system_once_with(
+            spring_bones,
+            |In(spring_bones): In<Vec<SpringBone>>,
+             mut commands: Commands,
+             query: Query<Entity, Without<Parent>>| {
+                commands
+                    .entity(query.single())
+                    .insert(SpringBones(spring_bones));
+            },
+        );
+
+        world.run_system_once(
+            |mut spring_boness: Query<&mut SpringBones>, children: Query<&Children>| {
+                for mut spring_bones in spring_boness.iter_mut() {
+                    for spring_bone in spring_bones.0.iter_mut() {
+                        let bones = spring_bone.bones.clone();
+                        for bone in bones {
+                            for child in children.iter_descendants(bone) {
+                                if !spring_bone.bones.contains(&child) {
+                                    spring_bone.bones.push(child);
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+        );
+
+        world.run_system_once(add_springbone_logic_state);
+
+        for bone in ext.human_bones(graph) {
+            let node = match bone.node(graph) {
+                Some(n) => n,
+                None => continue,
+            };
+
+            let weight = bone.read(graph);
+
+            let bone_name = match weight.name {
+                Some(b) => b,
+                None => continue,
+            };
+
+            let node_handle = match context.gltf.node_handles.get(&node) {
+                Some(handle) => handle.clone(),
+                None => continue,
+            };
+
+            let node_name = context.gltf.named_nodes.iter().find_map(|(name, n)| {
+                if *n == node_handle {
+                    Some(name.clone())
+                } else {
+                    None
+                }
+            });
+
+            let node_name = match node_name {
+                Some(n) => n,
+                None => continue,
+            };
+
+            world.run_system_once_with(
+                (node_name, bone_name),
+                |In((node_name, bone_name)): In<(String, BoneName)>,
+                 mut commands: Commands,
+                 names: Query<(Entity, &Name)>| {
+                    let node_entity = match names.iter().find_map(|(entity, name)| {
+                        if name.as_str() == node_name.as_str() {
+                            print!("{}", name);
+                            Some(entity)
+                        } else {
+                            None
+                        }
+                    }) {
+                        Some(entity) => entity,
+                        None => {
+                            warn!("Could not find entity for bone: {:?}", bone_name);
+                            return;
+                        }
+                    };
+                    commands.entity(node_entity).insert(bone_name);
+                },
+            );
+        }
+    }
+}
+
+fn add_springbone_logic_state(
+    mut commands: Commands,
+    spring_boness: Query<(Entity, &SpringBones)>,
+    logic_states: Query<&mut SpringBoneLogicState>,
+    global_transforms: Query<&GlobalTransform>,
+    local_transforms: Query<&Transform>,
+    children: Query<&Children>,
+    names: Query<&Name>,
+) {
+    for (_skel_e, spring_bones) in spring_boness.iter() {
+        for spring_bone in spring_bones.0.iter() {
+            for (_i, bone) in spring_bone.bones.iter().enumerate() {
+                if !logic_states.contains(*bone) {
+                    let child = match children.get(*bone) {
+                        Ok(c) => c,
+                        Err(_) => {
+                            // Adds an extra spring bone below it to make it look even better.
+                            if let Ok(name) = names.get(*bone) {
+                                if name.as_str() == "donotaddmore" {
+                                    continue;
+                                }
+                            }
+                            let child = commands
+                                .spawn((
+                                    TransformBundle {
+                                        local: Transform::from_xyz(0.0, -0.07, 0.0),
+                                        global: Default::default(),
+                                    },
+                                    Name::new("donotaddmore"),
+                                ))
+                                .id();
+
+                            commands.entity(*bone).add_child(child);
+                            continue;
+                        }
+                    };
+                    let mut next_bone = None;
+                    for c in child.iter() {
+                        next_bone.replace(*c);
+                        break;
+                    }
+                    let next_bone = match next_bone {
+                        None => continue,
+                        Some(next_bone) => next_bone,
+                    };
+
+                    let global_this_bone = global_transforms.get(*bone).unwrap();
+
+                    let local_next_bone = local_transforms.get(next_bone).unwrap();
+
+                    let local_this_bone = local_transforms.get(*bone).unwrap();
+
+                    let bone_axis = local_next_bone.translation.normalize();
+
+                    let bone_length = local_next_bone.translation.length();
+
+                    let initial_local_matrix = local_this_bone.compute_matrix();
+                    let initial_local_rotation = local_this_bone.rotation;
+
+                    commands.entity(*bone).insert(SpringBoneLogicState {
+                        prev_tail: global_this_bone.translation(),
+                        current_tail: global_this_bone.translation(),
+                        bone_axis,
+                        bone_length,
+                        initial_local_matrix,
+                        initial_local_rotation,
+                    });
+                }
+            }
+        }
+    }
 }

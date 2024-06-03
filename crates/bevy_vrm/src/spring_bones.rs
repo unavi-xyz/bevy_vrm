@@ -1,94 +1,82 @@
-use bevy::{prelude::*, scene::SceneInstance};
-use gltf_kun::graph::{
-    gltf::{GltfDocument, GltfWeight},
-    ByteNode, Extensions, Weight,
-};
+use bevy::prelude::*;
+use crate::{SpringBoneLogicState, SpringBones};
 
-use crate::{loader::Vrm, SpringBone, SpringBones};
+pub struct SpringBonePlugin;
+impl Plugin for SpringBonePlugin {
+    fn build(&self, app: &mut App) {
+        app.add_systems(Update, do_springbone_logic);
+        app.register_type::<SpringBones>();
+        app.register_type::<SpringBoneLogicState>();
+    }
+}
 
-#[derive(Component)]
-pub struct SpringBonesInitialized;
-
-pub fn set_spring_bones(
-    mut commands: Commands,
-    mut vrm: Query<
-        (Entity, &mut SpringBones, &Handle<Vrm>, &SceneInstance),
-        Without<SpringBonesInitialized>,
-    >,
-    names: Query<(Entity, &Name)>,
-    scene_manager: Res<SceneSpawner>,
-    vrms: Res<Assets<Vrm>>,
+fn do_springbone_logic(
+    mut global_transforms: Query<(&mut GlobalTransform, &mut Transform)>,
+    spring_boness: Query<&SpringBones>,
+    mut spring_bone_logic_states: Query<&mut SpringBoneLogicState>,
+    parents: Query<&Parent>,
+    time: Res<Time>,
+    _names: Query<&Name>,
 ) {
-    for (entity, mut spring_bones, handle, instance) in vrm.iter_mut() {
-        if !scene_manager.instance_is_ready(**instance) {
-            continue;
-        }
+    for spring_bones in spring_boness.iter() {
+        for spring_bone in spring_bones.0.iter() {
+            for (_i, bone) in spring_bone.bones.iter().enumerate() {
+                let bone: Entity = *bone;
+                let (global, _) = global_transforms.get(bone).unwrap();
+                let mut spring_bone_logic_state = match spring_bone_logic_states.get_mut(bone) {
+                    Ok(spring_bone_logic_state) => spring_bone_logic_state,
+                    Err(_) => continue,
+                };
+                let world_position = *global;
 
-        if let Some(vrm) = vrms.get(handle) {
-            commands.entity(entity).insert(SpringBonesInitialized);
+                let parent_entity = parents.get(bone).unwrap().get();
 
-            let graph = &vrm.gltf.graph;
+                let parent_world_rotation = global_transforms
+                    .get(parent_entity)
+                    .unwrap()
+                    .0
+                    .to_scale_rotation_translation()
+                    .1;
 
-            let doc = match graph.node_indices().find(|n| {
-                let weight = graph.node_weight(*n);
-                matches!(weight, Some(Weight::Gltf(GltfWeight::Document)))
-            }) {
-                Some(doc) => GltfDocument(doc),
-                None => continue,
-            };
+                let inertia = (spring_bone_logic_state.current_tail
+                    - spring_bone_logic_state.prev_tail)
+                    * (1.0 - spring_bone.drag_force);
+                let stiffness = time.delta_seconds()
+                    * (parent_world_rotation
+                        * spring_bone_logic_state.bone_axis
+                        * spring_bone.stiffness);
+                let external =
+                    time.delta_seconds() * spring_bone.gravity_dir * spring_bone.gravity_power;
 
-            let ext = match doc.get_extension::<gltf_kun_vrm::vrm0::Vrm>(graph) {
-                Some(ext) => ext,
-                None => continue,
-            };
+                let mut next_tail =
+                    spring_bone_logic_state.current_tail + inertia + stiffness + external;
 
-            for bone_group in ext.bone_groups(graph) {
-                let bones = bone_group
-                    .bones(graph)
-                    .into_iter()
-                    .filter_map(|node| {
-                        let node_handle = vrm.gltf.node_handles.get(&node).unwrap();
+                next_tail = world_position.translation()
+                    + (next_tail - world_position.translation()).normalize()
+                        * spring_bone_logic_state.bone_length;
 
-                        let node_name = vrm.gltf.named_nodes.iter().find_map(|(name, node)| {
-                            if node == node_handle {
-                                Some(name.clone())
-                            } else {
-                                None
-                            }
-                        });
+                spring_bone_logic_state.prev_tail = spring_bone_logic_state.current_tail;
+                spring_bone_logic_state.current_tail = next_tail;
 
-                        let node_name = match node_name {
-                            Some(name) => name,
-                            None => return None,
-                        };
+                let parent_world_matrix = global_transforms
+                    .get(parent_entity)
+                    .unwrap()
+                    .0
+                    .compute_matrix();
 
-                        names.iter().find_map(|(entity, name)| {
-                            if name.as_str() == node_name.as_str() {
-                                Some(entity)
-                            } else {
-                                None
-                            }
-                        })
-                    })
-                    .collect::<Vec<_>>();
+                let parent_pos = *global_transforms.get(parent_entity).unwrap().0;
 
-                let weight = bone_group.read(graph);
+                let to = ((parent_world_matrix * spring_bone_logic_state.initial_local_matrix)
+                    .inverse()
+                    .transform_point3(next_tail))
+                .normalize();
 
-                let gravity_dir = Vec3::new(
-                    weight.gravity_dir.x,
-                    weight.gravity_dir.y,
-                    weight.gravity_dir.z,
-                );
+                let (mut global, mut local) = global_transforms.get_mut(bone).unwrap();
 
-                spring_bones.0.push(SpringBone {
-                    bones,
-                    center: weight.center.unwrap_or_default(),
-                    drag_force: weight.drag_force.unwrap_or_default(),
-                    gravity_dir,
-                    gravity_power: weight.gravity_power.unwrap_or_default(),
-                    hit_radius: weight.hit_radius.unwrap_or_default(),
-                    stiffness: weight.stiffiness.unwrap_or_default(),
-                });
+                local.rotation = spring_bone_logic_state.initial_local_rotation
+                    * Quat::from_rotation_arc(spring_bone_logic_state.bone_axis, to);
+
+                *global = parent_pos.mul_transform(*local);
             }
         }
     }

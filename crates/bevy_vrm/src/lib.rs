@@ -1,14 +1,18 @@
 //! [Bevy](https://bevyengine.org/) plugin for loading [VRM](https://vrm.dev/en/) avatars.
 //! Aims to support both the VRM 0.0 and VRM 1.0 standards.
 
-use bevy::{prelude::*, utils::HashMap};
+use bevy::app::PluginGroupBuilder;
+use bevy::ecs::entity::MapEntities;
+use bevy::ecs::reflect::ReflectMapEntities;
+use bevy::prelude::*;
 use bevy_gltf_kun::import::gltf::GltfAssetPlugin;
 use bevy_shader_mtoon::MtoonPlugin;
 use loader::{Vrm, VrmLoader};
 
+use crate::spring_bones::SpringBonePlugin;
+
 mod auto_scene;
 pub mod extensions;
-mod humanoid_bones;
 pub mod loader;
 mod spring_bones;
 
@@ -19,29 +23,30 @@ pub mod mtoon {
 pub use serde_vrm::vrm0::BoneName;
 
 pub struct VrmPlugin;
+pub struct VrmPlugins;
+
+impl PluginGroup for VrmPlugins {
+    fn build(self) -> PluginGroupBuilder {
+        PluginGroupBuilder::start::<Self>()
+            .add(VrmPlugin)
+            .add(SpringBonePlugin)
+    }
+}
 
 impl Plugin for VrmPlugin {
     fn build(&self, app: &mut App) {
         app.add_plugins((GltfAssetPlugin, MtoonPlugin))
             .init_asset::<Vrm>()
             .init_asset_loader::<VrmLoader>()
-            .add_systems(
-                Update,
-                (
-                    auto_scene::set_vrm_scene,
-                    humanoid_bones::set_humanoid_bones,
-                    spring_bones::set_spring_bones,
-                ),
-            );
+            .register_type::<BoneName>()
+            .add_systems(Update, auto_scene::set_vrm_scene);
     }
 }
 
 #[derive(Bundle, Default)]
 pub struct VrmBundle {
     pub auto_scene: AutoScene,
-    pub humanoid_bones: HumanoidBones,
     pub scene_bundle: SceneBundle,
-    pub spring_bones: SpringBones,
     pub vrm: Handle<Vrm>,
 }
 
@@ -49,12 +54,11 @@ pub struct VrmBundle {
 #[derive(Component, Default)]
 pub struct AutoScene;
 
-#[derive(Component, Default)]
-pub struct HumanoidBones(pub HashMap<BoneName, Entity>);
-
-#[derive(Component, Default)]
+#[derive(Component, Default, Reflect)]
+#[reflect(Component, MapEntities)]
 pub struct SpringBones(pub Vec<SpringBone>);
 
+#[derive(Reflect)]
 pub struct SpringBone {
     pub bones: Vec<Entity>,
     pub center: f32,
@@ -63,4 +67,31 @@ pub struct SpringBone {
     pub gravity_power: f32,
     pub hit_radius: f32,
     pub stiffness: f32,
+}
+
+impl MapEntities for SpringBone {
+    fn map_entities<M: EntityMapper>(&mut self, entity_mapper: &mut M) {
+        for bone in &mut self.bones {
+            *bone = entity_mapper.map_entity(*bone);
+        }
+    }
+}
+
+impl MapEntities for SpringBones {
+    fn map_entities<M: EntityMapper>(&mut self, entity_mapper: &mut M) {
+        for bones in &mut self.0 {
+            bones.map_entities(entity_mapper);
+        }
+    }
+}
+
+#[derive(Component, Reflect)]
+#[reflect(Component)]
+pub struct SpringBoneLogicState {
+    pub prev_tail: Vec3,
+    pub current_tail: Vec3,
+    pub bone_axis: Vec3,
+    pub bone_length: f32,
+    pub initial_local_matrix: Mat4,
+    pub initial_local_rotation: Quat,
 }

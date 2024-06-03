@@ -24,6 +24,7 @@ pub fn update_ui(mut contexts: EguiContexts, mut settings: ResMut<Settings>) {
 
             ui.checkbox(&mut settings.draw_spring_bones, "Draw spring bones");
             ui.checkbox(&mut settings.move_leg, "Move leg bone");
+            ui.checkbox(&mut settings.move_avatar, "Move avatar");
 
             ui.separator();
 

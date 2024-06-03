@@ -88,6 +88,14 @@ pub struct Bone {
     pub use_default_values: Option<bool>,
 }
 
+#[cfg(feature = "bevy")]
+use bevy::ecs::reflect::ReflectComponent;
+
+#[cfg_attr(
+    feature = "bevy",
+    derive(bevy::reflect::Reflect, bevy::prelude::Component),
+    reflect(Component)
+)]
 #[derive(Clone, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
 pub enum BoneName {
     #[serde(rename = "hips")]
