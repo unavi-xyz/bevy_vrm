@@ -9,6 +9,8 @@ use bevy_gltf_kun::import::gltf::GltfAssetPlugin;
 use bevy_shader_mtoon::MtoonPlugin;
 use loader::{Vrm, VrmLoader};
 
+use crate::spring_bones::SpringBonePlugin;
+
 mod auto_scene;
 pub mod extensions;
 pub mod loader;
@@ -18,11 +20,9 @@ pub mod mtoon {
     pub use bevy_shader_mtoon::*;
 }
 
-use crate::spring_bones::SpringBonePlugin;
 pub use serde_vrm::vrm0::BoneName;
 
 pub struct VrmPlugin;
-
 pub struct VrmPlugins;
 
 impl PluginGroup for VrmPlugins {
