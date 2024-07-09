@@ -2,7 +2,7 @@
 
 use std::f32::consts::PI;
 
-use bevy::prelude::*;
+use bevy::{asset::AssetMetaCheck, prelude::*};
 use bevy_egui::EguiPlugin;
 use bevy_panorbit_camera::{PanOrbitCamera, PanOrbitCameraPlugin};
 use bevy_vrm::{loader::Vrm, mtoon::MtoonSun, VrmBundle, VrmPlugins};
@@ -20,9 +20,17 @@ impl Plugin for VrmViewerPlugin {
             app.add_plugins(bevy_web_file_drop::WebFileDropPlugin);
         }
 
-        app.insert_resource(ClearColor(Color::rgb(0.1, 0.1, 0.1)))
+        app.insert_resource(ClearColor(Color::linear_rgb(0.1, 0.1, 0.1)))
             .init_resource::<Settings>()
-            .add_plugins((DefaultPlugins, EguiPlugin, PanOrbitCameraPlugin, VrmPlugins))
+            .add_plugins((
+                DefaultPlugins.set(AssetPlugin {
+                    meta_check: AssetMetaCheck::Never,
+                    ..default()
+                }),
+                EguiPlugin,
+                PanOrbitCameraPlugin,
+                VrmPlugins,
+            ))
             .add_systems(Startup, setup)
             .add_systems(
                 Update,
@@ -44,9 +52,6 @@ struct Settings {
     pub move_avatar: bool,
 }
 
-#[cfg(target_family = "wasm")]
-const VRM_PATH: &str = "/bevy_vrm/assets/suzuha.vrm";
-#[cfg(not(target_family = "wasm"))]
 const VRM_PATH: &str = "alicia.vrm";
 
 fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {

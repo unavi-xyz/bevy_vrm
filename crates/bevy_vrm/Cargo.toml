@@ -12,16 +12,16 @@ workspace = true
 
 [dependencies]
 bevy.workspace = true
-bevy_gltf_kun = { version = "0.0.12", default-features = false, features = ["import"] }
+# bevy_gltf_kun = { version = "0.0.13", default-features = false, features = ["import"] }
+bevy_gltf_kun = { git = "https://github.com/unavi-xyz/gltf_kun", default-features = false, features = ["import"] }
 bevy_shader_mtoon.workspace = true
 gltf_kun.workspace = true
 gltf_kun_vrm.workspace = true
 serde.workspace = true
-serde_vrm.workspace = true
-serde_vrm.features = ["bevy"]
+serde_vrm = { workspace = true, features = ["bevy"] }
 thiserror.workspace = true
 
 [dev-dependencies]
-bevy = "0.13.0"
+bevy = "0.14.0"
 bevy_egui.workspace = true
 bevy_panorbit_camera.workspace = true

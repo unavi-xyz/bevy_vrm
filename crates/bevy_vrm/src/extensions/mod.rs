@@ -243,7 +243,7 @@ fn add_springbone_logic_state(
 ) {
     for (_skel_e, spring_bones) in spring_boness.iter() {
         for spring_bone in spring_bones.0.iter() {
-            for (_i, bone) in spring_bone.bones.iter().enumerate() {
+            for bone in spring_bone.bones.iter() {
                 if !logic_states.contains(*bone) {
                     let child = match children.get(*bone) {
                         Ok(c) => c,
@@ -269,10 +269,12 @@ fn add_springbone_logic_state(
                         }
                     };
                     let mut next_bone = None;
-                    for c in child.iter() {
+
+                    if let Some(c) = child.iter().next() {
                         next_bone.replace(*c);
                         break;
                     }
+
                     let next_bone = match next_bone {
                         None => continue,
                         Some(next_bone) => next_bone,

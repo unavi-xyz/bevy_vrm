@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use gltf_kun::{
     extensions::Extension,
     graph::{gltf::Texture, ByteNode, Graph, NodeIndex, OtherEdgeHelpers},
@@ -39,9 +41,11 @@ pub enum VrmEdge {
     Thumbnail,
 }
 
-impl ToString for VrmEdge {
-    fn to_string(&self) -> String {
-        serde_json::to_string(self).unwrap()
+impl Display for VrmEdge {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let string = serde_json::to_string(self).unwrap();
+        f.write_str(&string)?;
+        Ok(())
     }
 }
 

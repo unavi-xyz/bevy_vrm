@@ -3,7 +3,6 @@ use std::fmt::Debug;
 use bevy::{
     asset::{io::Reader, AssetLoader, LoadContext},
     prelude::*,
-    utils::BoxedFuture,
 };
 use bevy_gltf_kun::import::gltf::{
     loader::{GltfError, GltfLoader},
@@ -37,7 +36,7 @@ impl AssetLoader for VrmLoader {
         reader: &'a mut Reader,
         settings: &'a Self::Settings,
         load_context: &'a mut LoadContext,
-    ) -> BoxedFuture<'a, Result<Self::Asset, Self::Error>> {
+    ) -> impl bevy::utils::ConditionalSendFuture<Output = Result<Self::Asset, Self::Error>> {
         Box::pin(async move {
             let gltf = self.0.load(reader, settings, load_context).await?;
             Ok(Vrm { gltf })

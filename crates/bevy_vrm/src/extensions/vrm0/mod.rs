@@ -114,7 +114,7 @@ fn load_mtoon_shader(
     }
 
     if let Some(value) = weight.vector.color {
-        mtoon.base_color = Color::rgba_linear_from_array(value);
+        mtoon.base_color = LinearRgba::from_f32_array(value).into();
     }
 
     if let Some(texture) = material_property.main_texture(context.graph) {
@@ -136,7 +136,7 @@ fn load_mtoon_shader(
     }
 
     if let Some(value) = weight.vector.emissive_factor {
-        mtoon.emissive_factor = Color::rgba_linear_from_array(value);
+        mtoon.emissive_factor = LinearRgba::from_f32_array(value).into();
     }
 
     if let Some(texture) = material_property.emission_map(context.graph) {
@@ -151,7 +151,7 @@ fn load_mtoon_shader(
     }
 
     if let Some(value) = weight.vector.outline_color {
-        mtoon.outline_color = Color::rgba_linear_from_array(value);
+        mtoon.outline_color = LinearRgba::from_f32_array(value).into();
     }
 
     if let Some(value) = weight.keyword_map.outline_width_world {
@@ -175,7 +175,7 @@ fn load_mtoon_shader(
     }
 
     if let Some(value) = weight.vector.shade_color {
-        mtoon.shade_factor = Color::rgba_linear_from_array(value);
+        mtoon.shade_factor = LinearRgba::from_f32_array(value).into();
     }
 
     if let Some(texture) = material_property.shade_texture(context.graph) {

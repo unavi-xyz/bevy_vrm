@@ -1,6 +1,7 @@
 use std::f32::consts::PI;
 
 use bevy::{
+    color::palettes::css::{BISQUE, SALMON},
     prelude::*,
     render::{
         render_asset::RenderAssetUsages,
@@ -17,7 +18,7 @@ use bevy_shader_mtoon::{MtoonBundle, MtoonMaterial, MtoonPlugin, MtoonSun, Outli
 
 fn main() {
     App::new()
-        .insert_resource(ClearColor(Color::rgb(0.1, 0.1, 0.1)))
+        .insert_resource(ClearColor(Color::linear_rgb(0.1, 0.1, 0.1)))
         .add_plugins((
             DefaultPlugins.set(ImagePlugin::default_nearest()),
             EguiPlugin,
@@ -72,8 +73,8 @@ fn setup(
 
     let mtoon_plain = MtoonBundle {
         mtoon: mtoon_materials.add(MtoonMaterial {
-            base_color: Color::BISQUE,
-            shade_factor: Color::SALMON,
+            base_color: BISQUE.into(),
+            shade_factor: SALMON.into(),
             outline_width: 0.2,
             outline_mode: OutlineMode::World,
             ..default()

@@ -3,6 +3,7 @@ use bevy::{
     render::{
         render_asset::RenderAssets,
         render_resource::{AsBindGroup, AsBindGroupShaderType, Face, ShaderRef, ShaderType},
+        texture::GpuImage,
     },
 };
 
@@ -131,7 +132,7 @@ pub struct MtoonShaderUniform {
 }
 
 impl AsBindGroupShaderType<MtoonShaderUniform> for MtoonMaterial {
-    fn as_bind_group_shader_type(&self, _images: &RenderAssets<Image>) -> MtoonShaderUniform {
+    fn as_bind_group_shader_type(&self, _images: &RenderAssets<GpuImage>) -> MtoonShaderUniform {
         let mut flags = MtoonMaterialFlags::empty();
 
         if self.base_color_texture.is_some() {
@@ -168,23 +169,23 @@ impl AsBindGroupShaderType<MtoonShaderUniform> for MtoonMaterial {
             _ => 0.0,
         };
 
-        let light_color = self.light_color.as_linear_rgba_f32();
+        let light_color = self.light_color.to_linear().to_f32_array();
         let light_color = Vec3::new(light_color[0], light_color[1], light_color[2]);
 
-        let parametric_rim_color = self.parametric_rim_color.as_linear_rgba_f32();
+        let parametric_rim_color = self.parametric_rim_color.to_linear().to_f32_array();
         let parametric_rim_color = Vec3::new(
             parametric_rim_color[0],
             parametric_rim_color[1],
             parametric_rim_color[2],
         );
 
-        let shade_color = self.shade_factor.as_linear_rgba_f32();
+        let shade_color = self.shade_factor.to_linear().to_f32_array();
         let shade_color = Vec3::new(shade_color[0], shade_color[1], shade_color[2]);
 
         MtoonShaderUniform {
             alpha_cutoff,
-            base_color: self.base_color.as_linear_rgba_f32().into(),
-            emissive_factor: self.emissive_factor.as_linear_rgba_f32().into(),
+            base_color: self.base_color.to_linear().to_f32_array().into(),
+            emissive_factor: self.emissive_factor.to_linear().to_f32_array().into(),
             flags: flags.bits(),
             gi_equalization_factor: self.gi_equalization_factor,
             light_color,
@@ -232,7 +233,7 @@ impl Material for MtoonMaterial {
     fn specialize(
         _pipeline: &bevy::pbr::MaterialPipeline<Self>,
         descriptor: &mut bevy::render::render_resource::RenderPipelineDescriptor,
-        _layout: &bevy::render::mesh::MeshVertexBufferLayout,
+        _layout: &bevy::render::mesh::MeshVertexBufferLayoutRef,
         key: bevy::pbr::MaterialPipelineKey<Self>,
     ) -> Result<(), bevy::render::render_resource::SpecializedMeshPipelineError> {
         descriptor.primitive.cull_mode = key.bind_group_data.cull_mode;

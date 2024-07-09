@@ -27,7 +27,7 @@ pub fn draw_spring_bones(
                     transform.translation(),
                     Quat::default(),
                     spring_bone.hit_radius + 0.01,
-                    Color::rgb(spring_bone.stiffness, 1.0 - spring_bone.stiffness, 0.1),
+                    Color::linear_rgb(spring_bone.stiffness, 1.0 - spring_bone.stiffness, 0.1),
                 );
             }
         }

@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use gltf_kun::graph::{
     gltf::{Material, Texture},
     ByteNode, Graph, NodeIndex, OtherEdgeHelpers, Weight,
@@ -21,9 +23,11 @@ pub enum MaterialPropertyEdges {
     EmissionMap,
 }
 
-impl ToString for MaterialPropertyEdges {
-    fn to_string(&self) -> String {
-        serde_json::to_string(self).unwrap()
+impl Display for MaterialPropertyEdges {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let string = serde_json::to_string(self).unwrap();
+        f.write_str(&string)?;
+        Ok(())
     }
 }
 

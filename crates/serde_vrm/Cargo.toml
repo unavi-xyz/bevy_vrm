@@ -7,6 +7,9 @@ license.workspace = true
 repository.workspace = true
 edition.workspace = true
 
+[features]
+bevy = ["dep:bevy"]
+
 [dependencies]
+bevy = { workspace = true, optional = true }
 serde.workspace = true
-bevy = { version = "0.13.2", optional = true }

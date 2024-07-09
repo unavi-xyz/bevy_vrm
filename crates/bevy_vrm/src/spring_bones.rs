@@ -20,7 +20,7 @@ fn do_springbone_logic(
 ) {
     for spring_bones in spring_boness.iter() {
         for spring_bone in spring_bones.0.iter() {
-            for (_i, bone) in spring_bone.bones.iter().enumerate() {
+            for bone in spring_bone.bones.iter() {
                 let bone: Entity = *bone;
                 let (global, _) = global_transforms.get(bone).unwrap();
                 let mut spring_bone_logic_state = match spring_bone_logic_states.get_mut(bone) {

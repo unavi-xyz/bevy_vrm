@@ -1,9 +1,6 @@
-use bevy::{asset::AssetMetaCheck, prelude::*};
+use bevy::prelude::*;
 use vrm_viewer::VrmViewerPlugin;
 
 fn main() {
-    App::new()
-        .insert_resource(AssetMetaCheck::Never)
-        .add_plugins(VrmViewerPlugin)
-        .run();
+    App::new().add_plugins(VrmViewerPlugin).run();
 }

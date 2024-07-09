@@ -39,7 +39,7 @@ fn update_mtoon_shader(
 ) {
     for (_, mtoon) in mtoon.iter_mut() {
         if let Ok((transform, light)) = sun.get_single() {
-            mtoon.light_dir = transform.back();
+            mtoon.light_dir = transform.back().as_vec3();
             mtoon.light_color = light.color;
         }
     }
