@@ -3935,6 +3935,7 @@ version = "0.0.10"
 dependencies = [
  "bevy",
  "serde",
+ "serde_json",
 ]
 
 [[package]]

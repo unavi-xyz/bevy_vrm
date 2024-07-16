@@ -1,4 +1,5 @@
 use crate::{SpringBone, SpringBoneLogicState, SpringBones};
+use bevy::animation::{AnimationTarget, AnimationTargetId};
 use bevy::ecs::system::RunSystemOnce;
 use bevy::prelude::*;
 use bevy::transform::systems::{propagate_transforms, sync_simple_transforms};
@@ -59,6 +60,7 @@ impl BevyImportExtensions<GltfDocument> for VrmExtensions {
     }
 
     fn import_root(_context: &mut ImportContext) {}
+
     fn import_scene(context: &mut ImportContext, _scene: Scene, world: &mut World) {
         world.run_system_once(sync_simple_transforms);
         world.run_system_once(propagate_transforms);
@@ -210,22 +212,34 @@ impl BevyImportExtensions<GltfDocument> for VrmExtensions {
                 (node_name, bone_name),
                 |In((node_name, bone_name)): In<(String, BoneName)>,
                  mut commands: Commands,
-                 names: Query<(Entity, &Name)>| {
+                 names: Query<(Entity, &Name)>,
+                 parents: Query<&Parent>| {
                     let node_entity = match names.iter().find_map(|(entity, name)| {
                         if name.as_str() == node_name.as_str() {
-                            print!("{}", name);
                             Some(entity)
                         } else {
                             None
                         }
                     }) {
-                        Some(entity) => entity,
+                        Some(e) => e,
                         None => {
-                            warn!("Could not find entity for bone: {:?}", bone_name);
+                            warn!("Could not find entity for bone: {}", bone_name);
                             return;
                         }
                     };
-                    commands.entity(node_entity).insert(bone_name);
+
+                    let mut root_entity = node_entity;
+                    while let Ok(parent) = parents.get(root_entity) {
+                        root_entity = parent.get();
+                    }
+
+                    commands.entity(node_entity).insert((
+                        AnimationTarget {
+                            id: AnimationTargetId::from_name(&bone_name.to_string().into()),
+                            player: root_entity,
+                        },
+                        bone_name,
+                    ));
                 },
             );
         }

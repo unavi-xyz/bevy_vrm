@@ -1,5 +1,7 @@
 //! VRM 0.0 types.
 
+use std::fmt::Display;
+
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
@@ -208,6 +210,12 @@ pub enum BoneName {
     RightLittleDistal,
     #[serde(rename = "upperChest")]
     UpperChest,
+}
+
+impl Display for BoneName {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(&serde_json::to_string(self).unwrap())
+    }
 }
 
 #[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
