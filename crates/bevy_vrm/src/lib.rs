@@ -5,7 +5,7 @@ use bevy::app::PluginGroupBuilder;
 use bevy::ecs::entity::MapEntities;
 use bevy::ecs::reflect::ReflectMapEntities;
 use bevy::prelude::*;
-use bevy_gltf_kun::import::gltf::GltfAssetPlugin;
+use bevy_gltf_kun::GltfKunPlugin;
 use bevy_shader_mtoon::MtoonPlugin;
 use loader::{Vrm, VrmLoader};
 
@@ -35,7 +35,8 @@ impl PluginGroup for VrmPlugins {
 
 impl Plugin for VrmPlugin {
     fn build(&self, app: &mut App) {
-        app.add_plugins((GltfAssetPlugin, MtoonPlugin))
+        // TODO: Dont use default GltfKunPlugin
+        app.add_plugins((GltfKunPlugin::default(), MtoonPlugin))
             .init_asset::<Vrm>()
             .init_asset_loader::<VrmLoader>()
             .register_type::<BoneName>()

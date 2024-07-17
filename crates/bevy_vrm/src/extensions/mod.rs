@@ -3,7 +3,7 @@ use bevy::animation::{AnimationTarget, AnimationTargetId};
 use bevy::ecs::system::RunSystemOnce;
 use bevy::prelude::*;
 use bevy::transform::systems::{propagate_transforms, sync_simple_transforms};
-use bevy_gltf_kun::import::{extensions::BevyImportExtensions, gltf::document::ImportContext};
+use bevy_gltf_kun::import::{extensions::BevyExtensionImport, gltf::document::ImportContext};
 use gltf_kun::graph::gltf::GltfWeight;
 use gltf_kun::graph::{ByteNode, Weight};
 use gltf_kun::{
@@ -36,7 +36,7 @@ impl ExtensionImport<GltfDocument, GltfFormat> for VrmExtensions {
     }
 }
 
-impl BevyImportExtensions<GltfDocument> for VrmExtensions {
+impl BevyExtensionImport<GltfDocument> for VrmExtensions {
     fn import_material(
         context: &mut ImportContext,
         _standard_material: &mut StandardMaterial,
