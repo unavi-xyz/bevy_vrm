@@ -1,7 +1,12 @@
 use bevy::prelude::*;
 use bevy_gltf_kun::import::gltf::scene::GltfScene;
 
-use crate::{loader::Vrm, AutoScene};
+use crate::loader::Vrm;
+
+/// Automatically sets the scene to the loaded VRM's default scene,
+/// or the first scene if there is no default.
+#[derive(Component, Default)]
+pub struct AutoScene;
 
 pub fn set_vrm_scene(
     gltf_scenes: Res<Assets<GltfScene>>,

@@ -1,21 +1,22 @@
-use crate::{SpringBone, SpringBoneLogicState, SpringBones};
-use bevy::animation::{AnimationTarget, AnimationTargetId};
-use bevy::ecs::system::RunSystemOnce;
-use bevy::prelude::*;
-use bevy::transform::systems::{propagate_transforms, sync_simple_transforms};
+use bevy::{
+    animation::{AnimationTarget, AnimationTargetId},
+    ecs::system::RunSystemOnce,
+    prelude::*,
+    transform::systems::{propagate_transforms, sync_simple_transforms},
+};
 use bevy_gltf_kun::import::{extensions::BevyExtensionImport, gltf::document::ImportContext};
-use gltf_kun::graph::gltf::GltfWeight;
-use gltf_kun::graph::{ByteNode, Weight};
 use gltf_kun::{
     extensions::ExtensionImport,
     graph::{
-        gltf::{GltfDocument, Material, Node, Primitive, Scene},
-        Extensions, Graph,
+        gltf::{GltfDocument, GltfWeight, Material, Node, Primitive, Scene},
+        ByteNode, Extensions, Graph, Weight,
     },
     io::format::gltf::GltfFormat,
 };
 use gltf_kun_vrm::vrm0::Vrm;
 use serde_vrm::vrm0::BoneName;
+
+use crate::spring_bones::{SpringBone, SpringBoneLogicState, SpringBones};
 
 use self::vrm0::{import_material, import_primitive_material};
 
@@ -247,13 +248,13 @@ impl BevyExtensionImport<GltfDocument> for VrmExtensions {
 }
 
 fn add_springbone_logic_state(
-    mut commands: Commands,
-    spring_boness: Query<(Entity, &SpringBones)>,
-    logic_states: Query<&mut SpringBoneLogicState>,
+    children: Query<&Children>,
     global_transforms: Query<&GlobalTransform>,
     local_transforms: Query<&Transform>,
-    children: Query<&Children>,
+    logic_states: Query<&mut SpringBoneLogicState>,
+    mut commands: Commands,
     names: Query<&Name>,
+    spring_boness: Query<(Entity, &SpringBones)>,
 ) {
     for (_skel_e, spring_bones) in spring_boness.iter() {
         for spring_bone in spring_bones.0.iter() {
@@ -282,6 +283,7 @@ fn add_springbone_logic_state(
                             continue;
                         }
                     };
+
                     let mut next_bone = None;
 
                     if let Some(c) = child.iter().next() {
@@ -295,15 +297,11 @@ fn add_springbone_logic_state(
                     };
 
                     let global_this_bone = global_transforms.get(*bone).unwrap();
-
                     let local_next_bone = local_transforms.get(next_bone).unwrap();
-
                     let local_this_bone = local_transforms.get(*bone).unwrap();
 
                     let bone_axis = local_next_bone.translation.normalize();
-
                     let bone_length = local_next_bone.translation.length();
-
                     let initial_local_matrix = local_this_bone.compute_matrix();
                     let initial_local_rotation = local_this_bone.rotation;
 

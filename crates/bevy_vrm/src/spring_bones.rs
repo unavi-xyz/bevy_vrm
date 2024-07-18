@@ -1,22 +1,66 @@
-use crate::{SpringBoneLogicState, SpringBones};
-use bevy::prelude::*;
+use bevy::{
+    ecs::{entity::MapEntities, reflect::ReflectMapEntities},
+    prelude::*,
+};
+
+#[derive(Component, Default, Reflect)]
+#[reflect(Component, MapEntities)]
+pub struct SpringBones(pub Vec<SpringBone>);
+
+#[derive(Reflect)]
+pub struct SpringBone {
+    pub bones: Vec<Entity>,
+    pub center: f32,
+    pub drag_force: f32,
+    pub gravity_dir: Vec3,
+    pub gravity_power: f32,
+    pub hit_radius: f32,
+    pub stiffness: f32,
+}
+
+impl MapEntities for SpringBone {
+    fn map_entities<M: EntityMapper>(&mut self, entity_mapper: &mut M) {
+        for bone in &mut self.bones {
+            *bone = entity_mapper.map_entity(*bone);
+        }
+    }
+}
+
+impl MapEntities for SpringBones {
+    fn map_entities<M: EntityMapper>(&mut self, entity_mapper: &mut M) {
+        for bones in &mut self.0 {
+            bones.map_entities(entity_mapper);
+        }
+    }
+}
+
+#[derive(Component, Reflect)]
+#[reflect(Component)]
+pub struct SpringBoneLogicState {
+    pub prev_tail: Vec3,
+    pub current_tail: Vec3,
+    pub bone_axis: Vec3,
+    pub bone_length: f32,
+    pub initial_local_matrix: Mat4,
+    pub initial_local_rotation: Quat,
+}
 
 pub struct SpringBonePlugin;
+
 impl Plugin for SpringBonePlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Update, do_springbone_logic);
-        app.register_type::<SpringBones>();
-        app.register_type::<SpringBoneLogicState>();
+        app.register_type::<SpringBoneLogicState>()
+            .register_type::<SpringBones>()
+            .add_systems(Update, do_springbone_logic);
     }
 }
 
 fn do_springbone_logic(
     mut global_transforms: Query<(&mut GlobalTransform, &mut Transform)>,
-    spring_boness: Query<&SpringBones>,
     mut spring_bone_logic_states: Query<&mut SpringBoneLogicState>,
     parents: Query<&Parent>,
+    spring_boness: Query<&SpringBones>,
     time: Res<Time>,
-    _names: Query<&Name>,
 ) {
     for spring_bones in spring_boness.iter() {
         for spring_bone in spring_bones.0.iter() {
