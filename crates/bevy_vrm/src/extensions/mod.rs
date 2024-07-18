@@ -237,6 +237,10 @@ impl BevyExtensionImport<GltfDocument> for VrmExtensions {
                         root_entity = parent.get();
                     }
 
+                    commands
+                        .entity(root_entity)
+                        .insert(AnimationPlayer::default());
+
                     let id = VRM_ANIMATION_TARGETS[&bone_name];
 
                     commands.entity(node_entity).insert((
