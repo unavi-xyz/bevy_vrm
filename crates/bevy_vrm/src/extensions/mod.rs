@@ -1,5 +1,5 @@
 use bevy::{
-    animation::{AnimationTarget, AnimationTargetId},
+    animation::AnimationTarget,
     ecs::system::RunSystemOnce,
     prelude::*,
     transform::systems::{propagate_transforms, sync_simple_transforms},
@@ -16,7 +16,10 @@ use gltf_kun::{
 use gltf_kun_vrm::vrm0::Vrm;
 use serde_vrm::vrm0::BoneName;
 
-use crate::spring_bones::{SpringBone, SpringBoneLogicState, SpringBones};
+use crate::{
+    animations::vrm::VRM_ANIMATION_TARGETS,
+    spring_bones::{SpringBone, SpringBoneLogicState, SpringBones},
+};
 
 use self::vrm0::{import_material, import_primitive_material};
 
@@ -234,9 +237,11 @@ impl BevyExtensionImport<GltfDocument> for VrmExtensions {
                         root_entity = parent.get();
                     }
 
+                    let id = VRM_ANIMATION_TARGETS[&bone_name];
+
                     commands.entity(node_entity).insert((
                         AnimationTarget {
-                            id: AnimationTargetId::from_name(&bone_name.to_string().into()),
+                            id,
                             player: root_entity,
                         },
                         bone_name,
