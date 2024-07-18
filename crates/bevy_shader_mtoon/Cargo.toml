@@ -16,6 +16,6 @@ bevy_mod_outline = "0.8.0"
 bitflags = "2.4.2"
 
 [dev-dependencies]
-bevy = "0.14.0"
+bevy = { workspace = true, default-features = true }
 bevy_egui.workspace = true
 bevy_panorbit_camera.workspace = true

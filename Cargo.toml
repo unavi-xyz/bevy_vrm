@@ -22,7 +22,7 @@ serde_vrm = { path = "crates/serde_vrm", version = "0.0.10" }
 bevy = { version = "0.14.0", default-features = false, features = ["animation", "bevy_asset", "bevy_scene", "bevy_pbr"] }
 bevy_egui = { version = "0.28.0", default-features = false, features = ["open_url", "default_fonts", "render"] }
 bevy_panorbit_camera = { version = "0.19.0", features = ["bevy_egui"] }
-gltf_kun = { git = "https://github.com/unavi-xyz/gltf_kun", default-features = false }
+gltf_kun = { version = "0.0.13", default-features = false }
 serde = { version = "1.0.197", features = ["derive"] }
 serde_json = "1.0.115"
 thiserror = "1.0.57"

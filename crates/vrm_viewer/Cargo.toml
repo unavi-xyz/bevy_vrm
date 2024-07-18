@@ -10,7 +10,7 @@ edition.workspace = true
 workspace = true
 
 [dependencies]
-bevy = "0.14.0"
+bevy = { workspace = true, default-features = true }
 bevy_egui.workspace = true
 bevy_panorbit_camera.workspace = true
 bevy_vrm.workspace = true
