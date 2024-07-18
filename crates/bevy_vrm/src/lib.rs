@@ -9,6 +9,8 @@ use loader::{Vrm, VrmLoader};
 
 use crate::spring_bones::SpringBonePlugin;
 
+#[cfg(feature = "animations")]
+pub mod animations;
 pub mod auto_scene;
 pub mod extensions;
 pub mod loader;
