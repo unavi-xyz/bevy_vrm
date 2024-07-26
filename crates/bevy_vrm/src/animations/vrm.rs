@@ -8,7 +8,7 @@ macro_rules! push_bone {
     ($map:ident, $chain:ident, $name:ident) => {
         $map.insert(
             BoneName::$name,
-            $chain.push_target(&BoneName::$name.to_string()),
+            $chain.push_target(BoneName::$name.to_string()),
         );
     };
 }
