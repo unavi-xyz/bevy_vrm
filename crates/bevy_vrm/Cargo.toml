@@ -12,7 +12,7 @@ workspace = true
 
 [features]
 default = ["animations"]
-animations = ["dep:lazy_static", "dep:paste"]
+animations = ["bevy/animation", "dep:lazy_static", "dep:paste"]
 
 [dependencies]
 bevy.workspace = true
