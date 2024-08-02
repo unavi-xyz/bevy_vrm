@@ -1219,7 +1219,6 @@ dependencies = [
  "bevy_shader_mtoon",
  "gltf_kun",
  "gltf_kun_vrm",
- "lazy_static",
  "paste",
  "petgraph",
  "serde",

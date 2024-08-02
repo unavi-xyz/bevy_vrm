@@ -1,5 +1,6 @@
+use std::sync::LazyLock;
+
 use bevy::{animation::AnimationTargetId, utils::HashMap};
-use lazy_static::lazy_static;
 use serde_vrm::vrm0::BoneName;
 
 use crate::animations::target_chain::TargetChain;
@@ -63,8 +64,8 @@ macro_rules! leg {
     };
 }
 
-lazy_static! {
-    pub static ref VRM_ANIMATION_TARGETS: HashMap<BoneName, AnimationTargetId> = {
+pub static VRM_ANIMATION_TARGETS: LazyLock<HashMap<BoneName, AnimationTargetId>> =
+    LazyLock::new(|| {
         let mut map = HashMap::default();
         let mut chain = TargetChain::default();
 
@@ -99,5 +100,4 @@ lazy_static! {
         }
 
         map
-    };
-}
+    });
