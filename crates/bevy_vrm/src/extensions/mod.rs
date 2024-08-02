@@ -77,7 +77,7 @@ impl BevyExtensionImport<GltfDocument> for VrmExtensions {
         }) {
             Some(doc) => GltfDocument(doc),
             None => {
-                info!("failed to select gltf doc for vr0 loading");
+                info!("failed to select gltf doc for vrm 0 loading");
                 return;
             }
         };

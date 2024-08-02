@@ -2,6 +2,7 @@ use std::fmt::Display;
 
 use gltf_kun::graph::{gltf::Mesh, ByteNode, Graph, NodeIndex, OtherEdgeHelpers, Weight};
 use serde::{Deserialize, Serialize};
+use serde_vrm::vrm0::FirstPersonFlag;
 
 #[derive(Copy, Clone, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
 pub enum MeshAnnotationEdges {
@@ -19,7 +20,7 @@ impl Display for MeshAnnotationEdges {
 
 #[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
 pub struct MeshAnnotationWeight {
-    pub first_person_flag: Option<String>,
+    pub first_person_flag: FirstPersonFlag,
 }
 
 impl From<&Vec<u8>> for MeshAnnotationWeight {

@@ -12,6 +12,7 @@ use super::{
     bone_group::{BoneGroup, BoneGroupWeight},
     collider_group::{ColliderGroup, ColliderGroupWeight},
     material_property::{MaterialProperty, MaterialPropertyWeight},
+    mesh_annotation::{MeshAnnotation, MeshAnnotationWeight},
     weight::{FirstPerson, Humanoid, Meta, VrmWeight},
     Vrm, EXTENSION_NAME,
 };
@@ -213,6 +214,18 @@ impl ExtensionImport<GltfDocument, GltfFormat> for Vrm {
                         vrm.set_first_person_bone(graph, Some(*bone));
                     })
                     .ok_or_else(|| Box::new(VrmImportError::BoneNotFound(bone_idx as usize)))?;
+            }
+
+            for annotation in first_person.mesh_annotations.unwrap_or_default() {
+                let mesh_idx = annotation.mesh.unwrap_or_default();
+                let first_person_flag = annotation.first_person_flag;
+
+                if let Some(mesh) = doc.meshes(graph).get(mesh_idx as usize) {
+                    let ma = MeshAnnotation::new(graph);
+                    ma.set_mesh(graph, Some(*mesh));
+                    ma.write(graph, &MeshAnnotationWeight { first_person_flag });
+                    vrm.add_mesh_annotation(graph, ma);
+                }
             }
 
             FirstPerson {
