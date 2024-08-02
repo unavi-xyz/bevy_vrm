@@ -394,7 +394,7 @@ pub struct MaterialProperty {
 
 #[derive(Clone, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
 pub enum Shader {
-    #[serde(rename = "VRM_USE_GLTFSHADER")]
+    #[serde(rename = "Gltf")]
     Gltf,
     #[serde(rename = "VRM/MToon")]
     MToon,
