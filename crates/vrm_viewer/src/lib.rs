@@ -2,10 +2,16 @@
 
 use std::f32::consts::PI;
 
-use bevy::{asset::AssetMetaCheck, prelude::*};
+use bevy::{asset::AssetMetaCheck, prelude::*, render::view::RenderLayers};
 use bevy_egui::EguiPlugin;
 use bevy_panorbit_camera::{PanOrbitCamera, PanOrbitCameraPlugin};
-use bevy_vrm::{loader::Vrm, mtoon::MtoonSun, VrmBundle, VrmPlugins};
+use bevy_vrm::{
+    layers::{FirstPersonFlag, RENDER_LAYERS},
+    loader::Vrm,
+    mtoon::MtoonSun,
+    VrmBundle, VrmPlugins,
+};
+use ui::RenderLayer;
 
 mod draw_spring_bones;
 mod move_leg;
@@ -39,6 +45,7 @@ impl Plugin for VrmViewerPlugin {
                     draw_spring_bones::move_avatar,
                     move_leg::move_leg,
                     read_dropped_files,
+                    set_render_layers,
                     ui::update_ui,
                 ),
             );
@@ -48,8 +55,9 @@ impl Plugin for VrmViewerPlugin {
 #[derive(Resource, Default)]
 struct Settings {
     pub draw_spring_bones: bool,
-    pub move_leg: bool,
     pub move_avatar: bool,
+    pub move_leg: bool,
+    pub render_layer: RenderLayer,
 }
 
 const VRM_PATH: &str = "alicia.vrm";
@@ -90,6 +98,31 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
         vrm: asset_server.load(VRM_PATH),
         ..default()
     });
+}
+
+fn set_render_layers(
+    cameras: Query<Entity, With<Camera>>,
+    mut commands: Commands,
+    mut prev: Local<FirstPersonFlag>,
+    settings: Res<Settings>,
+) {
+    for entity in cameras.iter() {
+        let flag = match settings.render_layer {
+            RenderLayer::Both => FirstPersonFlag::Both,
+            RenderLayer::FirstPerson => FirstPersonFlag::FirstPersonOnly,
+            RenderLayer::ThirdPerson => FirstPersonFlag::ThirdPersonOnly,
+        };
+
+        if flag != *prev {
+            *prev = flag;
+
+            let layers = RENDER_LAYERS[&flag].clone();
+
+            commands
+                .entity(entity)
+                .insert(layers.union(&RenderLayers::layer(0)));
+        }
+    }
 }
 
 fn read_dropped_files(

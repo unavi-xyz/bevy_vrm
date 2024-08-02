@@ -1,7 +1,8 @@
 use std::sync::LazyLock;
 
 use bevy::{render::view::RenderLayers, utils::HashMap};
-use serde_vrm::vrm0::FirstPersonFlag;
+
+pub use serde_vrm::vrm0::FirstPersonFlag;
 
 pub const FIRST_PERSON_LAYER: usize = 7;
 pub const THIRD_PERSON_LAYER: usize = 8;
