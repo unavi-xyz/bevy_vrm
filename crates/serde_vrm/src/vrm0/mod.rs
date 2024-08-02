@@ -218,7 +218,7 @@ pub struct MeshAnnotation {
     pub first_person_flag: FirstPersonFlag,
 }
 
-#[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
+#[derive(Copy, Clone, Debug, Default, Hash, Deserialize, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub enum FirstPersonFlag {
     #[default]

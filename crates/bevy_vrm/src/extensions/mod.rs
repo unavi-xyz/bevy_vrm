@@ -9,15 +9,20 @@ use gltf_kun::{
     extensions::ExtensionImport,
     graph::{
         gltf::{GltfDocument, GltfWeight, Material, Node, Primitive, Scene},
-        ByteNode, Extensions, Graph, Weight,
+        ByteNode, Edge, Extensions, Graph, Weight,
     },
     io::format::gltf::GltfFormat,
 };
-use gltf_kun_vrm::vrm0::Vrm;
-use serde_vrm::vrm0::BoneName;
+use gltf_kun_vrm::vrm0::{
+    mesh_annotation::{MeshAnnotation, MeshAnnotationEdges},
+    Vrm,
+};
+use petgraph::{visit::EdgeRef, Direction};
+use serde_vrm::vrm0::{BoneName, FirstPersonFlag};
 
 use crate::{
     animations::vrm::VRM_ANIMATION_TARGETS,
+    layers::RENDER_LAYERS,
     spring_bones::{SpringBone, SpringBoneLogicState, SpringBones},
 };
 
@@ -61,6 +66,30 @@ impl BevyExtensionImport<GltfDocument> for VrmExtensions {
         if let Some(ext) = context.doc.get_extension::<Vrm>(context.graph) {
             import_primitive_material(context, entity, ext, primitive);
         }
+
+        let flag = context
+            .graph
+            .edges_directed(primitive.0, Direction::Incoming)
+            .find_map(|edge| {
+                if let Edge::Other(name) = edge.weight() {
+                    if name == MeshAnnotationEdges::Mesh.to_string().as_str() {
+                        let annotation = MeshAnnotation(edge.source());
+                        let weight = annotation.read(context.graph);
+                        return Some(weight.first_person_flag);
+                    }
+                }
+
+                None
+            })
+            .unwrap_or_default();
+
+        if flag == FirstPersonFlag::Auto {
+            // If mesh is child of the head bone, or a vertex contains the weight of the head bone
+            // then change to ThirdPersonOnly. Otherwise, change to Both.
+        }
+
+        let layers = RENDER_LAYERS[&flag].clone();
+        entity.insert(layers);
     }
 
     fn import_root(_context: &mut ImportContext) {}
@@ -82,7 +111,7 @@ impl BevyExtensionImport<GltfDocument> for VrmExtensions {
             }
         };
 
-        let ext = match doc.get_extension::<gltf_kun_vrm::vrm0::Vrm>(graph) {
+        let ext = match doc.get_extension::<Vrm>(graph) {
             Some(ext) => ext,
             None => {
                 info!("failed to select vrm 0 extension for vrm");

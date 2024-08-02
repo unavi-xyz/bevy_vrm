@@ -1221,6 +1221,7 @@ dependencies = [
  "gltf_kun_vrm",
  "lazy_static",
  "paste",
+ "petgraph",
  "serde",
  "serde_vrm",
  "thiserror",

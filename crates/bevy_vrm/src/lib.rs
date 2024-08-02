@@ -13,6 +13,7 @@ use crate::spring_bones::SpringBonePlugin;
 pub mod animations;
 pub mod auto_scene;
 pub mod extensions;
+pub mod layers;
 pub mod loader;
 pub mod spring_bones;
 
