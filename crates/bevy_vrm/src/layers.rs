@@ -11,11 +11,11 @@ pub static RENDER_LAYERS: LazyLock<HashMap<FirstPersonFlag, RenderLayers>> = Laz
 
     map.insert(
         FirstPersonFlag::Auto,
-        RenderLayers::from_layers(&[FIRST_PERSON_LAYER, THIRD_PERSON_LAYER]),
+        RenderLayers::from_layers(&[0, FIRST_PERSON_LAYER, THIRD_PERSON_LAYER]),
     );
     map.insert(
         FirstPersonFlag::Both,
-        RenderLayers::from_layers(&[FIRST_PERSON_LAYER, THIRD_PERSON_LAYER]),
+        RenderLayers::from_layers(&[0, FIRST_PERSON_LAYER, THIRD_PERSON_LAYER]),
     );
     map.insert(
         FirstPersonFlag::FirstPersonOnly,

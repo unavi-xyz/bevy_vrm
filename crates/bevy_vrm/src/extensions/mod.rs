@@ -84,7 +84,7 @@ impl BevyExtensionImport<GltfDocument> for VrmExtensions {
             .unwrap_or_default();
 
         if flag == FirstPersonFlag::Auto {
-            // If mesh is child of the head bone, or a vertex contains the weight of the head bone
+            // TODO: If mesh is child of the head bone, or a vertex contains the weight of the head bone
             // then change to ThirdPersonOnly. Otherwise, change to Both.
         }
 
