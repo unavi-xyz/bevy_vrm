@@ -3,18 +3,11 @@ use std::fmt::Debug;
 use bevy::{
     asset::{io::Reader, AssetLoader, LoadContext},
     prelude::*,
-    utils::HashMap,
 };
 use bevy_gltf_kun::import::gltf::{
     loader::{GltfError, GltfLoader},
-    mesh::GltfMesh,
     GltfKun,
 };
-use gltf_kun::graph::{
-    gltf::{GltfDocument, GltfWeight},
-    ByteNode, Extensions, Weight,
-};
-use serde_vrm::vrm0::FirstPersonFlag;
 use thiserror::Error;
 
 use crate::extensions::VrmExtensions;
