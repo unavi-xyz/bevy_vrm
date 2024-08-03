@@ -126,9 +126,9 @@ fn set_render_layers(
 }
 
 fn read_dropped_files(
+    asset_server: Res<AssetServer>,
     mut commands: Commands,
     mut events: EventReader<FileDragAndDrop>,
-    asset_server: Res<AssetServer>,
     mut vrms: Query<Entity, With<Handle<Vrm>>>,
 ) {
     for event in events.read() {

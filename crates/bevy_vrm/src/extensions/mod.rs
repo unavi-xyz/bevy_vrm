@@ -67,7 +67,7 @@ impl BevyExtensionImport<GltfDocument> for VrmExtensions {
             import_primitive_material(context, entity, ext, primitive);
         }
 
-        let flag = context
+        let mut flag = context
             .graph
             .edges_directed(primitive.0, Direction::Incoming)
             .find_map(|edge| {
@@ -84,8 +84,35 @@ impl BevyExtensionImport<GltfDocument> for VrmExtensions {
             .unwrap_or_default();
 
         if flag == FirstPersonFlag::Auto {
-            // TODO: If mesh is child of the head bone, or a vertex contains the weight of the head bone
-            // then change to ThirdPersonOnly. Otherwise, change to Both.
+            let mesh = primitive.mesh(context.graph).unwrap();
+            let nodes = mesh.nodes(context.graph);
+
+            let Some(ext) = get_vrm_extension(context.graph) else {
+                warn!("VRM extension not found");
+                return;
+            };
+
+            let head = ext
+                .human_bones(context.graph)
+                .into_iter()
+                .find(|b| {
+                    let b_weight = b.read(context.graph);
+                    b_weight.name == Some(BoneName::Head)
+                })
+                .unwrap();
+
+            let head_node = head.node(context.graph).unwrap();
+
+            for node in nodes {
+                let found = find_child(context.graph, node, head_node.children(context.graph));
+
+                if found {
+                    flag = FirstPersonFlag::ThirdPersonOnly;
+                    break;
+                } else {
+                    flag = FirstPersonFlag::Both;
+                }
+            }
         }
 
         let layers = RENDER_LAYERS[&flag].clone();
@@ -100,34 +127,18 @@ impl BevyExtensionImport<GltfDocument> for VrmExtensions {
 
         let graph = &context.graph;
 
-        let doc = match graph.node_indices().find(|n| {
-            let weight = graph.node_weight(*n);
-            matches!(weight, Some(Weight::Gltf(GltfWeight::Document)))
-        }) {
-            Some(doc) => GltfDocument(doc),
-            None => {
-                info!("failed to select gltf doc for vrm 0 loading");
-                return;
-            }
-        };
-
-        let ext = match doc.get_extension::<Vrm>(graph) {
-            Some(ext) => ext,
-            None => {
-                info!("failed to select vrm 0 extension for vrm");
-                return;
-            }
-        };
-
-        let names: Vec<(Entity, Name)> = world.run_system_once_with(
-            (),
-            |names: Query<(Entity, &Name)>| -> Vec<(Entity, Name)> {
+        let names: Vec<(Entity, Name)> =
+            world.run_system_once(|names: Query<(Entity, &Name)>| -> Vec<(Entity, Name)> {
                 names
                     .iter()
                     .map(|(a, b)| (a, b.clone()))
                     .collect::<Vec<_>>()
-            },
-        );
+            });
+
+        let Some(ext) = get_vrm_extension(graph) else {
+            warn!("VRM extension not found");
+            return;
+        };
 
         let mut spring_bones = vec![];
 
@@ -283,6 +294,33 @@ impl BevyExtensionImport<GltfDocument> for VrmExtensions {
             );
         }
     }
+}
+
+fn find_child(graph: &Graph, target: Node, children: Vec<Node>) -> bool {
+    for child in children {
+        if child == target {
+            return true;
+        }
+
+        if find_child(graph, target, child.children(graph)) {
+            return true;
+        }
+    }
+
+    false
+}
+
+fn get_vrm_extension(graph: &Graph) -> Option<Vrm> {
+    let doc_idx = graph.node_indices().find(|n| {
+        let weight = graph.node_weight(*n);
+        matches!(weight, Some(Weight::Gltf(GltfWeight::Document)))
+    })?;
+
+    let doc = GltfDocument(doc_idx);
+
+    let ext = doc.get_extension::<Vrm>(graph)?;
+
+    Some(ext)
 }
 
 fn add_springbone_logic_state(
