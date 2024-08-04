@@ -107,7 +107,7 @@ impl BevyExtensionImport<GltfDocument> for VrmExtensions {
             let head_node = head.node(context.graph).unwrap();
 
             for node in nodes {
-                let is_child = find_child(context.graph, node, head_node.children(context.graph));
+                let is_child = find_child(context.graph, node, head_node);
 
                 if is_child {
                     flag = FirstPersonFlag::ThirdPersonOnly;
@@ -304,13 +304,13 @@ impl BevyExtensionImport<GltfDocument> for VrmExtensions {
     }
 }
 
-fn find_child(graph: &Graph, target: Node, children: Vec<Node>) -> bool {
-    for child in children {
-        if child == target {
-            return true;
-        }
+fn find_child(graph: &Graph, target: Node, parent: Node) -> bool {
+    if target == parent {
+        return true;
+    }
 
-        if find_child(graph, target, child.children(graph)) {
+    for child in parent.children(graph) {
+        if find_child(graph, target, child) {
             return true;
         }
     }
@@ -333,7 +333,7 @@ fn is_primitive_head_weighted(
                         for idx in el {
                             let joint = joints[idx as usize];
 
-                            let is_child = find_child(graph, joint, head_node.children(graph));
+                            let is_child = find_child(graph, joint, head_node);
 
                             if is_child {
                                 return true;
