@@ -8,7 +8,10 @@ use bevy_gltf_kun::import::{extensions::BevyExtensionImport, gltf::document::Imp
 use gltf_kun::{
     extensions::ExtensionImport,
     graph::{
-        gltf::{GltfDocument, GltfWeight, Material, Node, Primitive, Scene},
+        gltf::{
+            accessor::iter::AccessorIter, primitive::Semantic, GltfDocument, GltfWeight, Material,
+            Node, Primitive, Scene,
+        },
         ByteNode, Edge, Extensions, Graph, Weight,
     },
     io::format::gltf::GltfFormat,
@@ -104,14 +107,19 @@ impl BevyExtensionImport<GltfDocument> for VrmExtensions {
             let head_node = head.node(context.graph).unwrap();
 
             for node in nodes {
-                let found = find_child(context.graph, node, head_node.children(context.graph));
+                let is_child = find_child(context.graph, node, head_node.children(context.graph));
 
-                if found {
+                if is_child {
                     flag = FirstPersonFlag::ThirdPersonOnly;
                     break;
-                } else {
-                    flag = FirstPersonFlag::Both;
                 }
+
+                if is_primitive_head_weighted(primitive, context.graph, node, head_node) {
+                    flag = FirstPersonFlag::ThirdPersonOnly;
+                    break;
+                }
+
+                flag = FirstPersonFlag::Both;
             }
         }
 
@@ -304,6 +312,46 @@ fn find_child(graph: &Graph, target: Node, children: Vec<Node>) -> bool {
 
         if find_child(graph, target, child.children(graph)) {
             return true;
+        }
+    }
+
+    false
+}
+
+fn is_primitive_head_weighted(
+    primitive: Primitive,
+    graph: &Graph,
+    node: Node,
+    head_node: Node,
+) -> bool {
+    if let Some(skin) = node.skin(graph) {
+        let joints = skin.joints(graph);
+        if let Some(accessor) = primitive.attribute(graph, Semantic::Joints(0)) {
+            match accessor.iter(graph) {
+                Ok(AccessorIter::U16x4(elements)) => {
+                    for el in elements {
+                        for idx in el {
+                            let joint = joints[idx as usize];
+
+                            let is_child = find_child(graph, joint, head_node.children(graph));
+
+                            if is_child {
+                                return true;
+                            }
+                        }
+                    }
+                }
+                Ok(other) => {
+                    warn!(
+                        "Unsupported joints accessor type: {:?} {:?}",
+                        other.component_type(),
+                        other.element_type(),
+                    );
+                }
+                Err(e) => {
+                    error!("Error reading joints accessor: {}", e);
+                }
+            }
         }
     }
 
