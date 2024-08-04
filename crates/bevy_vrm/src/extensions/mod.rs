@@ -329,14 +329,38 @@ fn is_primitive_head_weighted(
         if let Some(accessor) = primitive.attribute(graph, Semantic::Joints(0)) {
             match accessor.iter(graph) {
                 Ok(AccessorIter::U16x4(elements)) => {
-                    for el in elements {
-                        for idx in el {
+                    for (i, el) in elements.enumerate() {
+                        for (j, idx) in el.into_iter().enumerate() {
                             let joint = joints[idx as usize];
-
                             let is_child = find_child(graph, joint, head_node);
-
                             if is_child {
-                                return true;
+                                if let Some(accessor) =
+                                    primitive.attribute(graph, Semantic::Weights(0))
+                                {
+                                    match accessor.iter(graph) {
+                                        Ok(AccessorIter::F32x4(elements)) => {
+                                            for (k, weights) in elements.enumerate() {
+                                                if i != k {
+                                                    continue;
+                                                }
+
+                                                if weights[j] > 0.0 {
+                                                    return true;
+                                                }
+                                            }
+                                        }
+                                        Ok(other) => {
+                                            warn!(
+                                                "Unsupported weight accessor type: {:?} {:?}",
+                                                other.component_type(),
+                                                other.element_type(),
+                                            );
+                                        }
+                                        Err(e) => {
+                                            error!("Error reading weight accessor: {}", e);
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
