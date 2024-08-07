@@ -1,19 +1,13 @@
 //! [Bevy](https://bevyengine.org/) plugin for loading [VRM](https://vrm.dev/en/) avatars.
 //! Aims to support both the VRM 0.0 and VRM 1.0 standards.
-//!
-//! ## Render Layers
-//!
-//! [RenderLayers](bevy::render::view::RenderLayers) are used to represent VRM mesh annotations.
-//! If parts of your loaded VRM are invisible, it is likely because of this!
-//!
-//! Check out the [layers] module to see the used values.
-//! Add the corresponding layer to your camera for it to be rendered.
 
 use auto_scene::AutoScene;
 use bevy::{app::PluginGroupBuilder, prelude::*};
 use bevy_gltf_kun::GltfKunPlugin;
 use bevy_shader_mtoon::MtoonPlugin;
+use first_person::SetupFirstPerson;
 use loader::{Vrm, VrmLoader};
+use serde_vrm::vrm0::FirstPersonFlag;
 
 use crate::spring_bones::SpringBonePlugin;
 
@@ -21,6 +15,7 @@ use crate::spring_bones::SpringBonePlugin;
 pub mod animations;
 pub mod auto_scene;
 pub mod extensions;
+pub mod first_person;
 pub mod layers;
 pub mod loader;
 pub mod spring_bones;
@@ -46,10 +41,15 @@ impl Plugin for VrmPlugin {
     fn build(&self, app: &mut App) {
         // TODO: Dont use default GltfKunPlugin
         app.add_plugins((GltfKunPlugin::default(), MtoonPlugin))
+            .add_event::<SetupFirstPerson>()
             .init_asset::<Vrm>()
             .init_asset_loader::<VrmLoader>()
             .register_type::<BoneName>()
-            .add_systems(Update, auto_scene::set_vrm_scene);
+            .register_type::<FirstPersonFlag>()
+            .add_systems(
+                Update,
+                (auto_scene::set_vrm_scene, first_person::handle_setup_events).chain(),
+            );
     }
 }
 

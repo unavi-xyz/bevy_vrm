@@ -6,7 +6,7 @@ use bevy::{asset::AssetMetaCheck, prelude::*, render::view::RenderLayers};
 use bevy_egui::EguiPlugin;
 use bevy_panorbit_camera::{PanOrbitCamera, PanOrbitCameraPlugin};
 use bevy_vrm::{
-    layers::{FirstPersonFlag, RENDER_LAYERS},
+    first_person::{FirstPersonFlag, SetupFirstPerson, RENDER_LAYERS},
     loader::Vrm,
     mtoon::MtoonSun,
     VrmBundle, VrmPlugins,
@@ -46,6 +46,7 @@ impl Plugin for VrmViewerPlugin {
                     move_leg::move_leg,
                     read_dropped_files,
                     set_render_layers,
+                    setup_first_person,
                     ui::update_ui,
                 ),
             );
@@ -121,6 +122,19 @@ fn set_render_layers(
             commands
                 .entity(entity)
                 .insert(layers.union(&RenderLayers::layer(0)));
+        }
+    }
+}
+
+fn setup_first_person(
+    mut events: EventReader<AssetEvent<Vrm>>,
+    mut writer: EventWriter<SetupFirstPerson>,
+    vrms: Query<(Entity, &Handle<Vrm>)>,
+) {
+    for event in events.read() {
+        if let AssetEvent::LoadedWithDependencies { id } = event {
+            let (ent, _) = vrms.iter().find(|(_, handle)| handle.id() == *id).unwrap();
+            writer.send(SetupFirstPerson(ent));
         }
     }
 }

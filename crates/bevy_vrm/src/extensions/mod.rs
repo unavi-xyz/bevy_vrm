@@ -8,10 +8,7 @@ use bevy_gltf_kun::import::{extensions::BevyExtensionImport, gltf::document::Imp
 use gltf_kun::{
     extensions::ExtensionImport,
     graph::{
-        gltf::{
-            accessor::iter::AccessorIter, primitive::Semantic, GltfDocument, GltfWeight, Material,
-            Node, Primitive, Scene,
-        },
+        gltf::{GltfDocument, GltfWeight, Material, Node, Primitive, Scene},
         ByteNode, Edge, Extensions, Graph, Weight,
     },
     io::format::gltf::GltfFormat,
@@ -25,7 +22,6 @@ use serde_vrm::vrm0::{BoneName, FirstPersonFlag};
 
 use crate::{
     animations::vrm::VRM_ANIMATION_TARGETS,
-    layers::RENDER_LAYERS,
     spring_bones::{SpringBone, SpringBoneLogicState, SpringBones},
 };
 
@@ -113,18 +109,10 @@ impl BevyExtensionImport<GltfDocument> for VrmExtensions {
                     flag = FirstPersonFlag::ThirdPersonOnly;
                     break;
                 }
-
-                if is_primitive_head_weighted(primitive, context.graph, node, head_node) {
-                    flag = FirstPersonFlag::ThirdPersonOnly;
-                    break;
-                }
-
-                flag = FirstPersonFlag::Both;
             }
         }
 
-        let layers = RENDER_LAYERS[&flag].clone();
-        entity.insert(layers);
+        entity.insert(flag);
     }
 
     fn import_root(_context: &mut ImportContext) {}
@@ -312,70 +300,6 @@ fn find_child(graph: &Graph, target: Node, parent: Node) -> bool {
     for child in parent.children(graph) {
         if find_child(graph, target, child) {
             return true;
-        }
-    }
-
-    false
-}
-
-fn is_primitive_head_weighted(
-    primitive: Primitive,
-    graph: &Graph,
-    node: Node,
-    head_node: Node,
-) -> bool {
-    if let Some(skin) = node.skin(graph) {
-        let joints = skin.joints(graph);
-        if let Some(accessor) = primitive.attribute(graph, Semantic::Joints(0)) {
-            match accessor.iter(graph) {
-                Ok(AccessorIter::U16x4(elements)) => {
-                    for (i, el) in elements.enumerate() {
-                        for (j, idx) in el.into_iter().enumerate() {
-                            let joint = joints[idx as usize];
-                            let is_child = find_child(graph, joint, head_node);
-                            if is_child {
-                                if let Some(accessor) =
-                                    primitive.attribute(graph, Semantic::Weights(0))
-                                {
-                                    match accessor.iter(graph) {
-                                        Ok(AccessorIter::F32x4(elements)) => {
-                                            for (k, weights) in elements.enumerate() {
-                                                if i != k {
-                                                    continue;
-                                                }
-
-                                                if weights[j] > 0.0 {
-                                                    return true;
-                                                }
-                                            }
-                                        }
-                                        Ok(other) => {
-                                            warn!(
-                                                "Unsupported weight accessor type: {:?} {:?}",
-                                                other.component_type(),
-                                                other.element_type(),
-                                            );
-                                        }
-                                        Err(e) => {
-                                            error!("Error reading weight accessor: {}", e);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                Ok(other) => {
-                    warn!(
-                        "Unsupported joints accessor type: {:?} {:?}",
-                        other.component_type(),
-                        other.element_type(),
-                    );
-                }
-                Err(e) => {
-                    error!("Error reading joints accessor: {}", e);
-                }
-            }
         }
     }
 

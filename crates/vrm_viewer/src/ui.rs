@@ -5,9 +5,9 @@ use crate::Settings;
 
 #[derive(Copy, Clone, Default, PartialEq, Eq)]
 pub enum RenderLayer {
-    #[default]
     Both,
     FirstPerson,
+    #[default]
     ThirdPerson,
 }
 

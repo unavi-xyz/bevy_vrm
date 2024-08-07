@@ -218,14 +218,22 @@ pub struct MeshAnnotation {
     pub first_person_flag: FirstPersonFlag,
 }
 
+#[cfg_attr(
+    feature = "bevy",
+    derive(bevy::reflect::Reflect, bevy::prelude::Component),
+    reflect(Component)
+)]
 #[derive(Copy, Clone, Debug, Default, Hash, Deserialize, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub enum FirstPersonFlag {
     #[default]
     #[serde(alias = "Auto")]
     Auto,
+    #[serde(alias = "Both")]
     Both,
+    #[serde(alias = "FirstPersonOnly")]
     FirstPersonOnly,
+    #[serde(alias = "ThirdPersonOnly")]
     ThirdPersonOnly,
 }
 

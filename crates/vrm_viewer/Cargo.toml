@@ -10,7 +10,7 @@ edition.workspace = true
 workspace = true
 
 [dependencies]
-bevy = { workspace = true, default-features = true }
+bevy = { workspace = true, default-features = true, features = ["wayland"] }
 bevy_egui.workspace = true
 bevy_panorbit_camera.workspace = true
 bevy_vrm.workspace = true
