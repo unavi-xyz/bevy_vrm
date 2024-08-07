@@ -3,7 +3,7 @@ use std::sync::LazyLock;
 use bevy::{
     prelude::*,
     render::{
-        mesh::{morph::MeshMorphWeights, skinning::SkinnedMesh, VertexAttributeValues},
+        mesh::{morph::MeshMorphWeights, skinning::SkinnedMesh, Indices, VertexAttributeValues},
         view::RenderLayers,
     },
     utils::{HashMap, HashSet},
@@ -223,7 +223,16 @@ pub(crate) fn handle_setup_events(
                     }
                 }
 
-                // TODO: Optimize mesh by removing un-needed indices?
+                if let Some(indices) = mesh.indices_mut() {
+                    match indices {
+                        Indices::U16(vec) => {
+                            clean_indices(vec, &to_remove);
+                        }
+                        Indices::U32(vec) => {
+                            clean_indices(vec, &to_remove);
+                        }
+                    }
+                }
 
                 let mut new_skin = skin.clone();
                 let new_mesh_handle = meshes.add(mesh);
@@ -272,6 +281,43 @@ pub(crate) fn handle_setup_events(
                 .entity_mut(ent)
                 .insert(RENDER_LAYERS[&flag].clone());
         }
+    }
+}
+
+trait ToUsize {
+    fn to_usize(self) -> usize;
+}
+
+impl ToUsize for u16 {
+    fn to_usize(self) -> usize {
+        self as usize
+    }
+}
+
+impl ToUsize for u32 {
+    fn to_usize(self) -> usize {
+        self as usize
+    }
+}
+
+/// Remove the specified vertices from the indices.
+fn clean_indices<T: Copy + PartialEq + ToUsize>(indices: &mut Vec<T>, vertices: &[usize]) {
+    let mut to_remove = Vec::default();
+
+    for (i, chunk) in indices.chunks(3).enumerate() {
+        for n in chunk.iter() {
+            if vertices.contains(&n.to_usize()) {
+                to_remove.push(i);
+                break;
+            }
+        }
+    }
+
+    for i in to_remove.into_iter().rev() {
+        let start = i * 3;
+        indices.remove(start);
+        indices.remove(start);
+        indices.remove(start);
     }
 }
 
