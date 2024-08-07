@@ -39,97 +39,6 @@ pub static RENDER_LAYERS: LazyLock<HashMap<FirstPersonFlag, RenderLayers>> = Laz
     map
 });
 
-macro_rules! call_vertex_vec {
-    ($enum_val:expr, $index:expr, $method:ident) => {
-        match $enum_val {
-            VertexAttributeValues::Float32(ref mut vec) => {
-                vec.$method($index);
-            }
-            VertexAttributeValues::Sint32(ref mut vec) => {
-                vec.$method($index);
-            }
-            VertexAttributeValues::Uint32(ref mut vec) => {
-                vec.$method($index);
-            }
-            VertexAttributeValues::Float32x2(ref mut vec) => {
-                vec.$method($index);
-            }
-            VertexAttributeValues::Sint32x2(ref mut vec) => {
-                vec.$method($index);
-            }
-            VertexAttributeValues::Uint32x2(ref mut vec) => {
-                vec.$method($index);
-            }
-            VertexAttributeValues::Float32x3(ref mut vec) => {
-                vec.$method($index);
-            }
-            VertexAttributeValues::Sint32x3(ref mut vec) => {
-                vec.$method($index);
-            }
-            VertexAttributeValues::Uint32x3(ref mut vec) => {
-                vec.$method($index);
-            }
-            VertexAttributeValues::Float32x4(ref mut vec) => {
-                vec.$method($index);
-            }
-            VertexAttributeValues::Sint32x4(ref mut vec) => {
-                vec.$method($index);
-            }
-            VertexAttributeValues::Uint32x4(ref mut vec) => {
-                vec.$method($index);
-            }
-            VertexAttributeValues::Sint16x2(ref mut vec) => {
-                vec.$method($index);
-            }
-            VertexAttributeValues::Snorm16x2(ref mut vec) => {
-                vec.$method($index);
-            }
-            VertexAttributeValues::Uint16x2(ref mut vec) => {
-                vec.$method($index);
-            }
-            VertexAttributeValues::Unorm16x2(ref mut vec) => {
-                vec.$method($index);
-            }
-            VertexAttributeValues::Sint16x4(ref mut vec) => {
-                vec.$method($index);
-            }
-            VertexAttributeValues::Snorm16x4(ref mut vec) => {
-                vec.$method($index);
-            }
-            VertexAttributeValues::Uint16x4(ref mut vec) => {
-                vec.$method($index);
-            }
-            VertexAttributeValues::Unorm16x4(ref mut vec) => {
-                vec.$method($index);
-            }
-            VertexAttributeValues::Sint8x2(ref mut vec) => {
-                vec.$method($index);
-            }
-            VertexAttributeValues::Snorm8x2(ref mut vec) => {
-                vec.$method($index);
-            }
-            VertexAttributeValues::Uint8x2(ref mut vec) => {
-                vec.$method($index);
-            }
-            VertexAttributeValues::Unorm8x2(ref mut vec) => {
-                vec.$method($index);
-            }
-            VertexAttributeValues::Sint8x4(ref mut vec) => {
-                vec.$method($index);
-            }
-            VertexAttributeValues::Snorm8x4(ref mut vec) => {
-                vec.$method($index);
-            }
-            VertexAttributeValues::Uint8x4(ref mut vec) => {
-                vec.$method($index);
-            }
-            VertexAttributeValues::Unorm8x4(ref mut vec) => {
-                vec.$method($index);
-            }
-        }
-    };
-}
-
 #[derive(Event)]
 pub struct SetupFirstPerson(pub Entity);
 
@@ -216,12 +125,6 @@ pub(crate) fn handle_setup_events(
 
                 let mut to_remove = to_remove.into_iter().collect::<Vec<_>>();
                 to_remove.sort_by(|a, b| b.cmp(a));
-
-                for (_, values) in mesh.attributes_mut() {
-                    for i in to_remove.iter().copied() {
-                        call_vertex_vec!(values, i, remove);
-                    }
-                }
 
                 if let Some(indices) = mesh.indices_mut() {
                     match indices {

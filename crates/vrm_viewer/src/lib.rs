@@ -63,8 +63,6 @@ struct Settings {
     pub render_layer: RenderLayer,
 }
 
-const VRM_PATH: &str = "alicia.vrm";
-
 fn setup(mut commands: Commands, mut settings: ResMut<Settings>) {
     commands.spawn((
         Camera3dBundle {
@@ -93,7 +91,7 @@ fn setup(mut commands: Commands, mut settings: ResMut<Settings>) {
     let mut transform = Transform::default();
     transform.rotate_y(PI);
 
-    settings.model = VRM_PATH.to_string();
+    settings.model = "alicia.vrm".to_string();
 }
 
 fn set_render_layers(
@@ -112,11 +110,8 @@ fn set_render_layers(
         if flag != *prev {
             *prev = flag;
 
-            let layers = RENDER_LAYERS[&flag].clone();
-
-            commands
-                .entity(entity)
-                .insert(layers.union(&RenderLayers::layer(0)));
+            let layers = RenderLayers::layer(0).union(&RENDER_LAYERS[&flag]);
+            commands.entity(entity).insert(layers);
         }
     }
 }
