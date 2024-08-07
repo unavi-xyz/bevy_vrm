@@ -43,6 +43,7 @@ impl Plugin for VrmViewerPlugin {
                 (
                     draw_spring_bones::draw_spring_bones,
                     draw_spring_bones::move_avatar,
+                    load_model,
                     move_leg::move_leg,
                     read_dropped_files,
                     set_render_layers,
@@ -56,6 +57,7 @@ impl Plugin for VrmViewerPlugin {
 #[derive(Resource, Default)]
 struct Settings {
     pub draw_spring_bones: bool,
+    pub model: String,
     pub move_avatar: bool,
     pub move_leg: bool,
     pub render_layer: RenderLayer,
@@ -63,7 +65,7 @@ struct Settings {
 
 const VRM_PATH: &str = "alicia.vrm";
 
-fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
+fn setup(mut commands: Commands, mut settings: ResMut<Settings>) {
     commands.spawn((
         Camera3dBundle {
             transform: Transform::from_xyz(1.0, 2.0, 5.0),
@@ -91,14 +93,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     let mut transform = Transform::default();
     transform.rotate_y(PI);
 
-    commands.spawn(VrmBundle {
-        scene_bundle: SceneBundle {
-            transform,
-            ..default()
-        },
-        vrm: asset_server.load(VRM_PATH),
-        ..default()
-    });
+    settings.model = VRM_PATH.to_string();
 }
 
 fn set_render_layers(
@@ -139,12 +134,37 @@ fn setup_first_person(
     }
 }
 
-fn read_dropped_files(
+fn load_model(
     asset_server: Res<AssetServer>,
     mut commands: Commands,
-    mut events: EventReader<FileDragAndDrop>,
+    mut prev: Local<String>,
     mut vrms: Query<Entity, With<Handle<Vrm>>>,
+    settings: Res<Settings>,
 ) {
+    if prev.as_str() == settings.model.as_str() {
+        return;
+    }
+
+    if let Ok(entity) = vrms.get_single_mut() {
+        commands.entity(entity).despawn_recursive();
+    }
+
+    let mut transform = Transform::default();
+    transform.rotate_y(PI);
+
+    commands.spawn(VrmBundle {
+        scene_bundle: SceneBundle {
+            transform,
+            ..default()
+        },
+        vrm: asset_server.load(settings.model.clone()),
+        ..default()
+    });
+
+    *prev = settings.model.clone();
+}
+
+fn read_dropped_files(mut events: EventReader<FileDragAndDrop>, mut settings: ResMut<Settings>) {
     for event in events.read() {
         if let FileDragAndDrop::DroppedFile { path_buf, .. } = event {
             #[cfg(target_family = "wasm")]
@@ -153,21 +173,7 @@ fn read_dropped_files(
             let path = bevy::asset::AssetPath::from_path(path_buf.as_path());
 
             info!("DroppedFile: {}", path);
-
-            let entity = vrms.single_mut();
-            commands.entity(entity).despawn_recursive();
-
-            let mut transform = Transform::default();
-            transform.rotate_y(PI);
-
-            commands.spawn(VrmBundle {
-                scene_bundle: SceneBundle {
-                    transform,
-                    ..default()
-                },
-                vrm: asset_server.load(path),
-                ..default()
-            });
+            settings.model = path.to_string();
         }
     }
 }

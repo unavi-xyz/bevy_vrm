@@ -69,6 +69,31 @@ pub fn update_ui(mut contexts: EguiContexts, mut settings: ResMut<Settings>) {
                     }
                 });
 
+            ComboBox::from_label("Model")
+                .selected_text(settings.model.as_str())
+                .show_ui(ui, |ui| {
+                    ui.selectable_value(
+                        &mut settings.model,
+                        "alicia.vrm".to_string(),
+                        "alicia.vrm",
+                    );
+                    ui.selectable_value(
+                        &mut settings.model,
+                        "catbot.vrm".to_string(),
+                        "catbot.vrm",
+                    );
+                    ui.selectable_value(
+                        &mut settings.model,
+                        "cool_loops.vrm".to_string(),
+                        "cool_loops.vrm",
+                    );
+                    ui.selectable_value(
+                        &mut settings.model,
+                        "suzuha.vrm".to_string(),
+                        "suzuha.vrm",
+                    );
+                });
+
             ui.separator();
 
             ui.vertical_centered(|ui| {
