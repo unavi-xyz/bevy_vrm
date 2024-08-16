@@ -43,47 +43,39 @@ pub static RENDER_LAYERS: LazyLock<HashMap<FirstPersonFlag, RenderLayers>> = Laz
 pub struct SetupFirstPerson(pub Entity);
 
 pub(crate) fn handle_setup_events(
+    bones: Query<(Entity, &BoneName)>,
+    mut flags: Query<(
+        Entity,
+        &mut FirstPersonFlag,
+        &Handle<Mesh>,
+        Option<&Name>,
+        Option<&Handle<StandardMaterial>>,
+        Option<&Handle<MtoonMaterial>>,
+        Option<&MeshMorphWeights>,
+    )>,
+    mut commands: Commands,
     mut events: EventReader<SetupFirstPerson>,
     mut meshes: ResMut<Assets<Mesh>>,
-    mut scene_assets: ResMut<Assets<Scene>>,
-    scenes: Query<&Handle<Scene>>,
+    parents: Query<&Parent>,
+    skins: Query<&SkinnedMesh>,
 ) {
+    if bones.is_empty() {
+        return;
+    }
+
     for event in events.read() {
-        let Ok(handle) = scenes.get(event.0) else {
-            warn!("SetupFirstPerson event must be called on a Handle<Scene>");
-            continue;
-        };
-
-        let Some(scene) = scene_assets.get_mut(handle) else {
-            warn!("Scene not found");
-            continue;
-        };
-
-        let mut bones = scene.world.query::<(Entity, &BoneName)>();
-        let mut flags = scene
-            .world
-            .query::<(Entity, &FirstPersonFlag, &Handle<Mesh>)>();
-        let mut parents = scene.world.query::<&Parent>();
-        let mut skins = scene.world.query::<&SkinnedMesh>();
-        let mut standard_materials = scene.world.query::<&Handle<StandardMaterial>>();
-        let mut mtoon_materials = scene.world.query::<&Handle<MtoonMaterial>>();
-        let mut names = scene.world.query::<&Name>();
-        let mut morph_weights = scene.world.query::<&MeshMorphWeights>();
-
         let (head_ent, _) = bones
-            .iter(&scene.world)
-            .find(|(_, name)| **name == BoneName::Head)
+            .iter()
+            .find(|(e, name)| **name == BoneName::Head && is_child(*e, event.0, &parents))
             .unwrap();
 
-        for (ent, mut flag, mesh_handle) in flags
-            .iter(&scene.world)
-            .map(|(e, f, m)| (e, *f, m.clone()))
-            .collect::<Vec<_>>()
+        for (ent, mut flag, mesh_handle, name, standard_material, mtoon_material, morph_weights) in
+            flags.iter_mut()
         {
             // If auto, split the mesh into first-person and third-person variants.
             // Each vertex that is weighted to the head bone gets removed from the first-person variant.
-            if flag == FirstPersonFlag::Auto {
-                let Some(mesh) = meshes.get(&mesh_handle) else {
+            if *flag == FirstPersonFlag::Auto {
+                let Some(mesh) = meshes.get(mesh_handle) else {
                     warn!("Mesh not found");
                     continue;
                 };
@@ -102,7 +94,7 @@ pub(crate) fn handle_setup_events(
                     continue;
                 };
 
-                let Ok(skin) = skins.get(&scene.world, ent) else {
+                let Ok(skin) = skins.get(ent) else {
                     continue;
                 };
 
@@ -112,7 +104,7 @@ pub(crate) fn handle_setup_events(
                     for (j, idx) in item.iter().enumerate() {
                         let joint_ent = skin.joints[*idx as usize];
 
-                        if is_child(joint_ent, head_ent, &mut parents, &scene.world) {
+                        if is_child(joint_ent, head_ent, &parents) {
                             let weight = weights[i];
                             let weight = weight[j];
 
@@ -140,8 +132,7 @@ pub(crate) fn handle_setup_events(
                 let mut new_skin = skin.clone();
                 let new_mesh_handle = meshes.add(mesh);
 
-                let new_ent = scene
-                    .world
+                let new_ent = commands
                     .spawn((
                         SpatialBundle::default(),
                         new_mesh_handle,
@@ -149,20 +140,20 @@ pub(crate) fn handle_setup_events(
                     ))
                     .id();
 
-                if let Ok(v) = mtoon_materials.get(&scene.world, ent).cloned() {
-                    scene.world.entity_mut(new_ent).insert(v);
+                if let Some(v) = mtoon_material {
+                    commands.entity(new_ent).insert(v.clone());
                 }
 
-                if let Ok(v) = standard_materials.get(&scene.world, ent).cloned() {
-                    scene.world.entity_mut(new_ent).insert(v);
+                if let Some(v) = standard_material {
+                    commands.entity(new_ent).insert(v.clone());
                 }
 
-                if let Ok(v) = names.get(&scene.world, ent).cloned() {
-                    scene.world.entity_mut(new_ent).insert(v);
+                if let Some(v) = name {
+                    commands.entity(new_ent).insert(v.clone());
                 }
 
-                if let Ok(v) = morph_weights.get(&scene.world, ent).cloned() {
-                    scene.world.entity_mut(new_ent).insert(v);
+                if let Some(v) = morph_weights {
+                    commands.entity(new_ent).insert(v.clone());
                 }
 
                 for (i, e) in new_skin.joints.iter().enumerate() {
@@ -172,17 +163,15 @@ pub(crate) fn handle_setup_events(
                     }
                 }
 
-                scene.world.entity_mut(new_ent).insert(new_skin);
+                commands.entity(new_ent).insert(new_skin);
+                commands.entity(ent).add_child(new_ent);
 
-                scene.world.entity_mut(ent).add_child(new_ent);
-
-                flag = FirstPersonFlag::ThirdPersonOnly;
+                *flag = FirstPersonFlag::ThirdPersonOnly;
             }
 
-            scene
-                .world
-                .entity_mut(ent)
-                .insert(RENDER_LAYERS[&flag].clone());
+            commands
+                .entity(ent)
+                .insert(RENDER_LAYERS[flag.as_ref()].clone());
         }
     }
 }
@@ -225,16 +214,11 @@ fn clean_indices<T: Copy + PartialEq + ToUsize>(indices: &mut Vec<T>, vertices: 
 }
 
 /// Walks up the parent tree, searching for a specific Entity.
-fn is_child(
-    target_child: Entity,
-    target_parent: Entity,
-    parents: &mut QueryState<&Parent>,
-    world: &World,
-) -> bool {
+fn is_child(target_child: Entity, target_parent: Entity, parents: &Query<&Parent>) -> bool {
     if target_child == target_parent {
         true
-    } else if let Ok(parent) = parents.get(world, target_child) {
-        is_child(parent.get(), target_parent, parents, world)
+    } else if let Ok(parent) = parents.get(target_child) {
+        is_child(parent.get(), target_parent, parents)
     } else {
         false
     }
