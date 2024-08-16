@@ -102,7 +102,6 @@ fn set_render_layers(
 ) {
     for entity in cameras.iter() {
         let flag = match settings.render_layer {
-            RenderLayer::Both => FirstPersonFlag::Both,
             RenderLayer::FirstPerson => FirstPersonFlag::FirstPersonOnly,
             RenderLayer::ThirdPerson => FirstPersonFlag::ThirdPersonOnly,
         };

@@ -5,7 +5,6 @@ use crate::Settings;
 
 #[derive(Copy, Clone, Default, PartialEq, Eq)]
 pub enum RenderLayer {
-    Both,
     FirstPerson,
     #[default]
     ThirdPerson,
@@ -14,23 +13,21 @@ pub enum RenderLayer {
 impl RenderLayer {
     fn as_str(&self) -> &str {
         match self {
-            Self::Both => "Both",
-            Self::FirstPerson => "FirstPersonOnly",
-            Self::ThirdPerson => "ThirdPersonOnly",
+            Self::FirstPerson => "FirstPerson",
+            Self::ThirdPerson => "ThirdPerson",
         }
     }
 
     fn from_str(s: &str) -> Option<Self> {
         match s {
-            "Both" => Some(Self::Both),
-            "FirstPersonOnly" => Some(Self::FirstPerson),
-            "ThirdPersonOnly" => Some(Self::ThirdPerson),
+            "FirstPerson" => Some(Self::FirstPerson),
+            "ThirdPerson" => Some(Self::ThirdPerson),
             _ => None,
         }
     }
 
     fn variants() -> &'static [&'static str] {
-        &["Both", "FirstPersonOnly", "ThirdPersonOnly"]
+        &["FirstPerson", "ThirdPerson"]
     }
 }
 
