@@ -499,6 +499,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "bevy_blob_loader"
+version = "0.0.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "61a8daa1c266ee726272ddb1efa10b80a33d8b15aa1f87f7d2546fdaa2b15b13"
+dependencies = [
+ "base64 0.22.1",
+ "bevy",
+ "js-sys",
+ "wasm-bindgen",
+ "wasm-bindgen-futures",
+ "web-sys",
+]
+
+[[package]]
 name = "bevy_color"
 version = "0.14.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1234,7 +1248,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b42f3fda16360b1442499918be6f75ef9939609749d405ed74de8e8fc88f4e40"
 dependencies = [
  "bevy",
- "bevy_blob_loader",
+ "bevy_blob_loader 0.0.5",
  "js-sys",
  "wasm-bindgen",
 ]
@@ -4471,7 +4485,7 @@ name = "vrm_viewer"
 version = "0.0.11"
 dependencies = [
  "bevy",
- "bevy_blob_loader",
+ "bevy_blob_loader 0.0.6",
  "bevy_egui",
  "bevy_panorbit_camera",
  "bevy_vrm",
