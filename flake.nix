@@ -87,6 +87,7 @@
           checks = self.checks.${localSystem};
           packages = with pkgs; [
             cargo-rdme
+            cargo-release
             cargo-watch
             rust-analyzer
           ];
