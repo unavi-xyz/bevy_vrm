@@ -358,10 +358,14 @@ fn add_springbone_logic_state(
 
                     let mut next_bone = None;
 
-                    if let Some(c) = child.iter().next() {
+                    for c in child.iter() {
                         next_bone.replace(*c);
                         break;
                     }
+                    /*if let Some(c) = child.iter().next() {
+                        next_bone.replace(*c);
+                        break;
+                    }*/
 
                     let next_bone = match next_bone {
                         None => continue,
