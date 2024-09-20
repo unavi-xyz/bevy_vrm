@@ -16,7 +16,6 @@ pub mod animations;
 pub mod auto_scene;
 pub mod extensions;
 pub mod first_person;
-pub mod layers;
 pub mod loader;
 pub mod spring_bones;
 
