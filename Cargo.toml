@@ -1,11 +1,9 @@
 [workspace]
 resolver = "2"
-members = [
-  "crates/*"
-]
+members = ["crates/*"]
 
 [workspace.package]
-version = "0.0.11"
+version = "0.0.12"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/unavi-xyz/bevy_vrm"
 edition = "2021"
@@ -14,13 +12,21 @@ edition = "2021"
 type_complexity = "allow"
 
 [workspace.dependencies]
-bevy_shader_mtoon = { path = "crates/bevy_shader_mtoon", version = "0.0.11" }
-bevy_vrm = { path = "crates/bevy_vrm", version = "0.0.11" }
-gltf_kun_vrm = { path = "crates/gltf_kun_vrm", version = "0.0.11" }
-serde_vrm = { path = "crates/serde_vrm", version = "0.0.11" }
+bevy_shader_mtoon = { path = "crates/bevy_shader_mtoon", version = "0.0.12" }
+bevy_vrm = { path = "crates/bevy_vrm", version = "0.0.12" }
+gltf_kun_vrm = { path = "crates/gltf_kun_vrm", version = "0.0.12" }
+serde_vrm = { path = "crates/serde_vrm", version = "0.0.12" }
 
-bevy = { version = "0.14.0", default-features = false, features = ["bevy_asset", "bevy_scene", "bevy_pbr"] }
-bevy_egui = { version = "0.28.0", default-features = false, features = ["open_url", "default_fonts", "render"] }
+bevy = { version = "0.14.0", default-features = false, features = [
+  "bevy_asset",
+  "bevy_scene",
+  "bevy_pbr",
+] }
+bevy_egui = { version = "0.28.0", default-features = false, features = [
+  "open_url",
+  "default_fonts",
+  "render",
+] }
 bevy_panorbit_camera = { version = "0.19.0", features = ["bevy_egui"] }
 gltf_kun = { version = "0.0.13", default-features = false }
 serde = { version = "1.0.197", features = ["derive"] }
