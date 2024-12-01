@@ -27,7 +27,7 @@ bevy_egui = { version = "0.28.0", default-features = false, features = [
   "default_fonts",
   "render",
 ] }
-bevy_panorbit_camera = { version = "0.19.0", features = ["bevy_egui"] }
+bevy_panorbit_camera = { version = "0.19.5", features = ["bevy_egui"] }
 gltf_kun = { version = "0.0.13", default-features = false }
 serde = { version = "1.0.197", features = ["derive"] }
 serde_json = "1.0.115"
