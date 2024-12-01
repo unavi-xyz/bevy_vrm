@@ -17,7 +17,7 @@ bevy_vrm = { path = "crates/bevy_vrm", version = "0.0.12" }
 gltf_kun_vrm = { path = "crates/gltf_kun_vrm", version = "0.0.12" }
 serde_vrm = { path = "crates/serde_vrm", version = "0.0.12" }
 
-bevy = { version = "0.14.0", default-features = false, features = [
+bevy = { version = "0.14.2", default-features = false, features = [
   "bevy_asset",
   "bevy_scene",
   "bevy_pbr",
