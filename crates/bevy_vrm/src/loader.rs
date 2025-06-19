@@ -31,12 +31,13 @@ impl AssetLoader for VrmLoader {
     type Settings = ();
     type Error = VrmError;
 
-    fn load<'a>(
-        &'a self,
-        reader: &'a mut Reader,
-        settings: &'a Self::Settings,
-        load_context: &'a mut LoadContext,
-    ) -> impl bevy::utils::ConditionalSendFuture<Output = Result<Self::Asset, Self::Error>> {
+    fn load(
+        &self,
+        reader: &mut dyn Reader,
+        settings: &Self::Settings,
+        load_context: &mut LoadContext,
+    ) -> impl bevy::tasks::ConditionalSendFuture<Output = std::result::Result<Self::Asset, Self::Error>>
+    {
         Box::pin(async move {
             let gltf = self.0.load(reader, settings, load_context).await?;
             Ok(Vrm { gltf })

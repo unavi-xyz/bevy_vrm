@@ -21,7 +21,7 @@ pub struct SpringBone {
 impl MapEntities for SpringBone {
     fn map_entities<M: EntityMapper>(&mut self, entity_mapper: &mut M) {
         for bone in &mut self.bones {
-            *bone = entity_mapper.map_entity(*bone);
+            *bone = entity_mapper.get_mapped(*bone);
         }
     }
 }
@@ -58,7 +58,7 @@ impl Plugin for SpringBonePlugin {
 fn do_springbone_logic(
     mut global_transforms: Query<(&mut GlobalTransform, &mut Transform)>,
     mut spring_bone_logic_states: Query<&mut SpringBoneLogicState>,
-    parents: Query<&Parent>,
+    parents: Query<&ChildOf>,
     spring_boness: Query<&SpringBones>,
     time: Res<Time>,
 ) {
@@ -73,7 +73,7 @@ fn do_springbone_logic(
                 };
                 let world_position = *global;
 
-                let parent_entity = parents.get(bone).unwrap().get();
+                let parent_entity = parents.get(bone).unwrap().parent();
 
                 let parent_world_rotation = global_transforms
                     .get(parent_entity)
@@ -85,12 +85,12 @@ fn do_springbone_logic(
                 let inertia = (spring_bone_logic_state.current_tail
                     - spring_bone_logic_state.prev_tail)
                     * (1.0 - spring_bone.drag_force);
-                let stiffness = time.delta_seconds()
+                let stiffness = time.delta_secs()
                     * (parent_world_rotation
                         * spring_bone_logic_state.bone_axis
                         * spring_bone.stiffness);
                 let external =
-                    time.delta_seconds() * spring_bone.gravity_dir * spring_bone.gravity_power;
+                    time.delta_secs() * spring_bone.gravity_dir * spring_bone.gravity_power;
 
                 let mut next_tail =
                     spring_bone_logic_state.current_tail + inertia + stiffness + external;

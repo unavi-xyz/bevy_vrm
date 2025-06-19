@@ -14,14 +14,16 @@ use bevy_egui::{
     egui::{Slider, Window},
 };
 use bevy_panorbit_camera::{PanOrbitCamera, PanOrbitCameraPlugin};
-use bevy_shader_mtoon::{MtoonBundle, MtoonMaterial, MtoonPlugin, MtoonSun, OutlineMode};
+use bevy_shader_mtoon::{MtoonBundle, MtoonMaterial, MtoonPlugin, MtoonSun, VrmOutlineMode};
 
 fn main() {
     App::new()
         .insert_resource(ClearColor(Color::linear_rgb(0.1, 0.1, 0.1)))
         .add_plugins((
             DefaultPlugins.set(ImagePlugin::default_nearest()),
-            EguiPlugin,
+            EguiPlugin {
+                enable_multipass_for_primary_context: false,
+            },
             MtoonPlugin,
             PanOrbitCameraPlugin,
         ))
@@ -38,10 +40,7 @@ fn setup(
     mut meshes: ResMut<Assets<Mesh>>,
 ) {
     commands.spawn((
-        Camera3dBundle {
-            transform: Transform::from_xyz(0.0, 8.0, 14.0),
-            ..default()
-        },
+        Transform::from_xyz(0.0, 8.0, 14.0),
         PanOrbitCamera {
             focus: Vec3::new(0.0, 1.0, 0.0),
             ..default()
@@ -49,36 +48,33 @@ fn setup(
     ));
 
     commands.spawn((
-        DirectionalLightBundle {
-            directional_light: DirectionalLight {
-                illuminance: 10_000.0,
-                shadows_enabled: true,
-                ..default()
-            },
-            transform: Transform::from_rotation(Quat::from_rotation_x(-PI / 3.0)),
+        DirectionalLight {
+            illuminance: 10_000.0,
+            shadows_enabled: true,
             ..default()
         },
+        Transform::from_rotation(Quat::from_rotation_x(-PI / 3.0)),
         MtoonSun,
     ));
 
     let mtoon_textured = MtoonBundle {
-        mtoon: mtoon_materials.add(MtoonMaterial {
+        mtoon: MeshMaterial3d(mtoon_materials.add(MtoonMaterial {
             base_color_texture: Some(images.add(uv_debug_texture())),
             outline_width: 0.002,
-            outline_mode: OutlineMode::Screen,
+            outline_mode: VrmOutlineMode::Screen,
             ..default()
-        }),
+        })),
         ..default()
     };
 
     let mtoon_plain = MtoonBundle {
-        mtoon: mtoon_materials.add(MtoonMaterial {
+        mtoon: MeshMaterial3d(mtoon_materials.add(MtoonMaterial {
             base_color: BISQUE.into(),
             shade_factor: SALMON.into(),
             outline_width: 0.2,
-            outline_mode: OutlineMode::World,
+            outline_mode: VrmOutlineMode::World,
             ..default()
-        }),
+        })),
         ..default()
     };
 
@@ -98,57 +94,47 @@ fn setup(
     for (i, mesh) in shapes.into_iter().enumerate() {
         // Texture
         commands.spawn((
-            mesh.clone(),
+            Mesh3d(mesh.clone()),
             mtoon_textured.clone(),
-            SpatialBundle {
-                transform: Transform::from_xyz(
-                    -X_EXTENT / 2.0 + i as f32 / (num_shapes - 1) as f32 * X_EXTENT,
-                    1.0,
-                    3.0,
-                )
-                .with_rotation(Quat::from_rotation_x(-PI / 4.0)),
-                ..default()
-            },
+            Transform::from_xyz(
+                -X_EXTENT / 2.0 + i as f32 / (num_shapes - 1) as f32 * X_EXTENT,
+                1.0,
+                3.0,
+            )
+            .with_rotation(Quat::from_rotation_x(-PI / 4.0)),
         ));
 
         // Without texture
         commands.spawn((
-            mesh,
+            Mesh3d(mesh),
             mtoon_plain.clone(),
-            SpatialBundle {
-                transform: Transform::from_xyz(
-                    -X_EXTENT / 2.0 + i as f32 / (num_shapes - 1) as f32 * X_EXTENT,
-                    1.0,
-                    -3.0,
-                )
-                .with_rotation(Quat::from_rotation_x(-PI / 4.0)),
-                ..default()
-            },
+            Transform::from_xyz(
+                -X_EXTENT / 2.0 + i as f32 / (num_shapes - 1) as f32 * X_EXTENT,
+                1.0,
+                -3.0,
+            )
+            .with_rotation(Quat::from_rotation_x(-PI / 4.0)),
         ));
     }
 
     // Big shape to test shadows.
     commands.spawn((
-        meshes.add(Torus::default()),
+        Mesh3d(meshes.add(Torus::default())),
         mtoon_textured.clone(),
-        SpatialBundle {
-            transform: Transform::from_xyz(0.0, 5.0, 0.0).with_scale(Vec3::splat(4.25)),
-            ..default()
-        },
+        Transform::from_xyz(0.0, 5.0, 0.0).with_scale(Vec3::splat(4.25)),
     ));
 
     // Ground
-    commands.spawn(PbrBundle {
-        material: materials.add(StandardMaterial::default()),
-        mesh: meshes.add(Plane3d::default()),
-        transform: Transform::from_scale(Vec3::splat(30.0)),
-        ..default()
-    });
+    commands.spawn((
+        MeshMaterial3d(materials.add(StandardMaterial::default())),
+        Mesh3d(meshes.add(Plane3d::default())),
+        Transform::from_scale(Vec3::splat(30.0)),
+    ));
 }
 
-fn rotate(time: Res<Time>, mut query: Query<&mut Transform, With<Handle<MtoonMaterial>>>) {
+fn rotate(time: Res<Time>, mut query: Query<&mut Transform, With<MeshMaterial3d<MtoonMaterial>>>) {
     for mut transform in query.iter_mut() {
-        transform.rotate(Quat::from_rotation_y(time.delta_seconds() / 2.0));
+        transform.rotate(Quat::from_rotation_y(time.delta_secs() / 2.0));
     }
 }
 

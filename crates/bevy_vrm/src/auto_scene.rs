@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use bevy_gltf_kun::import::gltf::scene::GltfScene;
 
-use crate::loader::Vrm;
+use crate::{VrmInstance, VrmScene, loader::Vrm};
 
 /// Automatically sets the scene to the loaded VRM's default scene,
 /// or the first scene if there is no default.
@@ -11,11 +11,11 @@ pub struct AutoScene;
 pub fn set_vrm_scene(
     gltf_scenes: Res<Assets<GltfScene>>,
     mut commands: Commands,
-    scenes: Query<(Entity, &mut Handle<Scene>, &Handle<Vrm>), With<AutoScene>>,
+    scenes: Query<(Entity, &VrmScene, &VrmInstance), With<AutoScene>>,
     vrm: Res<Assets<Vrm>>,
 ) {
     for (entity, scene_handle, vrm_handle) in scenes.iter() {
-        let vrm = match vrm.get(vrm_handle) {
+        let vrm = match vrm.get(vrm_handle.0.id()) {
             Some(vrm) => vrm,
             None => continue,
         };
@@ -33,10 +33,10 @@ pub fn set_vrm_scene(
             None => continue,
         };
 
-        if scene_handle.id() == vrm_scene.id() {
+        if scene_handle.0.id() == vrm_scene.id() {
             continue;
         }
 
-        commands.entity(entity).insert(vrm_scene.clone());
+        commands.entity(entity).insert(VrmScene(vrm_scene.clone()));
     }
 }

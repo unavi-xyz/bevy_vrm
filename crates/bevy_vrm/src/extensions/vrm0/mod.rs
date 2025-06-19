@@ -1,6 +1,6 @@
 use bevy::{asset::LoadedAsset, prelude::*};
 use bevy_gltf_kun::import::gltf::document::ImportContext;
-use bevy_shader_mtoon::{MtoonMaterial, OutlineMode, OutlineSync};
+use bevy_shader_mtoon::{MtoonMaterial, OutlineSync, VrmOutlineMode};
 use gltf_kun::graph::{
     ByteNode,
     gltf::{Material, Primitive},
@@ -31,10 +31,9 @@ pub fn import_material(context: &mut ImportContext, material: Material, ext: Vrm
                 if !context.load_context.has_labeled_asset(label.clone()) {
                     let mtoon = load_mtoon_shader(context, *material_property);
 
-                    context.load_context.add_loaded_labeled_asset(
-                        label,
-                        LoadedAsset::new_with_dependencies(mtoon, None),
-                    );
+                    context
+                        .load_context
+                        .add_loaded_labeled_asset(label, LoadedAsset::new_with_dependencies(mtoon));
                 }
             }
             Some(Shader::Gltf) => {}
@@ -86,8 +85,8 @@ pub fn import_primitive_material(
                     .get_label_handle::<MtoonMaterial>(&label);
 
                 entity
-                    .remove::<Handle<StandardMaterial>>()
-                    .insert((handle, OutlineSync));
+                    .remove::<MeshMaterial3d<StandardMaterial>>()
+                    .insert((MeshMaterial3d(handle), OutlineSync));
             }
             Some(other) => {
                 warn!("Unsupported shader: {:?}", other);
@@ -156,9 +155,9 @@ fn load_mtoon_shader(
 
     if let Some(value) = weight.keyword_map.outline_width_world {
         if value {
-            mtoon.outline_mode = OutlineMode::World;
+            mtoon.outline_mode = VrmOutlineMode::World;
         } else {
-            mtoon.outline_mode = OutlineMode::Screen;
+            mtoon.outline_mode = VrmOutlineMode::Screen;
         }
     }
 

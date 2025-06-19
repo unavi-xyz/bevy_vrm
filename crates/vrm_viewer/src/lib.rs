@@ -6,7 +6,7 @@ use bevy::{asset::AssetMetaCheck, prelude::*, render::view::RenderLayers};
 use bevy_egui::EguiPlugin;
 use bevy_panorbit_camera::{PanOrbitCamera, PanOrbitCameraPlugin};
 use bevy_vrm::{
-    VrmBundle, VrmPlugins,
+    VrmBundle, VrmInstance, VrmPlugins, VrmScene,
     first_person::{FirstPersonFlag, RENDER_LAYERS, SetupFirstPerson},
     loader::Vrm,
     mtoon::MtoonSun,
@@ -33,7 +33,9 @@ impl Plugin for VrmViewerPlugin {
                     meta_check: AssetMetaCheck::Never,
                     ..default()
                 }),
-                EguiPlugin,
+                EguiPlugin {
+                    enable_multipass_for_primary_context: false,
+                },
                 PanOrbitCameraPlugin,
                 VrmPlugins,
             ))
@@ -65,10 +67,7 @@ struct Settings {
 
 fn setup(mut commands: Commands, mut settings: ResMut<Settings>) {
     commands.spawn((
-        Camera3dBundle {
-            transform: Transform::from_xyz(1.0, 2.0, 5.0),
-            ..default()
-        },
+        Transform::from_xyz(1.0, 2.0, 5.0),
         PanOrbitCamera {
             focus: Vec3::new(0.0, 0.8, 0.0),
             ..default()
@@ -76,15 +75,12 @@ fn setup(mut commands: Commands, mut settings: ResMut<Settings>) {
     ));
 
     commands.spawn((
-        DirectionalLightBundle {
-            directional_light: DirectionalLight {
-                illuminance: 10_000.0,
-                shadows_enabled: true,
-                ..default()
-            },
-            transform: Transform::from_rotation(Quat::from_rotation_x(-PI / 3.0)),
+        DirectionalLight {
+            illuminance: 10_000.0,
+            shadows_enabled: true,
             ..default()
         },
+        Transform::from_rotation(Quat::from_rotation_x(-PI / 3.0)),
         MtoonSun,
     ));
 
@@ -118,12 +114,15 @@ fn set_render_layers(
 fn setup_first_person(
     mut events: EventReader<AssetEvent<Vrm>>,
     mut writer: EventWriter<SetupFirstPerson>,
-    vrms: Query<(Entity, &Handle<Vrm>)>,
+    vrms: Query<(Entity, &VrmInstance)>,
 ) {
     for event in events.read() {
         if let AssetEvent::LoadedWithDependencies { id } = event {
-            let (ent, _) = vrms.iter().find(|(_, handle)| handle.id() == *id).unwrap();
-            writer.send(SetupFirstPerson(ent));
+            let (ent, _) = vrms
+                .iter()
+                .find(|(_, handle)| handle.0.id() == *id)
+                .unwrap();
+            writer.write(SetupFirstPerson(ent));
         }
     }
 }
@@ -132,28 +131,28 @@ fn load_model(
     asset_server: Res<AssetServer>,
     mut commands: Commands,
     mut prev: Local<String>,
-    mut vrms: Query<Entity, With<Handle<Vrm>>>,
+    mut vrms: Query<Entity, With<VrmInstance>>,
     settings: Res<Settings>,
 ) {
     if prev.as_str() == settings.model.as_str() {
         return;
     }
 
-    if let Ok(entity) = vrms.get_single_mut() {
-        commands.entity(entity).despawn_recursive();
+    if let Ok(entity) = vrms.single_mut() {
+        commands.entity(entity).despawn();
     }
 
     let mut transform = Transform::default();
     transform.rotate_y(PI);
 
-    commands.spawn(VrmBundle {
-        scene_bundle: SceneBundle {
-            transform,
+    commands.spawn((
+        transform,
+        VrmBundle {
+            scene: VrmScene::default(),
+            vrm: VrmInstance(asset_server.load(settings.model.clone())),
             ..default()
         },
-        vrm: asset_server.load(settings.model.clone()),
-        ..default()
-    });
+    ));
 
     *prev = settings.model.clone();
 }

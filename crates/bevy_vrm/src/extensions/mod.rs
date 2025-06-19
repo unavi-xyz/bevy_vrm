@@ -1,23 +1,23 @@
 use bevy::{
     animation::AnimationTarget,
-    ecs::system::RunSystemOnce,
+    ecs::system::{RunSystemError, RunSystemOnce},
     prelude::*,
-    transform::systems::{propagate_transforms, sync_simple_transforms},
+    transform::systems::{propagate_parent_transforms, sync_simple_transforms},
 };
 use bevy_gltf_kun::import::{extensions::BevyExtensionImport, gltf::document::ImportContext};
 use gltf_kun::{
     extensions::ExtensionImport,
     graph::{
-        ByteNode, Edge, Extensions, Graph, Weight,
         gltf::{GltfDocument, GltfWeight, Material, Node, Primitive, Scene},
+        ByteNode, Edge, Extensions, Graph, Weight,
     },
     io::format::gltf::GltfFormat,
 };
 use gltf_kun_vrm::vrm0::{
-    Vrm,
     mesh_annotation::{MeshAnnotation, MeshAnnotationEdges},
+    Vrm,
 };
-use petgraph::{Direction, visit::EdgeRef};
+use petgraph::{visit::EdgeRef, Direction};
 use serde_vrm::vrm0::{BoneName, FirstPersonFlag};
 
 use crate::{
@@ -118,18 +118,23 @@ impl BevyExtensionImport<GltfDocument> for VrmExtensions {
     fn import_root(_context: &mut ImportContext) {}
 
     fn import_scene(context: &mut ImportContext, _scene: Scene, world: &mut World) {
-        world.run_system_once(sync_simple_transforms);
-        world.run_system_once(propagate_transforms);
+        let _ = world.run_system_once(sync_simple_transforms);
+        let _ = world.run_system_once(propagate_parent_transforms);
 
         let graph = &context.graph;
 
-        let names: Vec<(Entity, Name)> =
+        let names: Result<Vec<(Entity, Name)>, RunSystemError> =
             world.run_system_once(|names: Query<(Entity, &Name)>| -> Vec<(Entity, Name)> {
                 names
                     .iter()
                     .map(|(a, b)| (a, b.clone()))
                     .collect::<Vec<_>>()
             });
+
+        let Ok(names) = names else {
+            error!("Error running names system");
+            return;
+        };
 
         let Some(ext) = get_vrm_extension(graph) else {
             warn!("VRM extension not found");
@@ -187,18 +192,18 @@ impl BevyExtensionImport<GltfDocument> for VrmExtensions {
             });
         }
 
-        world.run_system_once_with(
-            spring_bones,
+        let _ = world.run_system_once_with(
             |In(spring_bones): In<Vec<SpringBone>>,
              mut commands: Commands,
-             query: Query<Entity, Without<Parent>>| {
+             query: Query<Entity, Without<ChildOf>>| {
                 commands
-                    .entity(query.single())
+                    .entity(query.single().unwrap())
                     .insert(SpringBones(spring_bones));
             },
+            spring_bones,
         );
 
-        world.run_system_once(
+        let _ = world.run_system_once(
             |mut spring_boness: Query<&mut SpringBones>, children: Query<&Children>| {
                 for mut spring_bones in spring_boness.iter_mut() {
                     for spring_bone in spring_bones.0.iter_mut() {
@@ -215,7 +220,7 @@ impl BevyExtensionImport<GltfDocument> for VrmExtensions {
             },
         );
 
-        world.run_system_once(add_springbone_logic_state);
+        let _ = world.run_system_once(add_springbone_logic_state);
 
         for bone in ext.human_bones(graph) {
             let node = match bone.node(graph) {
@@ -248,12 +253,11 @@ impl BevyExtensionImport<GltfDocument> for VrmExtensions {
                 None => continue,
             };
 
-            world.run_system_once_with(
-                (node_name, bone_name),
+            let _ = world.run_system_once_with(
                 |In((node_name, bone_name)): In<(String, BoneName)>,
                  mut commands: Commands,
                  names: Query<(Entity, &Name)>,
-                 parents: Query<&Parent>| {
+                 parents: Query<&ChildOf>| {
                     let node_entity = match names.iter().find_map(|(entity, name)| {
                         if name.as_str() == node_name.as_str() {
                             Some(entity)
@@ -270,7 +274,7 @@ impl BevyExtensionImport<GltfDocument> for VrmExtensions {
 
                     let mut root_entity = node_entity;
                     while let Ok(parent) = parents.get(root_entity) {
-                        root_entity = parent.get();
+                        root_entity = parent.parent();
                     }
 
                     commands
@@ -287,6 +291,7 @@ impl BevyExtensionImport<GltfDocument> for VrmExtensions {
                         bone_name,
                     ));
                 },
+                (node_name, bone_name),
             );
         }
     }
@@ -343,10 +348,7 @@ fn add_springbone_logic_state(
                             }
                             let child = commands
                                 .spawn((
-                                    TransformBundle {
-                                        local: Transform::from_xyz(0.0, -0.07, 0.0),
-                                        global: Default::default(),
-                                    },
+                                    Transform::from_xyz(0.0, -0.07, 0.0),
                                     Name::new("donotaddmore"),
                                 ))
                                 .id();
@@ -359,7 +361,7 @@ fn add_springbone_logic_state(
                     let mut next_bone = None;
 
                     if let Some(c) = child.iter().next() {
-                        next_bone.replace(*c);
+                        next_bone.replace(c);
                     }
 
                     let next_bone = match next_bone {

@@ -1,13 +1,16 @@
 //! [Bevy](https://bevyengine.org/) plugin implementing the [MToon](https://vrm.dev/en/univrm/shaders/shader_mtoon.html) shader.
 
-use bevy::{asset::load_internal_asset, prelude::*};
+use bevy::{
+    asset::{load_internal_asset, weak_handle},
+    prelude::*,
+};
 
 mod shader;
 
-use bevy_mod_outline::{OutlineBundle, OutlinePlugin, OutlineVolume};
-pub use shader::{MtoonMaterial, OutlineMode};
+use bevy_mod_outline::{OutlineMode, OutlinePlugin, OutlineStencil, OutlineVolume};
+pub use shader::{MtoonMaterial, OutlineMode as VrmOutlineMode};
 
-const SHADER_HANDLE: Handle<Shader> = Handle::weak_from_u128(0x2d86c40a175b);
+const SHADER_HANDLE: Handle<Shader> = weak_handle!("88901104-e489-4263-b974-94885e37a3a7");
 
 #[derive(Default)]
 pub struct MtoonPlugin;
@@ -24,7 +27,7 @@ impl Plugin for MtoonPlugin {
 
 #[derive(Bundle, Clone, Default)]
 pub struct MtoonBundle {
-    pub mtoon: Handle<MtoonMaterial>,
+    pub mtoon: MeshMaterial3d<MtoonMaterial>,
     pub outline_sync: OutlineSync,
 }
 
@@ -38,7 +41,7 @@ fn update_mtoon_shader(
     sun: Query<(&GlobalTransform, &DirectionalLight), With<MtoonSun>>,
 ) {
     for (_, mtoon) in mtoon.iter_mut() {
-        if let Ok((transform, light)) = sun.get_single() {
+        if let Ok((transform, light)) = sun.single() {
             mtoon.light_dir = transform.back().as_vec3();
             mtoon.light_color = light.color;
         }
@@ -56,7 +59,11 @@ fn add_outline(
     mut entities: Query<Entity, (Without<OutlineVolume>, With<OutlineSync>)>,
 ) {
     for entity in entities.iter_mut() {
-        commands.entity(entity).insert(OutlineBundle::default());
+        commands.entity(entity).insert((
+            OutlineMode::default(),
+            OutlineVolume::default(),
+            OutlineStencil::default(),
+        ));
     }
 }
 
@@ -64,7 +71,11 @@ fn sync_outline(
     cameras: Query<&GlobalTransform, With<Camera>>,
     materials: Res<Assets<MtoonMaterial>>,
     mut entities: Query<
-        (&mut OutlineVolume, &Handle<MtoonMaterial>, &GlobalTransform),
+        (
+            &mut OutlineVolume,
+            &MeshMaterial3d<MtoonMaterial>,
+            &GlobalTransform,
+        ),
         With<OutlineSync>,
     >,
     windows: Query<&Window>,
@@ -77,24 +88,24 @@ fn sync_outline(
         .iter()
         .fold(0.0f32, |max, window| max.max(window.height()));
 
-    for (mut outline, handle, transform) in entities.iter_mut() {
-        let material = match materials.get(handle) {
+    for (mut outline, surface, transform) in entities.iter_mut() {
+        let material = match materials.get(surface.0.id()) {
             Some(m) => m,
             None => continue,
         };
 
         match material.outline_mode {
-            OutlineMode::None => {
+            VrmOutlineMode::None => {
                 outline.visible = false;
                 continue;
             }
-            OutlineMode::Screen => {
+            VrmOutlineMode::Screen => {
                 outline.visible = true;
 
                 // Outline width is a ratio of screen height.
                 outline.width = material.outline_width * max_height;
             }
-            OutlineMode::World => {
+            VrmOutlineMode::World => {
                 outline.visible = true;
 
                 // Outline width is in meters.

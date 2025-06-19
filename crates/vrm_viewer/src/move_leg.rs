@@ -25,7 +25,7 @@ pub fn move_leg(
             *original_transform = Some(*transform);
         }
 
-        let sin = time.elapsed_seconds().sin();
+        let sin = time.elapsed_secs().sin();
         transform.rotation = Quat::from_rotation_x(sin);
     }
 }
