@@ -1,3 +1,4 @@
-/target
-/result
 /crates/vrm_viewer/dist
+/dist
+/result
+/target
