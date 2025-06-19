@@ -1,12 +1,12 @@
 use std::fmt::Debug;
 
 use bevy::{
-    asset::{io::Reader, AssetLoader, LoadContext},
+    asset::{AssetLoader, LoadContext, io::Reader},
     prelude::*,
 };
 use bevy_gltf_kun::import::gltf::{
-    loader::{GltfError, GltfLoader},
     GltfKun,
+    loader::{GltfError, GltfLoader},
 };
 use thiserror::Error;
 

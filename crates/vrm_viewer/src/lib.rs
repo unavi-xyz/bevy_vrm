@@ -6,10 +6,10 @@ use bevy::{asset::AssetMetaCheck, prelude::*, render::view::RenderLayers};
 use bevy_egui::EguiPlugin;
 use bevy_panorbit_camera::{PanOrbitCamera, PanOrbitCameraPlugin};
 use bevy_vrm::{
-    first_person::{FirstPersonFlag, SetupFirstPerson, RENDER_LAYERS},
+    VrmBundle, VrmPlugins,
+    first_person::{FirstPersonFlag, RENDER_LAYERS, SetupFirstPerson},
     loader::Vrm,
     mtoon::MtoonSun,
-    VrmBundle, VrmPlugins,
 };
 use ui::RenderLayer;
 

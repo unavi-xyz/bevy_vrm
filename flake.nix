@@ -9,6 +9,8 @@
         nixpkgs.follows = "nixpkgs";
       };
     };
+    treefmt-nix.url = "github:numtide/treefmt-nix";
+
   };
 
   outputs =
@@ -18,6 +20,8 @@
       nixpkgs,
       rust-overlay,
       self,
+      treefmt-nix,
+
       ...
     }:
     flake-utils.lib.eachDefaultSystem (
@@ -83,10 +87,10 @@
         commonShell = {
           checks = self.checks.${localSystem};
           packages = with pkgs; [
+            cargo-edit
             cargo-rdme
             cargo-release
             cargo-watch
-            rust-analyzer
           ];
 
           LD_LIBRARY_PATH = pkgs.lib.makeLibraryPath commonArgs.buildInputs;
@@ -188,8 +192,11 @@
             wasm-bindgen-cli = pkgs.wasm-bindgen-cli;
           }
         );
+        treefmtEval = treefmt-nix.lib.evalModule pkgs ./treefmt.nix;
       in
       {
+        formatter = treefmtEval.config.build.wrapper;
+
         checks = {
           inherit
             bevy_vrm
@@ -243,8 +250,6 @@
         };
 
         devShells.default = craneLib.devShell commonShell;
-
-        formatter = pkgs.nixfmt-rfc-style;
       }
     );
 }

@@ -10,8 +10,8 @@ use bevy::{
 };
 
 use bevy_egui::{
-    egui::{Slider, Window},
     EguiContexts, EguiPlugin,
+    egui::{Slider, Window},
 };
 use bevy_panorbit_camera::{PanOrbitCamera, PanOrbitCameraPlugin};
 use bevy_shader_mtoon::{MtoonBundle, MtoonMaterial, MtoonPlugin, MtoonSun, OutlineMode};

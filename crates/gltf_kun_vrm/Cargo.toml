@@ -1,11 +1,11 @@
 [package]
-name = "gltf_kun_vrm"
 description = "VRM extensions for gltf_kun."
-keywords = ["vrm"]
-version.workspace = true
-license.workspace = true
-repository.workspace = true
 edition.workspace = true
+keywords = ["vrm"]
+license.workspace = true
+name = "gltf_kun_vrm"
+repository.workspace = true
+version.workspace = true
 
 [dependencies]
 gltf_kun.workspace = true
@@ -13,4 +13,4 @@ serde.workspace = true
 serde_json.workspace = true
 serde_vrm.workspace = true
 thiserror.workspace = true
-tracing = "0.1.40"
+tracing = "0.1.41"

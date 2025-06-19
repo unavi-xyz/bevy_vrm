@@ -2,10 +2,10 @@ use bevy::{asset::LoadedAsset, prelude::*};
 use bevy_gltf_kun::import::gltf::document::ImportContext;
 use bevy_shader_mtoon::{MtoonMaterial, OutlineMode, OutlineSync};
 use gltf_kun::graph::{
-    gltf::{Material, Primitive},
     ByteNode,
+    gltf::{Material, Primitive},
 };
-use gltf_kun_vrm::vrm0::{material_property::MaterialProperty, Vrm};
+use gltf_kun_vrm::vrm0::{Vrm, material_property::MaterialProperty};
 use serde_vrm::vrm0::Shader;
 
 pub fn import_material(context: &mut ImportContext, material: Material, ext: Vrm) {

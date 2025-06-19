@@ -2,7 +2,7 @@ use std::fmt::Display;
 
 use gltf_kun::{
     extensions::Extension,
-    graph::{gltf::Texture, ByteNode, Graph, NodeIndex, OtherEdgeHelpers},
+    graph::{ByteNode, Graph, NodeIndex, OtherEdgeHelpers, gltf::Texture},
 };
 use serde::{Deserialize, Serialize};
 
@@ -141,7 +141,7 @@ impl Vrm {
 
 #[cfg(test)]
 mod tests {
-    use gltf_kun::graph::{gltf::Texture, GraphNodeWeight};
+    use gltf_kun::graph::{GraphNodeWeight, gltf::Texture};
 
     use super::*;
 

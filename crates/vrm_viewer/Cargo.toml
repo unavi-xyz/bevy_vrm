@@ -1,10 +1,10 @@
 [package]
+edition.workspace = true
+license.workspace = true
 name = "vrm_viewer"
 publish = false
-version.workspace = true
-license.workspace = true
 repository.workspace = true
-edition.workspace = true
+version.workspace = true
 
 [lints]
 workspace = true
@@ -17,5 +17,5 @@ bevy_vrm.workspace = true
 
 [target.'cfg(target_family = "wasm")'.dependencies]
 bevy_blob_loader = "0.0.6"
-bevy_web_file_drop = "0.0.5"
-wasm-bindgen = "0.2.92"
+bevy_web_file_drop = "0.0.6"
+wasm-bindgen = "0.2.100"

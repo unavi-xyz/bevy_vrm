@@ -3,7 +3,7 @@ use std::sync::LazyLock;
 use bevy::{
     prelude::*,
     render::{
-        mesh::{morph::MeshMorphWeights, skinning::SkinnedMesh, Indices, VertexAttributeValues},
+        mesh::{Indices, VertexAttributeValues, morph::MeshMorphWeights, skinning::SkinnedMesh},
         view::RenderLayers,
     },
     utils::{HashMap, HashSet},

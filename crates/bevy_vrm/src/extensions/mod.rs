@@ -8,16 +8,16 @@ use bevy_gltf_kun::import::{extensions::BevyExtensionImport, gltf::document::Imp
 use gltf_kun::{
     extensions::ExtensionImport,
     graph::{
-        gltf::{GltfDocument, GltfWeight, Material, Node, Primitive, Scene},
         ByteNode, Edge, Extensions, Graph, Weight,
+        gltf::{GltfDocument, GltfWeight, Material, Node, Primitive, Scene},
     },
     io::format::gltf::GltfFormat,
 };
 use gltf_kun_vrm::vrm0::{
-    mesh_annotation::{MeshAnnotation, MeshAnnotationEdges},
     Vrm,
+    mesh_annotation::{MeshAnnotation, MeshAnnotationEdges},
 };
-use petgraph::{visit::EdgeRef, Direction};
+use petgraph::{Direction, visit::EdgeRef};
 use serde_vrm::vrm0::{BoneName, FirstPersonFlag};
 
 use crate::{

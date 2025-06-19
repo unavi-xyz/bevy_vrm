@@ -1,11 +1,11 @@
 [package]
-name = "serde_vrm"
 description = "Serde types for VRM."
-keywords = ["serde", "vrm"]
-version.workspace = true
-license.workspace = true
-repository.workspace = true
 edition.workspace = true
+keywords = ["serde", "vrm"]
+license.workspace = true
+name = "serde_vrm"
+repository.workspace = true
+version.workspace = true
 
 [features]
 bevy = ["dep:bevy"]

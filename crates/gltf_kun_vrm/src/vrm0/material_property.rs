@@ -1,8 +1,8 @@
 use std::fmt::Display;
 
 use gltf_kun::graph::{
-    gltf::{Material, Texture},
     ByteNode, Graph, NodeIndex, OtherEdgeHelpers, Weight,
+    gltf::{Material, Texture},
 };
 use serde::{Deserialize, Serialize};
 use serde_vrm::vrm0::{FloatProperties, KeywordMap, Shader, TagMap, VectorProperties};

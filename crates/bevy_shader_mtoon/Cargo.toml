@@ -1,19 +1,19 @@
 [package]
-name = "bevy_shader_mtoon"
 description = "Bevy MToon shader."
-keywords = ["bevy", "shader", "toon"]
-version.workspace = true
-license.workspace = true
-repository.workspace = true
 edition.workspace = true
+keywords = ["bevy", "shader", "toon"]
+license.workspace = true
+name = "bevy_shader_mtoon"
+repository.workspace = true
+version.workspace = true
 
 [lints]
 workspace = true
 
 [dependencies]
 bevy.workspace = true
-bevy_mod_outline = "0.8.0"
-bitflags = "2.4.2"
+bevy_mod_outline = "0.10.2"
+bitflags = "2.9.1"
 
 [dev-dependencies]
 bevy = { workspace = true, default-features = true }

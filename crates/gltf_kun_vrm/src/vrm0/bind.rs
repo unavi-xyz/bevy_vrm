@@ -1,6 +1,6 @@
 use std::fmt::Display;
 
-use gltf_kun::graph::{gltf::Primitive, ByteNode, Graph, NodeIndex, OtherEdgeHelpers, Weight};
+use gltf_kun::graph::{ByteNode, Graph, NodeIndex, OtherEdgeHelpers, Weight, gltf::Primitive};
 use serde::{Deserialize, Serialize};
 
 #[derive(Copy, Clone, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]

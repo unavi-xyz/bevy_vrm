@@ -1,11 +1,12 @@
 use gltf_kun::{
     extensions::{Extension, ExtensionImport},
-    graph::{gltf::GltfDocument, ByteNode, Extensions, Graph},
+    graph::{ByteNode, Extensions, Graph, gltf::GltfDocument},
     io::format::gltf::GltfFormat,
 };
 use thiserror::Error;
 
 use super::{
+    EXTENSION_NAME, Vrm,
     bind::{Bind, BindWeight},
     blend_shape_group::{BlendShapeGroup, BlendShapeGroupWeight},
     bone::{Bone, BoneWeight},
@@ -14,7 +15,6 @@ use super::{
     material_property::{MaterialProperty, MaterialPropertyWeight},
     mesh_annotation::{MeshAnnotation, MeshAnnotationWeight},
     weight::{FirstPerson, Humanoid, Meta, VrmWeight},
-    Vrm, EXTENSION_NAME,
 };
 
 #[derive(Debug, Error)]

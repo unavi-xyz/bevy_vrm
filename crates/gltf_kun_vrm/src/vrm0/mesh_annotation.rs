@@ -1,6 +1,6 @@
 use std::fmt::Display;
 
-use gltf_kun::graph::{gltf::Mesh, ByteNode, Graph, NodeIndex, OtherEdgeHelpers, Weight};
+use gltf_kun::graph::{ByteNode, Graph, NodeIndex, OtherEdgeHelpers, Weight, gltf::Mesh};
 use serde::{Deserialize, Serialize};
 use serde_vrm::vrm0::FirstPersonFlag;
 
