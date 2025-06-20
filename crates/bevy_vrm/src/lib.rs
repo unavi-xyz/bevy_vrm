@@ -63,4 +63,5 @@ pub struct VrmBundle {
     pub auto_scene: AutoScene,
     pub scene: VrmScene,
     pub vrm: VrmInstance,
+    pub scene_root: SceneRoot,
 }

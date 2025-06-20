@@ -37,6 +37,9 @@ pub fn set_vrm_scene(
             continue;
         }
 
-        commands.entity(entity).insert(VrmScene(vrm_scene.clone()));
+        commands.entity(entity).insert((
+            VrmScene(vrm_scene.clone()),
+            SceneRoot(vrm_scene.clone()),
+        ));
     }
 }
