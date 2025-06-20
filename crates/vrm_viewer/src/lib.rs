@@ -145,13 +145,11 @@ fn load_model(
     let mut transform = Transform::default();
     transform.rotate_y(PI);
 
-    let handle = asset_server.load(settings.model.clone());
-
     commands.spawn((
         transform,
         VrmBundle {
             scene: VrmScene::default(),
-            vrm: VrmInstance(handle),
+            vrm: VrmInstance(asset_server.load(settings.model.clone())),
             ..default()
         },
     ));
