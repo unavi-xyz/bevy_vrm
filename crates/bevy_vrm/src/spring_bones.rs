@@ -10,6 +10,7 @@ pub struct SpringBones(pub Vec<SpringBone>);
 #[derive(Reflect)]
 pub struct SpringBone {
     pub bones: Vec<Entity>,
+    pub bone_names: Vec<String>,
     pub center: f32,
     pub drag_force: f32,
     pub gravity_dir: Vec3,
@@ -51,7 +52,47 @@ impl Plugin for SpringBonePlugin {
     fn build(&self, app: &mut App) {
         app.register_type::<SpringBoneLogicState>()
             .register_type::<SpringBones>()
-            .add_systems(Update, do_springbone_logic);
+            .add_systems(Update, (remap_spring_bone_entities, do_springbone_logic).chain());
+    }
+}
+
+fn remap_spring_bone_entities(
+    mut spring_bones_query: Query<&mut SpringBones, Added<SpringBones>>,
+    names: Query<(Entity, &Name)>,
+    existing_entities: Query<Entity>,
+) {
+    for mut spring_bones in spring_bones_query.iter_mut() {
+        let mut needs_remapping = false;
+        for spring_bone in spring_bones.0.iter() {
+            for &bone_entity in spring_bone.bones.iter() {
+                if !existing_entities.contains(bone_entity) {
+                    needs_remapping = true;
+                    break;
+                }
+            }
+            if needs_remapping {
+                break;
+            }
+        }
+
+        if !needs_remapping {
+            continue;
+        }
+
+        let mut name_to_entity = std::collections::HashMap::new();
+        for (entity, name) in names.iter() {
+            name_to_entity.insert(name.as_str(), entity);
+        }
+
+        for spring_bone in spring_bones.0.iter_mut() {
+            spring_bone.bones.clear();
+
+            for bone_name in &spring_bone.bone_names {
+                if let Some(&entity) = name_to_entity.get(bone_name.as_str()) {
+                    spring_bone.bones.push(entity);
+                }
+            }
+        }
     }
 }
 
@@ -66,21 +107,25 @@ fn do_springbone_logic(
         for spring_bone in spring_bones.0.iter() {
             for bone in spring_bone.bones.iter() {
                 let bone: Entity = *bone;
-                let (global, _) = global_transforms.get(bone).unwrap();
+                let (global, _) = match global_transforms.get(bone) {
+                    Ok(transforms) => transforms,
+                    Err(_) => continue,
+                };
                 let mut spring_bone_logic_state = match spring_bone_logic_states.get_mut(bone) {
                     Ok(spring_bone_logic_state) => spring_bone_logic_state,
                     Err(_) => continue,
                 };
                 let world_position = *global;
 
-                let parent_entity = parents.get(bone).unwrap().parent();
+                let parent_entity = match parents.get(bone) {
+                    Ok(parent) => parent.parent(),
+                    Err(_) => continue,
+                };
 
-                let parent_world_rotation = global_transforms
-                    .get(parent_entity)
-                    .unwrap()
-                    .0
-                    .to_scale_rotation_translation()
-                    .1;
+                let parent_world_rotation = match global_transforms.get(parent_entity) {
+                    Ok((parent_global, _)) => parent_global.to_scale_rotation_translation().1,
+                    Err(_) => continue,
+                };
 
                 let inertia = (spring_bone_logic_state.current_tail
                     - spring_bone_logic_state.prev_tail)
@@ -102,20 +147,20 @@ fn do_springbone_logic(
                 spring_bone_logic_state.prev_tail = spring_bone_logic_state.current_tail;
                 spring_bone_logic_state.current_tail = next_tail;
 
-                let parent_world_matrix = global_transforms
-                    .get(parent_entity)
-                    .unwrap()
-                    .0
-                    .compute_matrix();
-
-                let parent_pos = *global_transforms.get(parent_entity).unwrap().0;
+                let (parent_world_matrix, parent_pos) = match global_transforms.get(parent_entity) {
+                    Ok((parent_global, _)) => (parent_global.compute_matrix(), *parent_global),
+                    Err(_) => continue,
+                };
 
                 let to = ((parent_world_matrix * spring_bone_logic_state.initial_local_matrix)
                     .inverse()
                     .transform_point3(next_tail))
                 .normalize();
 
-                let (mut global, mut local) = global_transforms.get_mut(bone).unwrap();
+                let (mut global, mut local) = match global_transforms.get_mut(bone) {
+                    Ok(transforms) => transforms,
+                    Err(_) => continue,
+                };
 
                 local.rotation = spring_bone_logic_state.initial_local_rotation
                     * Quat::from_rotation_arc(spring_bone_logic_state.bone_axis, to);
