@@ -16,6 +16,9 @@ bevy_panorbit_camera.workspace = true
 bevy_vrm.workspace = true
 
 [target.'cfg(target_family = "wasm")'.dependencies]
-bevy_blob_loader = "0.0.6"
-bevy_web_file_drop = "0.0.6"
+bevy_blob_loader = "0.1.0"
+bevy_web_file_drop = "0.1.0"
+getrandom = { version = "0.3.3", default-features = false, features = [
+  "wasm_js",
+] } # https://github.com/bevyengine/bevy/issues/17699
 wasm-bindgen = "0.2.100"
