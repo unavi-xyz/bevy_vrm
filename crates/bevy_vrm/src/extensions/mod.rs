@@ -144,32 +144,20 @@ impl BevyExtensionImport<GltfDocument> for VrmExtensions {
         let mut spring_bones = vec![];
 
         for bone_group in ext.bone_groups(graph) {
-            let mut bone_entities = Vec::new();
-            let mut bone_names = Vec::new();
-
-            for node in bone_group.bones(graph) {
-                let node_handle = context.gltf.node_handles.get(&node).unwrap();
-
-                let node_name = context.gltf.named_nodes.iter().find_map(|(name, node)| {
-                    if node == node_handle {
-                        Some(name.clone())
-                    } else {
-                        None
-                    }
-                });
-
-                let node_name = match node_name {
-                    Some(name) => name,
-                    None => continue,
-                };
-
-                if let Some((entity, _)) = names.iter().find(|(_, name)| {
-                    name.as_str() == node_name.as_str()
-                }) {
-                    bone_entities.push(*entity);
-                    bone_names.push(node_name);
-                }
-            }
+            let (bone_entities, bone_names): (Vec<_>, Vec<_>) = bone_group
+                .bones(graph)
+                .into_iter()
+                .filter_map(|node| {
+                    let node_handle = context.gltf.node_handles.get(&node)?;
+                    let node_name = context
+                        .gltf
+                        .named_nodes
+                        .iter()
+                        .find_map(|(name, n)| (n == node_handle).then(|| name.clone()))?;
+                    let (entity, _) = names.iter().find(|(_, name)| name.as_str() == node_name)?;
+                    Some((*entity, node_name))
+                })
+                .unzip();
 
             let weight = bone_group.read(graph);
 
@@ -208,13 +196,13 @@ impl BevyExtensionImport<GltfDocument> for VrmExtensions {
              names: Query<&Name>| {
                 for mut spring_bones in spring_boness.iter_mut() {
                     for spring_bone in spring_bones.0.iter_mut() {
-                        let bones = spring_bone.bones.clone();
-                        for bone in bones {
+                        let original_bones = spring_bone.bones.clone();
+                        for bone in original_bones {
                             for child in children.iter_descendants(bone) {
                                 if !spring_bone.bones.contains(&child) {
                                     spring_bone.bones.push(child);
-                                    if let Ok(child_name) = names.get(child) {
-                                        spring_bone.bone_names.push(child_name.as_str().to_string());
+                                    if let Ok(name) = names.get(child) {
+                                        spring_bone.bone_names.push(name.to_string());
                                     }
                                 }
                             }
@@ -362,35 +350,25 @@ fn add_springbone_logic_state(
                         }
                     };
 
-                    let mut next_bone = None;
-
-                    if let Some(c) = child.iter().next() {
-                        next_bone.replace(c);
-                    }
-
-                    let next_bone = match next_bone {
-                        None => continue,
-                        Some(next_bone) => next_bone,
+                    let Some(next_bone) = child.iter().next() else {
+                        continue;
                     };
-
-                    let global_this_bone = match global_transforms.get(*bone) {
-                        Ok(t) => t,
-                        Err(_) => continue,
+                    let Ok(global_this_bone) = global_transforms.get(*bone) else {
+                        continue;
                     };
-                    let local_next_bone = match local_transforms.get(next_bone) {
-                        Ok(t) => t,
-                        Err(_) => continue,
+                    let Ok(local_next_bone) = local_transforms.get(next_bone) else {
+                        continue;
                     };
-                    let local_this_bone = match local_transforms.get(*bone) {
-                        Ok(t) => t,
-                        Err(_) => continue,
+                    let Ok(local_this_bone) = local_transforms.get(*bone) else {
+                        continue;
                     };
 
                     let bone_axis = local_next_bone.translation.normalize_or_zero();
                     let bone_length = local_next_bone.translation.length();
                     let initial_local_matrix = local_this_bone.compute_matrix();
                     let initial_local_rotation = local_this_bone.rotation;
-                    let current_tail = global_this_bone.translation() + (global_this_bone.rotation() * bone_axis * bone_length);
+                    let current_tail = global_this_bone.translation()
+                        + (global_this_bone.rotation() * bone_axis * bone_length);
 
                     commands.entity(*bone).insert(SpringBoneLogicState {
                         prev_tail: current_tail,

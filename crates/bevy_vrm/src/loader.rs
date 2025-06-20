@@ -1,12 +1,15 @@
 use std::fmt::Debug;
 
 use bevy::{
-    asset::{AssetLoader, LoadContext, io::{Reader, VecReader}},
+    asset::{
+        AssetLoader, LoadContext,
+        io::{Reader, VecReader},
+    },
     prelude::*,
 };
 use bevy_gltf_kun::import::gltf::{
     GltfKun,
-    loader::{GltfError, GltfLoader, GlbLoader},
+    loader::{GlbLoader, GltfError, GltfLoader},
 };
 use thiserror::Error;
 
@@ -43,16 +46,23 @@ impl AssetLoader for VrmLoader {
     {
         Box::pin(async move {
             let mut bytes = Vec::new();
-            reader.read_to_end(&mut bytes).await.map_err(|e| VrmError::Gltf(GltfError::Io(e)))?;
+            reader
+                .read_to_end(&mut bytes)
+                .await
+                .map_err(|e| VrmError::Gltf(GltfError::Io(e)))?;
 
             let is_glb = bytes.len() >= 4 && &bytes[0..4] == b"glTF";
 
             let gltf = if is_glb {
                 let mut vec_reader = VecReader::new(bytes);
-                self.glb_loader.load(&mut vec_reader, settings, load_context).await?
+                self.glb_loader
+                    .load(&mut vec_reader, settings, load_context)
+                    .await?
             } else {
                 let mut vec_reader = VecReader::new(bytes);
-                self.gltf_loader.load(&mut vec_reader, settings, load_context).await?
+                self.gltf_loader
+                    .load(&mut vec_reader, settings, load_context)
+                    .await?
             };
 
             Ok(Vrm { gltf })
