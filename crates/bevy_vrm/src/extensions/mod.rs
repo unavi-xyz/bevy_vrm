@@ -149,11 +149,14 @@ impl BevyExtensionImport<GltfDocument> for VrmExtensions {
                 .into_iter()
                 .filter_map(|node| {
                     let node_handle = context.gltf.node_handles.get(&node)?;
-                    let node_name = context
-                        .gltf
-                        .named_nodes
-                        .iter()
-                        .find_map(|(name, node)| (node == node_handle).then(|| name.clone()))?;
+                    let node_name =
+                        context
+                            .gltf
+                            .named_nodes
+                            .iter()
+                            .find_map(|(name, gltf_node)| {
+                                (gltf_node == node_handle).then(|| name.clone())
+                            })?;
                     let (entity, _) = names.iter().find(|(_, name)| name.as_str() == node_name)?;
                     Some((*entity, node_name))
                 })
