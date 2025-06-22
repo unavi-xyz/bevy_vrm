@@ -177,19 +177,9 @@
         vrm_viewer_web = craneLib.buildTrunkPackage (
           commonArgs
           // {
-            # preBuild = ''
-            #   cd ./crates/vrm_viewer/
-            # '';
-            # postBuild = ''
-            #   ls -lah
-            #   # mv ./dist ../..
-            #   cd ../..
-            # '';
-
             pname = "vrm_viewer_web";
             cargoExtraArgs = "-p vrm_viewer";
 
-            # trunkIndexPath = "./crates/vrm_viewer/index.html";
             wasm-bindgen-cli = pkgs.wasm-bindgen-cli;
           }
         );
