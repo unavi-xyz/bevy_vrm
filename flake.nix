@@ -91,6 +91,7 @@
             cargo-rdme
             cargo-release
             cargo-watch
+            cargo-workspaces
           ];
 
           LD_LIBRARY_PATH = pkgs.lib.makeLibraryPath commonArgs.buildInputs;
@@ -211,16 +212,6 @@
         };
 
         apps = {
-          generate-readme = flake-utils.lib.mkApp {
-            drv = pkgs.writeShellScriptBin "generate-readme" ''
-              cd crates
-
-              for folder in */; do
-                (cd $folder && cargo rdme)
-              done
-            '';
-          };
-
           vrm_viewer = flake-utils.lib.mkApp { drv = vrm_viewer; };
 
           vrm_viewer_web = flake-utils.lib.mkApp {
