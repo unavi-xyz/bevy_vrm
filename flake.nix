@@ -41,9 +41,20 @@
         craneLib = (crane.mkLib pkgs).overrideToolchain rustToolchain;
 
         commonArgs = {
-          src = lib.cleanSourceWith {
-            src = ./.;
-            filter = path: type: (lib.hasSuffix ".wgsl" path) || (craneLib.filterCargoSources path type);
+          src = lib.fileset.toSource rec {
+            root = ./.;
+            fileset = lib.fileset.unions [
+              (craneLib.fileset.commonCargoSources root)
+              (lib.fileset.fileFilter (
+                file:
+                lib.any file.hasExt [
+                  "html"
+                  "wgsl"
+                ]
+              ) root)
+              ./assets
+              ./public
+            ];
           };
 
           strictDeps = true;
@@ -69,7 +80,6 @@
           nativeBuildInputs =
             (with pkgs; [
               binaryen
-              nodePackages.prettier
               pkg-config
               trunk
               wasm-bindgen-cli
@@ -120,7 +130,7 @@
           // {
             inherit cargoArtifacts;
             pname = "bevy_shader_mtoon";
-            cargoExtraArgs = "--locked -p bevy_shader_mtoon";
+            cargoExtraArgs = "-p bevy_shader_mtoon";
           }
         );
 
@@ -129,7 +139,7 @@
           // {
             inherit cargoArtifacts;
             pname = "bevy_vrm";
-            cargoExtraArgs = "--locked -p bevy_vrm";
+            cargoExtraArgs = "-p bevy_vrm";
           }
         );
 
@@ -138,7 +148,7 @@
           // {
             inherit cargoArtifacts;
             pname = "gltf_kun_vrm";
-            cargoExtraArgs = "--locked -p gltf_kun_vrm";
+            cargoExtraArgs = "-p gltf_kun_vrm";
           }
         );
 
@@ -147,7 +157,7 @@
           // {
             inherit cargoArtifacts;
             pname = "serde_vrm";
-            cargoExtraArgs = "--locked -p serde_vrm";
+            cargoExtraArgs = "-p serde_vrm";
           }
         );
 
@@ -156,17 +166,8 @@
           // {
             inherit cargoArtifacts;
 
-            src = lib.cleanSourceWith {
-              src = ./.;
-              filter =
-                path: type:
-                (lib.hasSuffix ".wgsl" path)
-                || (lib.hasInfix "/assets/" path)
-                || (craneLib.filterCargoSources path type);
-            };
-
             pname = "vrm_viewer";
-            cargoExtraArgs = "--locked -p vrm_viewer";
+            cargoExtraArgs = "-p vrm_viewer";
             postInstall = ''
               cp -r assets $out/bin/
             '';
@@ -176,23 +177,23 @@
         vrm_viewer_web = craneLib.buildTrunkPackage (
           commonArgs
           // {
-            src = lib.cleanSourceWith {
-              src = ./.;
-              filter =
-                path: type:
-                (lib.hasSuffix ".wgsl" path)
-                || (lib.hasSuffix ".html" path)
-                || (lib.hasInfix "/assets/" path)
-                || (lib.hasInfix "/crates/vrm_viewer/public/" path)
-                || (craneLib.filterCargoSources path type);
-            };
+            # preBuild = ''
+            #   cd ./crates/vrm_viewer/
+            # '';
+            # postBuild = ''
+            #   ls -lah
+            #   # mv ./dist ../..
+            #   cd ../..
+            # '';
 
             pname = "vrm_viewer_web";
-            cargoExtraArgs = "--locked -p vrm_viewer";
-            trunkIndexPath = "./crates/vrm_viewer/index.html";
+            cargoExtraArgs = "-p vrm_viewer";
+
+            # trunkIndexPath = "./crates/vrm_viewer/index.html";
             wasm-bindgen-cli = pkgs.wasm-bindgen-cli;
           }
         );
+
         treefmtEval = treefmt-nix.lib.evalModule pkgs ./treefmt.nix;
       in
       {
@@ -213,7 +214,6 @@
 
         apps = {
           vrm_viewer = flake-utils.lib.mkApp { drv = vrm_viewer; };
-
           vrm_viewer_web = flake-utils.lib.mkApp {
             drv = pkgs.writeShellScriptBin "vrm_viewer_web" ''
               ${pkgs.python3Minimal}/bin/python3 -m http.server --directory ${
