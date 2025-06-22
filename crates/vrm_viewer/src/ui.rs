@@ -42,7 +42,7 @@ pub fn update_ui(mut contexts: EguiContexts, mut settings: ResMut<Settings>) {
                 ui.label(" avatars using ");
                 ui.hyperlink_to("bevy_vrm", "https://github.com/unavi-xyz/bevy_vrm");
                 ui.label(", a plugin for the ");
-                ui.hyperlink_to("Bevy", "https://bevyengine.org");
+                ui.hyperlink_to("Bevy", "https://bevy.org");
                 ui.label(" game engine.");
             });
 

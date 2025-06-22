@@ -1,4 +1,4 @@
-//! [Bevy](https://bevyengine.org/) plugin implementing the [MToon](https://vrm.dev/en/univrm/shaders/shader_mtoon.html) shader.
+//! Bevy plugin implementing the [MToon](https://vrm.dev/en/univrm/shaders/shader_mtoon.html) shader.
 
 use bevy::{
     asset::{load_internal_asset, weak_handle},
