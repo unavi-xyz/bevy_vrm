@@ -11,9 +11,13 @@ version.workspace    = true
 workspace = true
 
 [dependencies]
-bevy.workspace   = true
+bevy = { default-features = false, features = [
+  "bevy_asset",
+  "bevy_pbr",
+  "bevy_window",
+], workspace = true }
 bevy_mod_outline = "0.10.2"
-bitflags         = "2.9.1"
+bitflags = "2.9.1"
 
 [dev-dependencies]
 bevy                           = { default-features = true, workspace = true }
