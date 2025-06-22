@@ -1,3 +1,3 @@
 [build]
 public_url = "/bevy_vrm/"
-target = "crates/vrm_viewer/index.html"
+target     = "crates/vrm_viewer/index.html"

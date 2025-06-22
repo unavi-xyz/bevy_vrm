@@ -1,21 +1,21 @@
 [workspace]
-members = ["crates/*"]
+members  = ["crates/*"]
 resolver = "2"
 
 [workspace.package]
-edition = "2024"
-license = "MIT OR Apache-2.0"
+edition    = "2024"
+license    = "MIT OR Apache-2.0"
 repository = "https://github.com/unavi-xyz/bevy_vrm"
-version = "0.0.12"
+version    = "0.0.12"
 
 [workspace.lints.clippy]
 type_complexity = "allow"
 
 [workspace.dependencies]
 bevy_shader_mtoon = { path = "crates/bevy_shader_mtoon", version = "0.0.12" }
-bevy_vrm = { path = "crates/bevy_vrm", version = "0.0.12" }
-gltf_kun_vrm = { path = "crates/gltf_kun_vrm", version = "0.0.12" }
-serde_vrm = { path = "crates/serde_vrm", version = "0.0.12" }
+bevy_vrm          = { path = "crates/bevy_vrm", version = "0.0.12" }
+gltf_kun_vrm      = { path = "crates/gltf_kun_vrm", version = "0.0.12" }
+serde_vrm         = { path = "crates/serde_vrm", version = "0.0.12" }
 
 bevy = { version = "0.16.1", default-features = false, features = [
   "bevy_asset",
@@ -35,7 +35,7 @@ thiserror = "2.0.12"
 
 [workspace.metadata.release]
 shared-version = true
-tag-name = "v{{version}}"
+tag-name       = "v{{version}}"
 
 [profile.dev]
 opt-level = 1

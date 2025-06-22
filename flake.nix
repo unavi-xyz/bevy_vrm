@@ -180,7 +180,7 @@
             pname = "vrm_viewer_web";
             cargoExtraArgs = "-p vrm_viewer";
 
-            wasm-bindgen-cli = pkgs.wasm-bindgen-cli;
+            inherit (pkgs) wasm-bindgen-cli;
           }
         );
 
@@ -214,12 +214,12 @@
         };
 
         packages = {
-          bevy_shader_mtoon = bevy_shader_mtoon;
-          bevy_vrm = bevy_vrm;
-          gltf_kun_vrm = gltf_kun_vrm;
-          serde_vrm = serde_vrm;
-          vrm_viewer = vrm_viewer;
-          vrm_viewer_web = vrm_viewer_web;
+          inherit bevy_shader_mtoon;
+          inherit bevy_vrm;
+          inherit gltf_kun_vrm;
+          inherit serde_vrm;
+          inherit vrm_viewer;
+          inherit vrm_viewer_web;
 
           default = pkgs.symlinkJoin {
             name = "viewer";

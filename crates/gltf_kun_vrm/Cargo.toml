@@ -1,16 +1,16 @@
 [package]
-description = "VRM extensions for gltf_kun."
-edition.workspace = true
-keywords = ["vrm"]
-license.workspace = true
-name = "gltf_kun_vrm"
+description          = "VRM extensions for gltf_kun."
+edition.workspace    = true
+keywords             = ["vrm"]
+license.workspace    = true
+name                 = "gltf_kun_vrm"
 repository.workspace = true
-version.workspace = true
+version.workspace    = true
 
 [dependencies]
-gltf_kun.workspace = true
-serde.workspace = true
+gltf_kun.workspace   = true
+serde.workspace      = true
 serde_json.workspace = true
-serde_vrm.workspace = true
-thiserror.workspace = true
-tracing = "0.1.41"
+serde_vrm.workspace  = true
+thiserror.workspace  = true
+tracing              = "0.1.41"
