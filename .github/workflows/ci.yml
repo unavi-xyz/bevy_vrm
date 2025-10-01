@@ -15,7 +15,7 @@ jobs:
           remove-docker-images: true
           remove-dotnet: true
           remove-haskell: true
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           submodules: true
       - uses: DeterminateSystems/flake-checker-action@v12
