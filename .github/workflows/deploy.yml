@@ -23,7 +23,7 @@ jobs:
       - uses: DeterminateSystems/magic-nix-cache-action@main
       - run: nix build .#vrm_viewer_web
       - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v4
         with:
           path: result
       - id: deployment
