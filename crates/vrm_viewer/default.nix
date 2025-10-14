@@ -67,19 +67,28 @@ _: {
         );
       };
 
-      packages."${pname}" = pkgs.crane.buildPackage (
-        cargoArgs
-        // {
-          inherit cargoArtifacts;
-          doCheck = false;
+      packages = {
+        "${pname}" = pkgs.crane.buildPackage (
+          cargoArgs
+          // {
+            inherit cargoArtifacts;
+            doCheck = false;
 
-          postInstall = ''
-            mv $out/bin/* $out
-            rm -r $out/bin
-            cp LICENSE-APACHE $out
-            cp LICENSE-MIT $out
-          '';
-        }
-      );
+            postInstall = ''
+              mv $out/bin/* $out
+              rm -r $out/bin
+              cp LICENSE-APACHE $out
+              cp LICENSE-MIT $out
+            '';
+          }
+        );
+        "${pname}_web" = pkgs.crane.buildTrunkPackage (
+          cargoArgs
+          // {
+            pname = "${pname}_web";
+            inherit (pkgs) wasm-bindgen-cli;
+          }
+        );
+      };
     };
 }

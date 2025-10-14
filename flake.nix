@@ -51,7 +51,13 @@
                 (
                   self: _:
                   let
-                    nightly = self.fenix.complete.toolchain;
+                    nightly = (
+                      with self.fenix;
+                      combine [
+                        complete.toolchain
+                        targets.wasm32-unknown-unknown.latest.rust-std
+                      ]
+                    );
                   in
                   {
                     crane = (inputs.crane.mkLib self).overrideToolchain nightly;
