@@ -8,26 +8,21 @@ jobs:
   check:
     runs-on: ubuntu-latest
     steps:
-      - uses: AdityaGarg8/remove-unwanted-software@v5
+      - uses: AdityaGarg8/remove-unwanted-software@v4
         with:
           remove-android: true
-          remove-codeql: true
-          remove-docker-images: true
-          remove-dotnet: true
-          remove-haskell: true
+          remove-cached-tools: true
+          # remove-codeql: true
+          # remove-docker-images: true
+          # remove-dotnet: true
+          # remove-haskell: true
+          # remove-large-packages: true
       - uses: actions/checkout@v4
         with:
-          submodules: true
-      - uses: DeterminateSystems/flake-checker-action@v10
-      - uses: DeterminateSystems/nix-installer-action@main
-      - uses: DeterminateSystems/magic-nix-cache-action@main
-      - uses: Swatinem/rust-cache@v2
-      - run: nix develop -c cargo ws exec --no-bail -- cargo rdme --force
-      - uses: EndBug/add-and-commit@v9
+          ref: ${{ github.event.pull_request.head.ref }}
+      - uses: DeterminateSystems/flake-checker-action@v11
+      - uses: DeterminateSystems/determinate-nix-action@v3
         with:
-          message: "chore: generate README"
-          default_author: github_actions
-      - run: nix develop -c cargo clippy --all-features --fix --no-deps
-      - run: nix fmt
-      - run: nix develop -c cargo doc --all-features --no-deps
-      - run: nix develop -c cargo test --all-features --all-targets
+          extra-conf: extra-experimental-features = pipe-operators
+      - uses: DeterminateSystems/magic-nix-cache-action@main
+      - run: nix flake check
