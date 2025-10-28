@@ -70,12 +70,12 @@ impl BevyExtensionImport<GltfDocument> for VrmExtensions {
             .graph
             .edges_directed(primitive.0, Direction::Incoming)
             .find_map(|edge| {
-                if let Edge::Other(name) = edge.weight() {
-                    if name == MeshAnnotationEdges::Mesh.to_string().as_str() {
-                        let annotation = MeshAnnotation(edge.source());
-                        let weight = annotation.read(context.graph);
-                        return Some(weight.first_person_flag);
-                    }
+                if let Edge::Other(name) = edge.weight()
+                    && name == MeshAnnotationEdges::Mesh.to_string().as_str()
+                {
+                    let annotation = MeshAnnotation(edge.source());
+                    let weight = annotation.read(context.graph);
+                    return Some(weight.first_person_flag);
                 }
 
                 None
@@ -336,10 +336,10 @@ fn add_springbone_logic_state(
                         Ok(c) => c,
                         Err(_) => {
                             // Adds an extra spring bone below it to make it look even better.
-                            if let Ok(name) = names.get(*bone) {
-                                if name.as_str() == "donotaddmore" {
-                                    continue;
-                                }
+                            if let Ok(name) = names.get(*bone)
+                                && name.as_str() == "donotaddmore"
+                            {
+                                continue;
                             }
                             let child = commands
                                 .spawn((

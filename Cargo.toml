@@ -29,6 +29,10 @@ serde = { features = ["derive"], version = "1.0.219" }
 serde_json = "1.0.140"
 thiserror = "2.0.12"
 
+[patch.crates-io]
+bevy_gltf_kun = { git = "https://github.com/unavi-xyz/gltf_kun" }
+gltf_kun      = { git = "https://github.com/unavi-xyz/gltf_kun" }
+
 [workspace.metadata.release]
 shared-version = true
 tag-name       = "v{{version}}"

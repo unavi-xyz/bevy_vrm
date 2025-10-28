@@ -797,13 +797,13 @@ dependencies = [
 [[package]]
 name = "bevy_gltf_kun"
 version = "0.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e1c2c5d1e6f02816200c7670e7222cbf9957f630bb27338b49a407902bb04fb1"
+source = "git+https://github.com/unavi-xyz/gltf_kun#b28fad1a24190ee944cf1dbd77e4ade232143ee7"
 dependencies = [
  "anyhow",
  "bevy",
  "gltf_kun",
  "image",
+ "serde",
  "serde_json",
  "thiserror 2.0.17",
 ]
@@ -2684,8 +2684,7 @@ dependencies = [
 [[package]]
 name = "gltf_kun"
 version = "0.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "92d0b16fba617fdee2b9b1431bf5507fcd42f71ad8c36d79cc080b03bac7d097"
+source = "git+https://github.com/unavi-xyz/gltf_kun#b28fad1a24190ee944cf1dbd77e4ade232143ee7"
 dependencies = [
  "base64 0.22.1",
  "bevy_math",

@@ -9,7 +9,7 @@ use bevy::{
 };
 use bevy_gltf_kun::import::gltf::{
     GltfKun,
-    loader::{GlbLoader, GltfError, GltfLoader},
+    loader::{GlbLoader, GltfError, GltfLoader, GltfLoaderSettings},
 };
 use thiserror::Error;
 
@@ -40,7 +40,7 @@ impl AssetLoader for VrmLoader {
     fn load(
         &self,
         reader: &mut dyn Reader,
-        settings: &Self::Settings,
+        _settings: &Self::Settings,
         load_context: &mut LoadContext,
     ) -> impl bevy::tasks::ConditionalSendFuture<Output = std::result::Result<Self::Asset, Self::Error>>
     {
@@ -53,15 +53,17 @@ impl AssetLoader for VrmLoader {
 
             let is_glb = bytes.len() >= 4 && &bytes[0..4] == b"glTF";
 
+            let gltf_settings = GltfLoaderSettings::default();
+
             let gltf = if is_glb {
                 let mut vec_reader = VecReader::new(bytes);
                 self.glb_loader
-                    .load(&mut vec_reader, settings, load_context)
+                    .load(&mut vec_reader, &gltf_settings, load_context)
                     .await?
             } else {
                 let mut vec_reader = VecReader::new(bytes);
                 self.gltf_loader
-                    .load(&mut vec_reader, settings, load_context)
+                    .load(&mut vec_reader, &gltf_settings, load_context)
                     .await?
             };
 
