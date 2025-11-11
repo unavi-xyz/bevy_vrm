@@ -35,23 +35,23 @@ struct MtoonMaterialUniform {
     shading_toony_factor: f32,
 };
 
-@group(2) @binding(0)
+@group(#{MATERIAL_BIND_GROUP}) @binding(0)
 var<uniform> material: MtoonMaterialUniform;
 
-@group(2) @binding(1) var base_color_texture: texture_2d<f32>;
-@group(2) @binding(2) var base_color_sampler: sampler;
-@group(2) @binding(3) var emissive_texture: texture_2d<f32>;
-@group(2) @binding(4) var emissive_sampler: sampler;
-@group(2) @binding(5) var matcap_texture: texture_2d<f32>;
-@group(2) @binding(6) var matcap_sampler: sampler;
-@group(2) @binding(7) var normal_map_texture: texture_2d<f32>;
-@group(2) @binding(8) var normal_map_sampler: sampler;
-@group(2) @binding(9) var rim_multiply_texture: texture_2d<f32>;
-@group(2) @binding(10) var rim_multiply_sampler: sampler;
-@group(2) @binding(11) var shade_color_texture: texture_2d<f32>;
-@group(2) @binding(12) var shade_color_sampler: sampler;
-@group(2) @binding(13) var shade_shift_texture: texture_2d<f32>;
-@group(2) @binding(14) var shade_shift_sampler: sampler;
+@group(#{MATERIAL_BIND_GROUP}) @binding(1) var base_color_texture: texture_2d<f32>;
+@group(#{MATERIAL_BIND_GROUP}) @binding(2) var base_color_sampler: sampler;
+@group(#{MATERIAL_BIND_GROUP}) @binding(3) var emissive_texture: texture_2d<f32>;
+@group(#{MATERIAL_BIND_GROUP}) @binding(4) var emissive_sampler: sampler;
+@group(#{MATERIAL_BIND_GROUP}) @binding(5) var matcap_texture: texture_2d<f32>;
+@group(#{MATERIAL_BIND_GROUP}) @binding(6) var matcap_sampler: sampler;
+@group(#{MATERIAL_BIND_GROUP}) @binding(7) var normal_map_texture: texture_2d<f32>;
+@group(#{MATERIAL_BIND_GROUP}) @binding(8) var normal_map_sampler: sampler;
+@group(#{MATERIAL_BIND_GROUP}) @binding(9) var rim_multiply_texture: texture_2d<f32>;
+@group(#{MATERIAL_BIND_GROUP}) @binding(10) var rim_multiply_sampler: sampler;
+@group(#{MATERIAL_BIND_GROUP}) @binding(11) var shade_color_texture: texture_2d<f32>;
+@group(#{MATERIAL_BIND_GROUP}) @binding(12) var shade_color_sampler: sampler;
+@group(#{MATERIAL_BIND_GROUP}) @binding(13) var shade_shift_texture: texture_2d<f32>;
+@group(#{MATERIAL_BIND_GROUP}) @binding(14) var shade_shift_sampler: sampler;
 
 const MTOON_FLAGS_ALPHA_MODE_MASK: u32 = 1u;
 const MTOON_FLAGS_ALPHA_MODE_OPAQUE: u32 = 2u;

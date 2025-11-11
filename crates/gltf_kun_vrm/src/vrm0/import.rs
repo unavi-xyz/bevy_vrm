@@ -251,13 +251,13 @@ impl ExtensionImport<GltfDocument, GltfFormat> for Vrm {
                 for bind_json in binds {
                     let bind = Bind::new(graph);
 
-                    if let Some(mesh_idx) = bind_json.mesh {
-                        if let Some(mesh) = doc.meshes(graph).get(mesh_idx as usize) {
-                            let index = bind_json.index.unwrap_or_default();
+                    if let Some(mesh_idx) = bind_json.mesh
+                        && let Some(mesh) = doc.meshes(graph).get(mesh_idx as usize)
+                    {
+                        let index = bind_json.index.unwrap_or_default();
 
-                            if let Some(primitive) = mesh.primitives(graph).get(index as usize) {
-                                bind.set_primitive(graph, Some(*primitive));
-                            }
+                        if let Some(primitive) = mesh.primitives(graph).get(index as usize) {
+                            bind.set_primitive(graph, Some(*primitive));
                         }
                     }
 

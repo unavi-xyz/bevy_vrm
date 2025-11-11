@@ -1,7 +1,7 @@
 //! Bevy plugin implementing the [MToon](https://vrm.dev/en/univrm/shaders/shader_mtoon.html) shader.
 
 use bevy::{
-    asset::{load_internal_asset, weak_handle},
+    asset::{load_internal_asset, uuid_handle},
     prelude::*,
 };
 
@@ -10,7 +10,7 @@ mod shader;
 use bevy_mod_outline::{OutlineMode, OutlinePlugin, OutlineStencil, OutlineVolume};
 pub use shader::{MtoonMaterial, OutlineMode as VrmOutlineMode};
 
-const SHADER_HANDLE: Handle<Shader> = weak_handle!("88901104-e489-4263-b974-94885e37a3a7");
+const SHADER_HANDLE: Handle<Shader> = uuid_handle!("88901104-e489-4263-b974-94885e37a3a7");
 
 #[derive(Default)]
 pub struct MtoonPlugin;

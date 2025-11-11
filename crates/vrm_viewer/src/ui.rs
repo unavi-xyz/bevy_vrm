@@ -32,7 +32,7 @@ impl RenderLayer {
 }
 
 pub fn update_ui(mut contexts: EguiContexts, mut settings: ResMut<Settings>) {
-    bevy_egui::egui::Window::new("VRM Viewer").show(contexts.ctx_mut(), |ui| {
+    bevy_egui::egui::Window::new("VRM Viewer").show(contexts.ctx_mut().unwrap(), |ui| {
         ui.vertical(|ui| {
             ui.horizontal(|ui| {
                 ui.spacing_mut().item_spacing.x = 0.0;

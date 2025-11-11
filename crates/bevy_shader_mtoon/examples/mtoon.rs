@@ -1,16 +1,14 @@
 use std::f32::consts::PI;
 
 use bevy::{
+    asset::RenderAssetUsages,
     color::palettes::css::{BISQUE, SALMON},
     prelude::*,
-    render::{
-        render_asset::RenderAssetUsages,
-        render_resource::{Extent3d, TextureDimension, TextureFormat},
-    },
+    render::render_resource::{Extent3d, TextureDimension, TextureFormat},
 };
 
 use bevy_egui::{
-    EguiContexts, EguiPlugin,
+    EguiContexts, EguiPlugin, EguiPrimaryContextPass,
     egui::{Slider, Window},
 };
 use bevy_panorbit_camera::{PanOrbitCamera, PanOrbitCameraPlugin};
@@ -21,14 +19,13 @@ fn main() {
         .insert_resource(ClearColor(Color::linear_rgb(0.1, 0.1, 0.1)))
         .add_plugins((
             DefaultPlugins.set(ImagePlugin::default_nearest()),
-            EguiPlugin {
-                enable_multipass_for_primary_context: false,
-            },
+            EguiPlugin::default(),
             MtoonPlugin,
             PanOrbitCameraPlugin,
         ))
         .add_systems(Startup, setup)
-        .add_systems(Update, (rotate, ui))
+        .add_systems(EguiPrimaryContextPass, ui)
+        .add_systems(Update, rotate)
         .run();
 }
 
@@ -152,7 +149,7 @@ fn ui(
         material.shading_toony_factor = settings.shading_toony_factor;
     }
 
-    Window::new("bevy_shader_mtoon").show(contexts.ctx_mut(), |ui| {
+    Window::new("bevy_shader_mtoon").show(contexts.ctx_mut().unwrap(), |ui| {
         ui.add(
             Slider::new(&mut settings.gi_equalization_factor, 0.0..=1.0)
                 .text("GL Equalization Factor"),

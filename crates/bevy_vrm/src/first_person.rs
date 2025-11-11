@@ -4,11 +4,9 @@ use std::{
 };
 
 use bevy::{
+    camera::visibility::RenderLayers,
+    mesh::{Indices, VertexAttributeValues, morph::MeshMorphWeights, skinning::SkinnedMesh},
     prelude::*,
-    render::{
-        mesh::{Indices, VertexAttributeValues, morph::MeshMorphWeights, skinning::SkinnedMesh},
-        view::RenderLayers,
-    },
 };
 use bevy_shader_mtoon::MtoonMaterial;
 use serde_vrm::vrm0::BoneName;
@@ -41,7 +39,7 @@ pub static RENDER_LAYERS: LazyLock<HashMap<FirstPersonFlag, RenderLayers>> = Laz
     map
 });
 
-#[derive(Event)]
+#[derive(Message)]
 pub struct SetupFirstPerson(pub Entity);
 
 pub(crate) fn handle_setup_events(
@@ -56,7 +54,7 @@ pub(crate) fn handle_setup_events(
         Option<&MeshMorphWeights>,
     )>,
     mut commands: Commands,
-    mut events: EventReader<SetupFirstPerson>,
+    mut events: MessageReader<SetupFirstPerson>,
     mut meshes: ResMut<Assets<Mesh>>,
     parents: Query<&ChildOf>,
     skins: Query<&SkinnedMesh>,

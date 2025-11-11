@@ -368,7 +368,7 @@ fn add_springbone_logic_state(
 
                     let bone_axis = local_next_bone.translation.normalize_or_zero();
                     let bone_length = local_next_bone.translation.length();
-                    let initial_local_matrix = local_this_bone.compute_matrix();
+                    let initial_local_matrix = local_this_bone.to_matrix();
                     let initial_local_rotation = local_this_bone.rotation;
                     let current_tail = global_this_bone.translation()
                         + (global_this_bone.rotation() * bone_axis * bone_length);

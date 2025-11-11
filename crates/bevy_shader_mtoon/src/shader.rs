@@ -2,9 +2,10 @@ use bevy::{
     prelude::*,
     render::{
         render_asset::RenderAssets,
-        render_resource::{AsBindGroup, AsBindGroupShaderType, Face, ShaderRef, ShaderType},
+        render_resource::{AsBindGroup, AsBindGroupShaderType, Face, ShaderType},
         texture::GpuImage,
     },
+    shader::ShaderRef,
 };
 
 use crate::SHADER_HANDLE;
@@ -231,9 +232,9 @@ impl Material for MtoonMaterial {
     }
 
     fn specialize(
-        _pipeline: &bevy::pbr::MaterialPipeline<Self>,
+        _pipeline: &bevy::pbr::MaterialPipeline,
         descriptor: &mut bevy::render::render_resource::RenderPipelineDescriptor,
-        _layout: &bevy::render::mesh::MeshVertexBufferLayoutRef,
+        _layout: &bevy::mesh::MeshVertexBufferLayoutRef,
         key: bevy::pbr::MaterialPipelineKey<Self>,
     ) -> Result<(), bevy::render::render_resource::SpecializedMeshPipelineError> {
         descriptor.primitive.cull_mode = key.bind_group_data.cull_mode;

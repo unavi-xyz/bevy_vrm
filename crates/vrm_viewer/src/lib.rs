@@ -2,8 +2,8 @@
 
 use std::f32::consts::PI;
 
-use bevy::{asset::AssetMetaCheck, prelude::*, render::view::RenderLayers};
-use bevy_egui::EguiPlugin;
+use bevy::{asset::AssetMetaCheck, camera::visibility::RenderLayers, prelude::*};
+use bevy_egui::{EguiPlugin, EguiPrimaryContextPass};
 use bevy_panorbit_camera::{PanOrbitCamera, PanOrbitCameraPlugin};
 use bevy_vrm::{
     VrmBundle, VrmInstance, VrmPlugins, VrmScene,
@@ -31,15 +31,15 @@ impl Plugin for VrmViewerPlugin {
             .add_plugins((
                 DefaultPlugins.set(AssetPlugin {
                     meta_check: AssetMetaCheck::Never,
+                    file_path: "../../assets".to_string(),
                     ..default()
                 }),
-                EguiPlugin {
-                    enable_multipass_for_primary_context: false,
-                },
+                EguiPlugin::default(),
                 PanOrbitCameraPlugin,
                 VrmPlugins,
             ))
             .add_systems(Startup, setup)
+            .add_systems(EguiPrimaryContextPass, ui::update_ui)
             .add_systems(
                 Update,
                 (
@@ -50,7 +50,6 @@ impl Plugin for VrmViewerPlugin {
                     read_dropped_files,
                     set_render_layers,
                     setup_first_person,
-                    ui::update_ui,
                 ),
             );
     }
@@ -112,8 +111,8 @@ fn set_render_layers(
 }
 
 fn setup_first_person(
-    mut events: EventReader<AssetEvent<Vrm>>,
-    mut writer: EventWriter<SetupFirstPerson>,
+    mut events: MessageReader<AssetEvent<Vrm>>,
+    mut writer: MessageWriter<SetupFirstPerson>,
     vrms: Query<(Entity, &VrmInstance)>,
 ) {
     for event in events.read() {
@@ -157,7 +156,7 @@ fn load_model(
     *prev = settings.model.clone();
 }
 
-fn read_dropped_files(mut events: EventReader<FileDragAndDrop>, mut settings: ResMut<Settings>) {
+fn read_dropped_files(mut events: MessageReader<FileDragAndDrop>, mut settings: ResMut<Settings>) {
     for event in events.read() {
         if let FileDragAndDrop::DroppedFile { path_buf, .. } = event {
             #[cfg(target_family = "wasm")]

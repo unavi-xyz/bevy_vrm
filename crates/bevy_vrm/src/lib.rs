@@ -40,7 +40,7 @@ impl Plugin for VrmPlugin {
     fn build(&self, app: &mut App) {
         // TODO: Dont use default GltfKunPlugin
         app.add_plugins((GltfKunPlugin::default(), MtoonPlugin))
-            .add_event::<SetupFirstPerson>()
+            .add_message::<SetupFirstPerson>()
             .init_asset::<Vrm>()
             .init_asset_loader::<VrmLoader>()
             .register_type::<BoneName>()

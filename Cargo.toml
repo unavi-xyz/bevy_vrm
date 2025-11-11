@@ -17,21 +17,17 @@ bevy_vrm          = { path = "crates/bevy_vrm", version = "0.1.0" }
 gltf_kun_vrm      = { path = "crates/gltf_kun_vrm", version = "0.1.0" }
 serde_vrm         = { path = "crates/serde_vrm", version = "0.1.0" }
 
-bevy = { default-features = false, version = "0.16.0" }
+bevy = { default-features = false, version = "0.17.2" }
 bevy_egui = { default-features = false, features = [
   "default_fonts",
   "open_url",
   "render",
-], version = "0.34.1" }
-bevy_panorbit_camera = { features = ["bevy_egui"], version = "0.26.0" }
-gltf_kun = { default-features = false, version = "0.2.0" }
-serde = { features = ["derive"], version = "1.0.219" }
-serde_json = "1.0.140"
-thiserror = "2.0.12"
-
-[patch.crates-io]
-bevy_gltf_kun = { git = "https://github.com/unavi-xyz/gltf_kun" }
-gltf_kun      = { git = "https://github.com/unavi-xyz/gltf_kun" }
+], version = "0.38.0" }
+bevy_panorbit_camera = { features = ["bevy_egui"], version = "0.33.0" }
+gltf_kun = { default-features = false, version = "0.3.0" }
+serde = { features = ["derive"], version = "1.0.228" }
+serde_json = "1.0.145"
+thiserror = "2.0.17"
 
 [workspace.metadata.release]
 shared-version = true

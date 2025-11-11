@@ -115,7 +115,7 @@ fn do_springbone_logic(
                     continue;
                 };
                 let parent_world_rotation = parent_global.to_scale_rotation_translation().1;
-                let parent_matrix = parent_global.compute_matrix();
+                let parent_matrix = parent_global.to_matrix();
                 let parent_global_transform = *parent_global;
 
                 let inertia = (spring_bone_logic_state.current_tail
