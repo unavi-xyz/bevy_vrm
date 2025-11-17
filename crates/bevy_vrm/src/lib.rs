@@ -1,7 +1,7 @@
 //! Bevy plugin for loading [VRM](https://vrm.dev/en/) avatars.
 //! Aims to support both the VRM 0.0 and VRM 1.0 standards.
 
-use bevy::{app::PluginGroupBuilder, prelude::*};
+use bevy::{app::PluginGroupBuilder, prelude::*, scene::InstanceId};
 use bevy_gltf_kun::{GltfKunPlugin, import::gltf::scene::GltfScene};
 use bevy_shader_mtoon::MtoonPlugin;
 use loader::{Vrm, VrmLoader};
@@ -50,7 +50,7 @@ fn spawn_vrm_scenes(
     gltf_scenes: Res<Assets<GltfScene>>,
     mut commands: Commands,
     mut scene_spawner: ResMut<SceneSpawner>,
-    to_spawn: Query<(Entity, &VrmInstance), Without<VrmSceneSpawned>>,
+    to_spawn: Query<(Entity, &VrmInstance), Without<VrmInstanceId>>,
     vrms: Res<Assets<Vrm>>,
 ) {
     for (entity, vrm_handle) in to_spawn.iter() {
@@ -71,16 +71,16 @@ fn spawn_vrm_scenes(
         };
 
         // Spawn the scene as a child of this entity.
-        scene_spawner.spawn_as_child(gltf_scene.scene.clone(), entity);
+        let id = scene_spawner.spawn_as_child(gltf_scene.scene.clone(), entity);
 
         // Mark as spawned.
-        commands.entity(entity).insert(VrmSceneSpawned);
+        commands.entity(entity).insert(VrmInstanceId(id));
     }
 }
 
 #[derive(Component, Default)]
 pub struct VrmInstance(pub Handle<Vrm>);
 
-/// Marker component added after a VRM's scene has been spawned.
+/// Instance ID of the spawned VRM scene.
 #[derive(Component)]
-pub struct VrmSceneSpawned;
+pub struct VrmInstanceId(pub InstanceId);
