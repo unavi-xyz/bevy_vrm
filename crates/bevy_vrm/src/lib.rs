@@ -1,9 +1,8 @@
 //! Bevy plugin for loading [VRM](https://vrm.dev/en/) avatars.
 //! Aims to support both the VRM 0.0 and VRM 1.0 standards.
 
-use auto_scene::AutoScene;
 use bevy::{app::PluginGroupBuilder, prelude::*};
-use bevy_gltf_kun::GltfKunPlugin;
+use bevy_gltf_kun::{GltfKunPlugin, import::gltf::scene::GltfScene};
 use bevy_shader_mtoon::MtoonPlugin;
 use first_person::SetupFirstPerson;
 use loader::{Vrm, VrmLoader};
@@ -13,7 +12,6 @@ use crate::spring_bones::SpringBonePlugin;
 
 #[cfg(feature = "animations")]
 pub mod animations;
-pub mod auto_scene;
 pub mod extensions;
 pub mod first_person;
 pub mod loader;
@@ -47,21 +45,46 @@ impl Plugin for VrmPlugin {
             .register_type::<FirstPersonFlag>()
             .add_systems(
                 Update,
-                (auto_scene::set_vrm_scene, first_person::handle_setup_events).chain(),
+                (spawn_vrm_scenes, first_person::handle_setup_events).chain(),
             );
+    }
+}
+
+fn spawn_vrm_scenes(
+    gltf_scenes: Res<Assets<GltfScene>>,
+    mut commands: Commands,
+    mut scene_spawner: ResMut<SceneSpawner>,
+    to_spawn: Query<(Entity, &VrmInstance), Without<VrmSceneSpawned>>,
+    vrms: Res<Assets<Vrm>>,
+) {
+    for (entity, vrm_handle) in to_spawn.iter() {
+        let Some(vrm) = vrms.get(&vrm_handle.0) else {
+            continue;
+        };
+
+        let vrm_scene_handle = match &vrm.gltf.default_scene {
+            Some(handle) => handle,
+            None => match vrm.gltf.scenes.first() {
+                Some(handle) => handle,
+                None => continue,
+            },
+        };
+
+        let Some(gltf_scene) = gltf_scenes.get(vrm_scene_handle) else {
+            continue;
+        };
+
+        // Spawn the scene as a child of this entity.
+        scene_spawner.spawn_as_child(gltf_scene.scene.clone(), entity);
+
+        // Mark as spawned.
+        commands.entity(entity).insert(VrmSceneSpawned);
     }
 }
 
 #[derive(Component, Default)]
 pub struct VrmInstance(pub Handle<Vrm>);
 
-#[derive(Component, Default)]
-pub struct VrmScene(pub Handle<Scene>);
-
-#[derive(Bundle, Default)]
-pub struct VrmBundle {
-    pub auto_scene: AutoScene,
-    pub scene: VrmScene,
-    pub vrm: VrmInstance,
-    pub scene_root: SceneRoot,
-}
+/// Marker component added after a VRM's scene has been spawned.
+#[derive(Component)]
+pub struct VrmSceneSpawned;

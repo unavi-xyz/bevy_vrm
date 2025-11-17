@@ -5,7 +5,7 @@ use bevy_panorbit_camera::{PanOrbitCamera, PanOrbitCameraPlugin};
 use bevy_vrm::first_person::{FirstPersonFlag, SetupFirstPerson};
 use bevy_vrm::loader::Vrm;
 use bevy_vrm::mtoon::MtoonSun;
-use bevy_vrm::{VrmBundle, VrmInstance, VrmPlugins};
+use bevy_vrm::{VrmInstance, VrmPlugins};
 
 #[derive(Component)]
 struct LinearMotion {
@@ -65,10 +65,7 @@ fn setup_scene(mut commands: Commands, asset_server: Res<AssetServer>) {
     // Avatar 1: Medium speed, Auto first person flag (default).
     commands.spawn((
         Transform::from_xyz(-3.0, 0.0, 0.0),
-        VrmBundle {
-            vrm: VrmInstance(asset_server.load("alicia.vrm")),
-            ..default()
-        },
+        VrmInstance(asset_server.load("alicia.vrm")),
         LinearMotion {
             amplitude: 3.0,
             speed: 1.0,
@@ -80,10 +77,7 @@ fn setup_scene(mut commands: Commands, asset_server: Res<AssetServer>) {
     // Avatar 2: Slower movement, ThirdPersonOnly flag.
     commands.spawn((
         Transform::from_xyz(0.0, 0.0, 0.0),
-        VrmBundle {
-            vrm: VrmInstance(asset_server.load("alicia.vrm")),
-            ..default()
-        },
+        VrmInstance(asset_server.load("alicia.vrm")),
         LinearMotion {
             amplitude: 4.0,
             speed: 0.7,
@@ -95,10 +89,7 @@ fn setup_scene(mut commands: Commands, asset_server: Res<AssetServer>) {
     // Avatar 3: Faster movement, Both flag.
     commands.spawn((
         Transform::from_xyz(3.0, 0.0, 0.0),
-        VrmBundle {
-            vrm: VrmInstance(asset_server.load("alicia.vrm")),
-            ..default()
-        },
+        VrmInstance(asset_server.load("alicia.vrm")),
         LinearMotion {
             amplitude: 2.5,
             speed: 1.5,

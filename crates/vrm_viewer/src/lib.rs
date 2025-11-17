@@ -6,7 +6,7 @@ use bevy::{asset::AssetMetaCheck, camera::visibility::RenderLayers, prelude::*};
 use bevy_egui::{EguiPlugin, EguiPrimaryContextPass};
 use bevy_panorbit_camera::{PanOrbitCamera, PanOrbitCameraPlugin};
 use bevy_vrm::{
-    VrmBundle, VrmInstance, VrmPlugins, VrmScene,
+    VrmInstance, VrmPlugins,
     first_person::{FirstPersonFlag, RENDER_LAYERS, SetupFirstPerson},
     loader::Vrm,
     mtoon::MtoonSun,
@@ -146,11 +146,7 @@ fn load_model(
 
     commands.spawn((
         transform,
-        VrmBundle {
-            scene: VrmScene::default(),
-            vrm: VrmInstance(asset_server.load(settings.model.clone())),
-            ..default()
-        },
+        VrmInstance(asset_server.load(settings.model.clone())),
     ));
 
     *prev = settings.model.clone();
