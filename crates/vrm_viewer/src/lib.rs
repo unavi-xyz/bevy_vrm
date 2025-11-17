@@ -7,7 +7,7 @@ use bevy_egui::{EguiPlugin, EguiPrimaryContextPass};
 use bevy_panorbit_camera::{PanOrbitCamera, PanOrbitCameraPlugin};
 use bevy_vrm::{
     VrmInstance, VrmPlugins,
-    first_person::{FirstPersonFlag, RENDER_LAYERS, SetupFirstPerson},
+    first_person::{DEFAULT_RENDER_LAYERS, FirstPersonFlag, SetupFirstPerson},
     loader::Vrm,
     mtoon::MtoonSun,
 };
@@ -104,7 +104,7 @@ fn set_render_layers(
         if flag != *prev {
             *prev = flag;
 
-            let layers = RenderLayers::layer(0).union(&RENDER_LAYERS[&flag]);
+            let layers = RenderLayers::layer(0).union(&DEFAULT_RENDER_LAYERS[&flag]);
             commands.entity(entity).insert(layers);
         }
     }
@@ -122,9 +122,10 @@ fn setup_first_person(
                 .find(|(_, handle)| handle.0.id() == *id)
                 .unwrap();
 
-            commands
-                .entity(entity)
-                .trigger(|entity| SetupFirstPerson { entity });
+            commands.entity(entity).trigger(|entity| SetupFirstPerson {
+                entity,
+                render_layers: None,
+            });
         }
     }
 }

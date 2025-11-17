@@ -16,32 +16,37 @@ pub use serde_vrm::vrm0::FirstPersonFlag;
 pub const FIRST_PERSON_LAYER: usize = 7;
 pub const THIRD_PERSON_LAYER: usize = 8;
 
-pub static RENDER_LAYERS: LazyLock<HashMap<FirstPersonFlag, RenderLayers>> = LazyLock::new(|| {
-    let mut map = HashMap::default();
+pub static DEFAULT_RENDER_LAYERS: LazyLock<HashMap<FirstPersonFlag, RenderLayers>> =
+    LazyLock::new(|| {
+        let mut map = HashMap::default();
 
-    map.insert(
-        FirstPersonFlag::Auto,
-        RenderLayers::from_layers(&[0, FIRST_PERSON_LAYER, THIRD_PERSON_LAYER]),
-    );
-    map.insert(
-        FirstPersonFlag::Both,
-        RenderLayers::from_layers(&[0, FIRST_PERSON_LAYER, THIRD_PERSON_LAYER]),
-    );
-    map.insert(
-        FirstPersonFlag::FirstPersonOnly,
-        RenderLayers::layer(FIRST_PERSON_LAYER),
-    );
-    map.insert(
-        FirstPersonFlag::ThirdPersonOnly,
-        RenderLayers::layer(THIRD_PERSON_LAYER),
-    );
+        map.insert(
+            FirstPersonFlag::Auto,
+            RenderLayers::from_layers(&[0, FIRST_PERSON_LAYER, THIRD_PERSON_LAYER]),
+        );
+        map.insert(
+            FirstPersonFlag::Both,
+            RenderLayers::from_layers(&[0, FIRST_PERSON_LAYER, THIRD_PERSON_LAYER]),
+        );
+        map.insert(
+            FirstPersonFlag::FirstPersonOnly,
+            RenderLayers::layer(FIRST_PERSON_LAYER),
+        );
+        map.insert(
+            FirstPersonFlag::ThirdPersonOnly,
+            RenderLayers::layer(THIRD_PERSON_LAYER),
+        );
 
-    map
-});
+        map
+    });
 
+/// Add [RenderLayers] to each mesh in the VRM.
 #[derive(EntityEvent)]
 pub struct SetupFirstPerson {
     pub entity: Entity,
+    /// Render layer values to use for each first person flag.
+    /// Defaults to [DEFAULT_RENDER_LAYERS] if not provided.
+    pub render_layers: Option<HashMap<FirstPersonFlag, RenderLayers>>,
 }
 
 pub(crate) fn setup_first_person(
@@ -64,6 +69,11 @@ pub(crate) fn setup_first_person(
     if bones.is_empty() {
         return;
     }
+
+    let render_layers = event
+        .render_layers
+        .as_ref()
+        .unwrap_or(&DEFAULT_RENDER_LAYERS);
 
     let (head_ent, _) = bones
         .iter()
@@ -141,7 +151,7 @@ pub(crate) fn setup_first_person(
                 .spawn((
                     Transform::default(),
                     Mesh3d(new_mesh_handle),
-                    RENDER_LAYERS[&FirstPersonFlag::FirstPersonOnly].clone(),
+                    render_layers[&FirstPersonFlag::FirstPersonOnly].clone(),
                 ))
                 .id();
 
@@ -176,7 +186,7 @@ pub(crate) fn setup_first_person(
 
         commands
             .entity(ent)
-            .insert(RENDER_LAYERS[flag.as_ref()].clone());
+            .insert(render_layers[flag.as_ref()].clone());
     }
 }
 
