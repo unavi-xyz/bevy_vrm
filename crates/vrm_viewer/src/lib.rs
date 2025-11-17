@@ -111,17 +111,20 @@ fn set_render_layers(
 }
 
 fn setup_first_person(
+    mut commands: Commands,
     mut events: MessageReader<AssetEvent<Vrm>>,
-    mut writer: MessageWriter<SetupFirstPerson>,
     vrms: Query<(Entity, &VrmInstance)>,
 ) {
     for event in events.read() {
         if let AssetEvent::LoadedWithDependencies { id } = event {
-            let (ent, _) = vrms
+            let (entity, _) = vrms
                 .iter()
                 .find(|(_, handle)| handle.0.id() == *id)
                 .unwrap();
-            writer.write(SetupFirstPerson(ent));
+
+            commands
+                .entity(entity)
+                .trigger(|entity| SetupFirstPerson { entity });
         }
     }
 }

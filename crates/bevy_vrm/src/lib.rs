@@ -4,7 +4,6 @@
 use bevy::{app::PluginGroupBuilder, prelude::*};
 use bevy_gltf_kun::{GltfKunPlugin, import::gltf::scene::GltfScene};
 use bevy_shader_mtoon::MtoonPlugin;
-use first_person::SetupFirstPerson;
 use loader::{Vrm, VrmLoader};
 use serde_vrm::vrm0::FirstPersonFlag;
 
@@ -38,15 +37,12 @@ impl Plugin for VrmPlugin {
     fn build(&self, app: &mut App) {
         // TODO: Dont use default GltfKunPlugin
         app.add_plugins((GltfKunPlugin::default(), MtoonPlugin))
-            .add_message::<SetupFirstPerson>()
             .init_asset::<Vrm>()
             .init_asset_loader::<VrmLoader>()
             .register_type::<BoneName>()
             .register_type::<FirstPersonFlag>()
-            .add_systems(
-                Update,
-                (spawn_vrm_scenes, first_person::handle_setup_events).chain(),
-            );
+            .add_observer(first_person::setup_first_person)
+            .add_systems(Update, spawn_vrm_scenes);
     }
 }
 

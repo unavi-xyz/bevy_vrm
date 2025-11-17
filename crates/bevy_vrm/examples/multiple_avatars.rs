@@ -2,8 +2,6 @@ use std::f32::consts::PI;
 
 use bevy::prelude::*;
 use bevy_panorbit_camera::{PanOrbitCamera, PanOrbitCameraPlugin};
-use bevy_vrm::first_person::{FirstPersonFlag, SetupFirstPerson};
-use bevy_vrm::loader::Vrm;
 use bevy_vrm::mtoon::MtoonSun;
 use bevy_vrm::{VrmInstance, VrmPlugins};
 
@@ -13,10 +11,6 @@ struct LinearMotion {
     offset: f32,
     speed: f32,
 }
-
-/// Marker component to override first person flag for this avatar.
-#[derive(Component)]
-struct OverrideFirstPersonFlag(FirstPersonFlag);
 
 fn main() {
     App::new()
@@ -29,14 +23,7 @@ fn main() {
             PanOrbitCameraPlugin,
         ))
         .add_systems(Startup, setup_scene)
-        .add_systems(
-            Update,
-            (
-                animate_linear_motion,
-                setup_first_person,
-                override_first_person_flags,
-            ),
-        )
+        .add_systems(Update, animate_linear_motion)
         .run();
 }
 
@@ -62,40 +49,37 @@ fn setup_scene(mut commands: Commands, asset_server: Res<AssetServer>) {
         MtoonSun,
     ));
 
-    // Avatar 1: Medium speed, Auto first person flag (default).
+    // Avatar 1: Medium speed moving back and forth.
     commands.spawn((
         Transform::from_xyz(-3.0, 0.0, 0.0),
-        VrmInstance(asset_server.load("alicia.vrm")),
+        VrmInstance(asset_server.load("suzuha.vrm")),
         LinearMotion {
             amplitude: 3.0,
             speed: 1.0,
             offset: 0.0,
         },
-        OverrideFirstPersonFlag(FirstPersonFlag::Auto),
     ));
 
-    // Avatar 2: Slower movement, ThirdPersonOnly flag.
+    // Avatar 2: Slower movement.
     commands.spawn((
         Transform::from_xyz(0.0, 0.0, 0.0),
-        VrmInstance(asset_server.load("alicia.vrm")),
+        VrmInstance(asset_server.load("suzuha.vrm")),
         LinearMotion {
             amplitude: 4.0,
             speed: 0.7,
             offset: PI / 2.0,
         },
-        OverrideFirstPersonFlag(FirstPersonFlag::ThirdPersonOnly),
     ));
 
-    // Avatar 3: Faster movement, Both flag.
+    // Avatar 3: Faster movement with phase offset.
     commands.spawn((
         Transform::from_xyz(3.0, 0.0, 0.0),
-        VrmInstance(asset_server.load("alicia.vrm")),
+        VrmInstance(asset_server.load("suzuha.vrm")),
         LinearMotion {
             amplitude: 2.5,
             speed: 1.5,
             offset: PI,
         },
-        OverrideFirstPersonFlag(FirstPersonFlag::Both),
     ));
 }
 
@@ -108,40 +92,5 @@ fn animate_linear_motion(time: Res<Time>, mut query: Query<(&mut Transform, &Lin
         // Rotate to face movement direction.
         let rotation = if z > 0.0 { 0.0 } else { PI };
         transform.rotation = Quat::from_rotation_y(rotation);
-    }
-}
-
-fn setup_first_person(
-    mut events: MessageReader<AssetEvent<Vrm>>,
-    mut writer: MessageWriter<SetupFirstPerson>,
-    vrms: Query<(Entity, &VrmInstance)>,
-) {
-    for event in events.read() {
-        if let AssetEvent::LoadedWithDependencies { id } = event {
-            let Some((entity, _)) = vrms.iter().find(|(_, handle)| handle.0.id() == *id) else {
-                continue;
-            };
-
-            writer.write(SetupFirstPerson(entity));
-        }
-    }
-}
-
-fn override_first_person_flags(
-    avatars: Query<(Entity, &OverrideFirstPersonFlag), With<VrmInstance>>,
-    mut flags: Query<&mut FirstPersonFlag>,
-    children: Query<&Children>,
-) {
-    for (avatar_entity, override_flag) in avatars.iter() {
-        // Recursively traverse all descendants to find and update FirstPersonFlag components.
-        let mut stack = vec![avatar_entity];
-        while let Some(entity) = stack.pop() {
-            if let Ok(mut flag) = flags.get_mut(entity) {
-                *flag = override_flag.0;
-            }
-            if let Ok(children) = children.get(entity) {
-                stack.extend(children.iter());
-            }
-        }
     }
 }
