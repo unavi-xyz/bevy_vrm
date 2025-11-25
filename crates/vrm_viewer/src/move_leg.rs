@@ -9,7 +9,7 @@ pub fn move_leg(
     time: Res<Time>,
     mut bones: Query<(&mut Transform, &BoneName)>,
 ) {
-    for (mut transform, bone) in bones.iter_mut() {
+    for (mut transform, bone) in &mut bones {
         if !matches!(bone, BoneName::RightUpperLeg) {
             continue;
         }

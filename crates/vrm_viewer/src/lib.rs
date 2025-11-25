@@ -120,7 +120,7 @@ fn setup_first_person(
             let (entity, _) = vrms
                 .iter()
                 .find(|(_, handle)| handle.0.id() == *id)
-                .unwrap();
+                .expect("VRM asset must have corresponding entity");
 
             commands.entity(entity).trigger(|entity| SetupFirstPerson {
                 entity,
@@ -153,14 +153,14 @@ fn load_model(
         VrmInstance(asset_server.load(settings.model.clone())),
     ));
 
-    *prev = settings.model.clone();
+    prev.clone_from(&settings.model);
 }
 
 fn read_dropped_files(mut events: MessageReader<FileDragAndDrop>, mut settings: ResMut<Settings>) {
     for event in events.read() {
         if let FileDragAndDrop::DroppedFile { path_buf, .. } = event {
             #[cfg(target_family = "wasm")]
-            let path = String::from(path_buf.to_str().unwrap());
+            let path = String::from(path_buf.to_str().expect("File path must be valid UTF-8"));
             #[cfg(not(target_family = "wasm"))]
             let path = bevy::asset::AssetPath::from_path(path_buf.as_path());
 

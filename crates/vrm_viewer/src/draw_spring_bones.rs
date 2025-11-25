@@ -14,13 +14,10 @@ pub fn draw_spring_bones(
     }
 
     for spring_bones in spring_bones.iter() {
-        for spring_bone in spring_bones.0.iter() {
-            for bone_entity in spring_bone.bones.iter() {
-                let transform = match transforms.get(*bone_entity) {
-                    Ok(t) => t,
-                    Err(_) => {
-                        continue;
-                    }
+        for spring_bone in &spring_bones.0 {
+            for bone_entity in &spring_bone.bones {
+                let Ok(transform) = transforms.get(*bone_entity) else {
+                    continue;
                 };
 
                 gizmos.sphere(
@@ -33,7 +30,7 @@ pub fn draw_spring_bones(
     }
 }
 
-pub(crate) fn move_avatar(
+pub fn move_avatar(
     mut query: Query<&mut Transform, With<SpringBones>>,
     time: Res<Time>,
     settings: Res<Settings>,
@@ -42,7 +39,7 @@ pub(crate) fn move_avatar(
         return;
     }
     let move_speed = (time.elapsed_secs() + 1.0) / 10.0;
-    for mut t in query.iter_mut() {
+    for mut t in &mut query {
         let a = time.elapsed_secs() * move_speed;
         let b = a.sin();
         t.rotation.x = b / 20.0;

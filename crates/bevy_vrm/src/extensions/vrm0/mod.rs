@@ -10,12 +10,9 @@ use serde_vrm::vrm0::Shader;
 
 pub fn import_material(context: &mut ImportContext, material: Material, ext: Vrm) {
     for (i, material_property) in ext.material_properties(context.graph).iter().enumerate() {
-        let m = match material_property.material(context.graph) {
-            Some(material) => material,
-            None => {
-                warn!("Material not found for property {}", i);
-                continue;
-            }
+        let Some(m) = material_property.material(context.graph) else {
+            warn!("Material not found for property {}", i);
+            continue;
         };
 
         if m.0 != material.0 {
@@ -36,11 +33,10 @@ pub fn import_material(context: &mut ImportContext, material: Material, ext: Vrm
                         .add_loaded_labeled_asset(label, LoadedAsset::new_with_dependencies(mtoon));
                 }
             }
-            Some(Shader::Gltf) => {}
+            Some(Shader::Gltf) | None => {}
             Some(other) => {
                 warn!("Unsupported shader: {:?}", other);
             }
-            None => {}
         }
     }
 }
@@ -51,18 +47,14 @@ pub fn import_primitive_material(
     ext: Vrm,
     primitive: Primitive,
 ) {
-    let primitive_material = match primitive.material(context.graph) {
-        Some(material) => material,
-        None => return,
+    let Some(primitive_material) = primitive.material(context.graph) else {
+        return;
     };
 
     for (i, material_property) in ext.material_properties(context.graph).iter().enumerate() {
-        let material = match material_property.material(context.graph) {
-            Some(material) => material,
-            None => {
-                warn!("Material not found for property {}", i);
-                continue;
-            }
+        let Some(material) = material_property.material(context.graph) else {
+            warn!("Material not found for property {}", i);
+            continue;
         };
 
         if material.0 != primitive_material.0 {
@@ -117,7 +109,10 @@ fn load_mtoon_shader(
     }
 
     if let Some(texture) = material_property.main_texture(context.graph) {
-        let index = context.doc.texture_index(context.graph, texture).unwrap();
+        let index = context
+            .doc
+            .texture_index(context.graph, texture)
+            .expect("VRM main_texture must have valid texture index");
         let label = texture_label(index);
         let handle = context.load_context.get_label_handle(&label);
         mtoon.base_color_texture = Some(handle);
@@ -128,7 +123,10 @@ fn load_mtoon_shader(
     }
 
     if let Some(texture) = material_property.bump_map(context.graph) {
-        let index = context.doc.texture_index(context.graph, texture).unwrap();
+        let index = context
+            .doc
+            .texture_index(context.graph, texture)
+            .expect("VRM bump_map must have valid texture index");
         let label = texture_label(index);
         let handle = context.load_context.get_label_handle(&label);
         mtoon.normal_map_texture = Some(handle);
@@ -139,7 +137,10 @@ fn load_mtoon_shader(
     }
 
     if let Some(texture) = material_property.emission_map(context.graph) {
-        let index = context.doc.texture_index(context.graph, texture).unwrap();
+        let index = context
+            .doc
+            .texture_index(context.graph, texture)
+            .expect("VRM emission_map must have valid texture index");
         let label = texture_label(index);
         let handle = context.load_context.get_label_handle(&label);
         mtoon.emissive_texture = Some(handle);
@@ -183,7 +184,7 @@ fn load_mtoon_shader(
             .textures(context.graph)
             .iter()
             .position(|t| t.0 == texture.0)
-            .unwrap();
+            .expect("VRM shade_texture must exist in document texture list");
         let label = texture_label(index);
         let handle = context.load_context.get_label_handle(&label);
         mtoon.shade_multiply_texture = Some(handle);
@@ -193,9 +194,9 @@ fn load_mtoon_shader(
 }
 
 fn mtoon_label(index: usize) -> String {
-    format!("MaterialMtoon{}", index)
+    format!("MaterialMtoon{index}")
 }
 
 fn texture_label(index: usize) -> String {
-    format!("Texture{}", index)
+    format!("Texture{index}")
 }

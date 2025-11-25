@@ -54,14 +54,13 @@ impl AssetLoader for VrmLoader {
             let is_glb = bytes.len() >= 4 && &bytes[0..4] == b"glTF";
 
             let gltf_settings = GltfLoaderSettings::default();
+            let mut vec_reader = VecReader::new(bytes);
 
             let gltf = if is_glb {
-                let mut vec_reader = VecReader::new(bytes);
                 self.glb_loader
                     .load(&mut vec_reader, &gltf_settings, load_context)
                     .await?
             } else {
-                let mut vec_reader = VecReader::new(bytes);
                 self.gltf_loader
                     .load(&mut vec_reader, &gltf_settings, load_context)
                     .await?

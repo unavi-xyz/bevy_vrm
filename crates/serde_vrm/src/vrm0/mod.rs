@@ -194,7 +194,10 @@ pub enum BoneName {
 
 impl Display for BoneName {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.write_str(&serde_json::to_string(self).unwrap())
+        f.write_str(
+            &serde_json::to_string(self)
+                .expect("BoneName enum should always serialize successfully"),
+        )
     }
 }
 

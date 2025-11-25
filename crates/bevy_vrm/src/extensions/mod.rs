@@ -83,7 +83,9 @@ impl BevyExtensionImport<GltfDocument> for VrmExtensions {
             .unwrap_or_default();
 
         if flag == FirstPersonFlag::Auto {
-            let mesh = primitive.mesh(context.graph).unwrap();
+            let mesh = primitive
+                .mesh(context.graph)
+                .expect("VRM primitive must have valid mesh reference");
             let nodes = mesh.nodes(context.graph);
 
             let Some(ext) = get_vrm_extension(context.graph) else {
@@ -98,9 +100,11 @@ impl BevyExtensionImport<GltfDocument> for VrmExtensions {
                     let b_weight = b.read(context.graph);
                     b_weight.name == Some(BoneName::Head)
                 })
-                .unwrap();
+                .expect("VRM file must contain Head bone");
 
-            let head_node = head.node(context.graph).unwrap();
+            let head_node = head
+                .node(context.graph)
+                .expect("VRM Head bone must reference valid node");
 
             for node in nodes {
                 let is_child = find_child(context.graph, node, head_node);
@@ -117,6 +121,7 @@ impl BevyExtensionImport<GltfDocument> for VrmExtensions {
 
     fn import_root(_context: &mut ImportContext) {}
 
+    #[allow(clippy::too_many_lines)]
     fn import_scene(context: &mut ImportContext, _scene: Scene, world: &mut World) {
         let _ = world.run_system_once(sync_simple_transforms);
         let _ = world.run_system_once(propagate_parent_transforms);
@@ -187,7 +192,11 @@ impl BevyExtensionImport<GltfDocument> for VrmExtensions {
              mut commands: Commands,
              query: Query<Entity, Without<ChildOf>>| {
                 commands
-                    .entity(query.single().unwrap())
+                    .entity(
+                        query
+                            .single()
+                            .expect("Scene must have exactly one root entity"),
+                    )
                     .insert(SpringBones(spring_bones));
             },
             spring_bones,
@@ -197,8 +206,8 @@ impl BevyExtensionImport<GltfDocument> for VrmExtensions {
             |mut spring_boness: Query<&mut SpringBones>,
              children: Query<&Children>,
              names: Query<&Name>| {
-                for mut spring_bones in spring_boness.iter_mut() {
-                    for spring_bone in spring_bones.0.iter_mut() {
+                for mut spring_bones in &mut spring_boness {
+                    for spring_bone in &mut spring_bones.0 {
                         let original_bones = spring_bone.bones.clone();
                         for bone in original_bones {
                             for child in children.iter_descendants(bone) {
@@ -218,21 +227,18 @@ impl BevyExtensionImport<GltfDocument> for VrmExtensions {
         let _ = world.run_system_once(add_springbone_logic_state);
 
         for bone in ext.human_bones(graph) {
-            let node = match bone.node(graph) {
-                Some(n) => n,
-                None => continue,
+            let Some(node) = bone.node(graph) else {
+                continue;
             };
 
             let weight = bone.read(graph);
 
-            let bone_name = match weight.name {
-                Some(b) => b,
-                None => continue,
+            let Some(bone_name) = weight.name else {
+                continue;
             };
 
-            let node_handle = match context.gltf.node_handles.get(&node) {
-                Some(handle) => handle.clone(),
-                None => continue,
+            let Some(node_handle) = context.gltf.node_handles.get(&node).cloned() else {
+                continue;
             };
 
             let node_name = context.gltf.named_nodes.iter().find_map(|(name, n)| {
@@ -243,9 +249,8 @@ impl BevyExtensionImport<GltfDocument> for VrmExtensions {
                 }
             });
 
-            let node_name = match node_name {
-                Some(n) => n,
-                None => continue,
+            let Some(node_name) = node_name else {
+                continue;
             };
 
             let _ = world.run_system_once_with(
@@ -253,18 +258,15 @@ impl BevyExtensionImport<GltfDocument> for VrmExtensions {
                  mut commands: Commands,
                  names: Query<(Entity, &Name)>,
                  parents: Query<&ChildOf>| {
-                    let node_entity = match names.iter().find_map(|(entity, name)| {
+                    let Some(node_entity) = names.iter().find_map(|(entity, name)| {
                         if name.as_str() == node_name.as_str() {
                             Some(entity)
                         } else {
                             None
                         }
-                    }) {
-                        Some(e) => e,
-                        None => {
-                            warn!("Could not find entity for bone: {}", bone_name);
-                            return;
-                        }
+                    }) else {
+                        warn!("Could not find entity for bone: {}", bone_name);
+                        return;
                     };
 
                     let mut root_entity = node_entity;
@@ -329,28 +331,25 @@ fn add_springbone_logic_state(
     spring_boness: Query<(Entity, &SpringBones)>,
 ) {
     for (_skel_e, spring_bones) in spring_boness.iter() {
-        for spring_bone in spring_bones.0.iter() {
-            for bone in spring_bone.bones.iter() {
+        for spring_bone in &spring_bones.0 {
+            for bone in &spring_bone.bones {
                 if !logic_states.contains(*bone) {
-                    let child = match children.get(*bone) {
-                        Ok(c) => c,
-                        Err(_) => {
-                            // Adds an extra spring bone below it to make it look even better.
-                            if let Ok(name) = names.get(*bone)
-                                && name.as_str() == "donotaddmore"
-                            {
-                                continue;
-                            }
-                            let child = commands
-                                .spawn((
-                                    Transform::from_xyz(0.0, -0.07, 0.0),
-                                    Name::new("donotaddmore"),
-                                ))
-                                .id();
-
-                            commands.entity(*bone).add_child(child);
+                    let Ok(child) = children.get(*bone) else {
+                        // Adds an extra spring bone below it to make it look even better.
+                        if let Ok(name) = names.get(*bone)
+                            && name.as_str() == "donotaddmore"
+                        {
                             continue;
                         }
+                        let child = commands
+                            .spawn((
+                                Transform::from_xyz(0.0, -0.07, 0.0),
+                                Name::new("donotaddmore"),
+                            ))
+                            .id();
+
+                        commands.entity(*bone).add_child(child);
+                        continue;
                     };
 
                     let Some(next_bone) = child.iter().next() else {

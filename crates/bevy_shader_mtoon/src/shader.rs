@@ -1,3 +1,5 @@
+#![allow(clippy::option_if_let_else)] // Bevy reflection
+
 use bevy::{
     prelude::*,
     render::{
@@ -67,7 +69,7 @@ pub struct MtoonMaterial {
     pub shade_shift_texture: Option<Handle<Image>>,
 }
 
-#[derive(Debug, Default, Clone, PartialEq, Reflect)]
+#[derive(Debug, Default, Clone, PartialEq, Eq, Reflect)]
 pub enum OutlineMode {
     #[default]
     None,
@@ -146,7 +148,7 @@ impl AsBindGroupShaderType<MtoonShaderUniform> for MtoonMaterial {
             flags |= MtoonMaterialFlags::MATCAP_TEXTURE;
         }
         if self.normal_map_texture.is_some() {
-            flags |= MtoonMaterialFlags::NORMAL_MAP_TEXTURE
+            flags |= MtoonMaterialFlags::NORMAL_MAP_TEXTURE;
         }
         if self.rim_multiply_texture.is_some() {
             flags |= MtoonMaterialFlags::RIM_MULTIPLY_TEXTURE;
@@ -212,7 +214,7 @@ pub struct MtoonMaterialKey {
 
 impl From<&MtoonMaterial> for MtoonMaterialKey {
     fn from(material: &MtoonMaterial) -> Self {
-        MtoonMaterialKey {
+        Self {
             cull_mode: if material.double_sided {
                 None
             } else {

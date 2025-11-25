@@ -40,12 +40,12 @@ pub static DEFAULT_RENDER_LAYERS: LazyLock<HashMap<FirstPersonFlag, RenderLayers
         map
     });
 
-/// Add [RenderLayers] to each mesh in the VRM.
+/// Add [`RenderLayers`] to each mesh in the VRM.
 #[derive(EntityEvent)]
 pub struct SetupFirstPerson {
     pub entity: Entity,
     /// Render layer values to use for each first person flag.
-    /// Defaults to [DEFAULT_RENDER_LAYERS] if not provided.
+    /// Defaults to [`DEFAULT_RENDER_LAYERS`] if not provided.
     pub render_layers: Option<HashMap<FirstPersonFlag, RenderLayers>>,
 }
 
@@ -78,10 +78,10 @@ pub(crate) fn setup_first_person(
     let (head_ent, _) = bones
         .iter()
         .find(|(e, name)| **name == BoneName::Head && is_child(*e, event.entity, &parents))
-        .unwrap();
+        .expect("VRM must have Head bone");
 
     for (ent, mut flag, mesh_handle, name, standard_material, mtoon_material, morph_weights) in
-        flags.iter_mut()
+        &mut flags
     {
         // Skip if not a child of this VRM entity.
         if !is_child(ent, event.entity, &parents) {
@@ -211,7 +211,7 @@ fn clean_indices<T: Copy + PartialEq + ToUsize>(indices: &mut Vec<T>, vertices: 
     let mut to_remove = Vec::default();
 
     for (i, chunk) in indices.chunks(3).enumerate() {
-        for n in chunk.iter() {
+        for n in chunk {
             if vertices.contains(&n.to_usize()) {
                 to_remove.push(i);
                 break;

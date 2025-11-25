@@ -31,8 +31,8 @@ pub struct MtoonBundle {
     pub outline_sync: OutlineSync,
 }
 
-/// Marks a [DirectionalLight] to be used for shading within the MToon shader.
-/// Only a single [MtoonSun] is allowed.
+/// Marks a [`DirectionalLight`] to be used for shading within the `MToon` shader.
+/// Only a single [`MtoonSun`] is allowed.
 #[derive(Component)]
 pub struct MtoonSun;
 
@@ -48,7 +48,7 @@ fn update_mtoon_shader(
     }
 }
 
-/// Syncs an Entity's outline with its [MtoonMaterial].
+/// Syncs an Entity's outline with its [`MtoonMaterial`].
 /// Will add the outline if one is not present.
 #[derive(Component, Clone, Default, Reflect)]
 #[reflect(Component)]
@@ -56,9 +56,9 @@ pub struct OutlineSync;
 
 fn add_outline(
     mut commands: Commands,
-    mut entities: Query<Entity, (Without<OutlineVolume>, With<OutlineSync>)>,
+    entities: Query<Entity, (Without<OutlineVolume>, With<OutlineSync>)>,
 ) {
-    for entity in entities.iter_mut() {
+    for entity in entities {
         commands.entity(entity).insert((
             OutlineMode::default(),
             OutlineVolume::default(),
@@ -88,10 +88,9 @@ fn sync_outline(
         .iter()
         .fold(0.0f32, |max, window| max.max(window.height()));
 
-    for (mut outline, surface, transform) in entities.iter_mut() {
-        let material = match materials.get(surface.0.id()) {
-            Some(m) => m,
-            None => continue,
+    for (mut outline, surface, transform) in &mut entities {
+        let Some(material) = materials.get(surface.0.id()) else {
+            continue;
         };
 
         match material.outline_mode {

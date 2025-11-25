@@ -149,36 +149,40 @@ fn ui(
         material.shading_toony_factor = settings.shading_toony_factor;
     }
 
-    Window::new("bevy_shader_mtoon").show(contexts.ctx_mut().unwrap(), |ui| {
-        ui.add(
-            Slider::new(&mut settings.gi_equalization_factor, 0.0..=1.0)
-                .text("GL Equalization Factor"),
-        );
+    Window::new("bevy_shader_mtoon").show(
+        contexts.ctx_mut().expect("EGUI context must be available"),
+        |ui| {
+            ui.add(
+                Slider::new(&mut settings.gi_equalization_factor, 0.0..=1.0)
+                    .text("GL Equalization Factor"),
+            );
 
-        ui.add(
-            Slider::new(&mut settings.parametric_rim_fresnel_power, 0.0..=10.0)
-                .text("Parametric Rim Fresnel Power"),
-        );
+            ui.add(
+                Slider::new(&mut settings.parametric_rim_fresnel_power, 0.0..=10.0)
+                    .text("Parametric Rim Fresnel Power"),
+            );
 
-        ui.add(
-            Slider::new(&mut settings.parametric_rim_lift_factor, 0.0..=1.0)
-                .text("Parametric Rim Lift Factor"),
-        );
+            ui.add(
+                Slider::new(&mut settings.parametric_rim_lift_factor, 0.0..=1.0)
+                    .text("Parametric Rim Lift Factor"),
+            );
 
-        ui.add(
-            Slider::new(&mut settings.rim_lighting_mix_factor, 0.0..=1.0)
-                .text("Rim Lighting Mix Factor"),
-        );
+            ui.add(
+                Slider::new(&mut settings.rim_lighting_mix_factor, 0.0..=1.0)
+                    .text("Rim Lighting Mix Factor"),
+            );
 
-        ui.add(
-            Slider::new(&mut settings.shading_shift_factor, -1.0..=1.0)
-                .text("Shading Shift Factor"),
-        );
+            ui.add(
+                Slider::new(&mut settings.shading_shift_factor, -1.0..=1.0)
+                    .text("Shading Shift Factor"),
+            );
 
-        ui.add(
-            Slider::new(&mut settings.shading_toony_factor, 0.0..=1.0).text("Shading Toony Factor"),
-        );
-    });
+            ui.add(
+                Slider::new(&mut settings.shading_toony_factor, 0.0..=1.0)
+                    .text("Shading Toony Factor"),
+            );
+        },
+    );
 }
 
 fn uv_debug_texture() -> Image {

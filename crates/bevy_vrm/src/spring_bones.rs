@@ -64,7 +64,7 @@ fn remap_spring_bone_entities(
     names: Query<(Entity, &Name)>,
     existing_entities: Query<Entity>,
 ) {
-    for mut spring_bones in spring_bones_query.iter_mut() {
+    for mut spring_bones in &mut spring_bones_query {
         let needs_remapping = spring_bones
             .0
             .iter()
@@ -98,7 +98,7 @@ fn do_springbone_logic(
     time: Res<Time>,
 ) {
     for spring_bones in spring_boness.iter() {
-        for spring_bone in spring_bones.0.iter() {
+        for spring_bone in &spring_bones.0 {
             for &bone in &spring_bone.bones {
                 let Ok((global, _)) = global_transforms.get(bone) else {
                     continue;

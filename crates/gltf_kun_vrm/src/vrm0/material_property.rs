@@ -25,7 +25,8 @@ pub enum MaterialPropertyEdges {
 
 impl Display for MaterialPropertyEdges {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let string = serde_json::to_string(self).unwrap();
+        let string = serde_json::to_string(self)
+            .expect("MaterialPropertyEdges enum should always serialize successfully");
         f.write_str(&string)?;
         Ok(())
     }
