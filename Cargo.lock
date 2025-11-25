@@ -1646,9 +1646,9 @@ dependencies = [
 
 [[package]]
 name = "bevy_web_file_drop"
-version = "0.2.0"
+version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6b925671015a7bcac9b12986dc7acf0782fa1675db19241dc5d8e5a2c7765aeb"
+checksum = "a3f79cfc164d0d14297da203e30e1cb26895fa39f36da45dc9dad4f230637062"
 dependencies = [
  "bevy",
  "bevy_blob_loader",
