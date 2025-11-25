@@ -69,8 +69,15 @@ pub fn update_ui(mut contexts: EguiContexts, mut settings: ResMut<Settings>) {
                         }
                     });
 
+                let mut model_str = settings.model.clone();
+
+                if model_str.starts_with("blob://") {
+                    let max_len = model_str.len().min(16);
+                    model_str = format!("{}...", &model_str[0..max_len]);
+                }
+
                 ComboBox::from_label("Model")
-                    .selected_text(settings.model.as_str())
+                    .selected_text(model_str)
                     .show_ui(ui, |ui| {
                         ui.selectable_value(
                             &mut settings.model,

@@ -31,6 +31,7 @@ impl Plugin for VrmViewerPlugin {
             .add_plugins((
                 DefaultPlugins.set(AssetPlugin {
                     meta_check: AssetMetaCheck::Never,
+                    #[cfg(not(target_family = "wasm"))]
                     file_path: "../../assets".to_string(),
                     ..default()
                 }),
