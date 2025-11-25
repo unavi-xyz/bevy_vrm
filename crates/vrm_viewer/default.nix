@@ -86,7 +86,7 @@ _: {
           cargoArgs
           // {
             pname = "${pname}_web";
-            inherit (pkgs) wasm-bindgen-cli;
+            wasm-bindgen-cli = pkgs.wasm-bindgen-cli_0_2_104;
           }
         );
       };
