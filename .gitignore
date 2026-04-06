@@ -1,3 +1,5 @@
+.direnv/
+.envrc
 /dist
 /result
 /target
