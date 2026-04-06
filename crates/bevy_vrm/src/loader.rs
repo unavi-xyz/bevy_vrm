@@ -20,7 +20,7 @@ pub struct Vrm {
     pub gltf: GltfKun,
 }
 
-#[derive(Default)]
+#[derive(Default, TypePath)]
 pub struct VrmLoader {
     pub gltf_loader: GltfLoader<VrmExtensions>,
     pub glb_loader: GlbLoader<VrmExtensions>,

@@ -21,11 +21,6 @@ pub struct VrmViewerPlugin;
 
 impl Plugin for VrmViewerPlugin {
     fn build(&self, app: &mut App) {
-        #[cfg(target_family = "wasm")]
-        {
-            app.add_plugins(bevy_web_file_drop::WebFileDropPlugin);
-        }
-
         app.insert_resource(ClearColor(Color::linear_rgb(0.1, 0.1, 0.1)))
             .init_resource::<Settings>()
             .add_plugins((

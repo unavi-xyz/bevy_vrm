@@ -84,8 +84,8 @@ fn setup_scene(mut commands: Commands, asset_server: Res<AssetServer>) {
 }
 
 fn animate_linear_motion(time: Res<Time>, mut query: Query<(&mut Transform, &LinearMotion)>) {
-    for (mut transform, motion) in query.iter_mut() {
-        let t = time.elapsed_secs() * motion.speed + motion.offset;
+    for (mut transform, motion) in &mut query {
+        let t = time.elapsed_secs().mul_add(motion.speed, motion.offset);
         let z = t.sin() * motion.amplitude;
         transform.translation.z = z;
 

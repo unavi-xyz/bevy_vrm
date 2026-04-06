@@ -1,5 +1,5 @@
 use bevy::{
-    animation::AnimationTarget,
+    animation::AnimatedBy,
     ecs::system::{RunSystemError, RunSystemOnce},
     prelude::*,
     transform::systems::{propagate_parent_transforms, sync_simple_transforms},
@@ -30,6 +30,7 @@ use self::vrm0::{import_material, import_primitive_material};
 pub mod vrm0;
 pub mod vrm1;
 
+#[derive(TypePath)]
 pub struct VrmExtensions;
 
 impl ExtensionImport<GltfDocument, GltfFormat> for VrmExtensions {
@@ -280,13 +281,9 @@ impl BevyExtensionImport<GltfDocument> for VrmExtensions {
 
                     let id = VRM_ANIMATION_TARGETS[&bone_name];
 
-                    commands.entity(node_entity).insert((
-                        AnimationTarget {
-                            id,
-                            player: root_entity,
-                        },
-                        bone_name,
-                    ));
+                    commands
+                        .entity(node_entity)
+                        .insert((id, AnimatedBy(root_entity), bone_name));
                 },
                 (node_name, bone_name),
             );

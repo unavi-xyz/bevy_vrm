@@ -29,6 +29,8 @@ fn main() {
         .run();
 }
 
+const X_EXTENT: f32 = 10.0;
+
 fn setup(
     mut commands: Commands,
     mut images: ResMut<Assets<Image>>,
@@ -85,16 +87,13 @@ fn setup(
 
     let num_shapes = shapes.len();
 
-    // Spacing between shapes
-    const X_EXTENT: f32 = 10.0;
-
     for (i, mesh) in shapes.into_iter().enumerate() {
         // Texture
         commands.spawn((
             Mesh3d(mesh.clone()),
             mtoon_textured.clone(),
             Transform::from_xyz(
-                -X_EXTENT / 2.0 + i as f32 / (num_shapes - 1) as f32 * X_EXTENT,
+                (i as f32 / (num_shapes - 1) as f32).mul_add(X_EXTENT, -X_EXTENT / 2.0),
                 1.0,
                 3.0,
             )
@@ -106,7 +105,7 @@ fn setup(
             Mesh3d(mesh),
             mtoon_plain.clone(),
             Transform::from_xyz(
-                -X_EXTENT / 2.0 + i as f32 / (num_shapes - 1) as f32 * X_EXTENT,
+                (i as f32 / (num_shapes - 1) as f32).mul_add(X_EXTENT, -X_EXTENT / 2.0),
                 1.0,
                 -3.0,
             )
@@ -117,7 +116,7 @@ fn setup(
     // Big shape to test shadows.
     commands.spawn((
         Mesh3d(meshes.add(Torus::default())),
-        mtoon_textured.clone(),
+        mtoon_textured,
         Transform::from_xyz(0.0, 5.0, 0.0).with_scale(Vec3::splat(4.25)),
     ));
 
@@ -130,7 +129,7 @@ fn setup(
 }
 
 fn rotate(time: Res<Time>, mut query: Query<&mut Transform, With<MeshMaterial3d<MtoonMaterial>>>) {
-    for mut transform in query.iter_mut() {
+    for mut transform in &mut query {
         transform.rotate(Quat::from_rotation_y(time.delta_secs() / 2.0));
     }
 }
