@@ -22,7 +22,6 @@ pub mod mtoon {
 
 pub use serde_vrm::vrm0::BoneName;
 
-pub struct VrmPlugin;
 pub struct VrmPlugins;
 
 impl PluginGroup for VrmPlugins {
@@ -32,6 +31,8 @@ impl PluginGroup for VrmPlugins {
             .add(SpringBonePlugin)
     }
 }
+
+pub struct VrmPlugin;
 
 impl Plugin for VrmPlugin {
     fn build(&self, app: &mut App) {
