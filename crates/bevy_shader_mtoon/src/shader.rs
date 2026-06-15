@@ -207,7 +207,7 @@ impl AsBindGroupShaderType<MtoonShaderUniform> for MtoonMaterial {
     }
 }
 
-#[derive(Clone, PartialEq, Eq, Hash)]
+#[derive(Clone, Copy, PartialEq, Eq, Hash)]
 pub struct MtoonMaterialKey {
     cull_mode: Option<Face>,
 }

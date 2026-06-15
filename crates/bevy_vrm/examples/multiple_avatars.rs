@@ -2,8 +2,7 @@ use std::f32::consts::PI;
 
 use bevy::prelude::*;
 use bevy_panorbit_camera::{PanOrbitCamera, PanOrbitCameraPlugin};
-use bevy_vrm::mtoon::MtoonSun;
-use bevy_vrm::{VrmInstance, VrmPlugins};
+use bevy_vrm::{VrmInstance, VrmPlugins, mtoon::MtoonSun};
 
 #[derive(Component)]
 struct LinearMotion {

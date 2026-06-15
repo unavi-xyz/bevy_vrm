@@ -6,7 +6,6 @@ use bevy::{
     prelude::*,
     render::render_resource::{Extent3d, TextureDimension, TextureFormat},
 };
-
 use bevy_egui::{
     EguiContexts, EguiPlugin, EguiPrimaryContextPass,
     egui::{Slider, Window},
