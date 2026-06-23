@@ -25,8 +25,7 @@
   outputs =
     inputs@{ flake-parts, systems, ... }:
     flake-parts.lib.mkFlake { inherit inputs; } (
-      { ... }:
-      {
+      { ... }: {
         systems = import systems;
 
         imports = [
@@ -51,13 +50,11 @@
                 (
                   self: _:
                   let
-                    toolchain = (
-                      with self.fenix;
+                    toolchain = with self.fenix;
                       combine [
                         complete.toolchain
                         targets.wasm32-unknown-unknown.latest.rust-std
-                      ]
-                    );
+                      ];
                   in
                   {
                     crane = (inputs.crane.mkLib self).overrideToolchain toolchain;

@@ -10,7 +10,6 @@ use bevy::{
 };
 use bevy_shader_mtoon::MtoonMaterial;
 use serde_vrm::vrm0::BoneName;
-
 pub use serde_vrm::vrm0::FirstPersonFlag;
 
 pub const FIRST_PERSON_LAYER: usize = 7;
@@ -88,7 +87,8 @@ pub(crate) fn setup_first_person(
             continue;
         }
         // If auto, split the mesh into first-person and third-person variants.
-        // Each vertex that is weighted to the head bone gets removed from the first-person variant.
+        // Each vertex that is weighted to the head bone gets removed from the
+        // first-person variant.
         if *flag == FirstPersonFlag::Auto {
             let Some(mesh) = meshes.get(mesh_handle) else {
                 warn!("Mesh not found");

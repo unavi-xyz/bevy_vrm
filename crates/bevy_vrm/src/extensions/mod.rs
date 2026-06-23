@@ -20,12 +20,11 @@ use gltf_kun_vrm::vrm0::{
 use petgraph::{Direction, visit::EdgeRef};
 use serde_vrm::vrm0::{BoneName, FirstPersonFlag};
 
+use self::vrm0::{import_material, import_primitive_material};
 use crate::{
     animations::vrm::VRM_ANIMATION_TARGETS,
     spring_bones::{SpringBone, SpringBoneLogicState, SpringBones},
 };
-
-use self::vrm0::{import_material, import_primitive_material};
 
 pub mod vrm0;
 pub mod vrm1;

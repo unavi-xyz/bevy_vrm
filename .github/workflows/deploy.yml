@@ -24,9 +24,9 @@ jobs:
           extra-conf: extra-experimental-features = pipe-operators
       - uses: DeterminateSystems/magic-nix-cache-action@main
       - run: nix build .#vrm_viewer_web
-      - uses: actions/configure-pages@v5
+      - uses: actions/configure-pages@v6
       - uses: actions/upload-pages-artifact@v5
         with:
           path: result
       - id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5

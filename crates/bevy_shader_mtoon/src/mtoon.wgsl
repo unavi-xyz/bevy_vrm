@@ -1,3 +1,5 @@
+#define_import_path bevy_shader_mtoon::mtoon
+
 #import bevy_pbr::{
     pbr_fragment::pbr_input_from_vertex_output,
     mesh_view_bindings::view,
@@ -66,11 +68,7 @@ const MTOON_FLAGS_SHADING_SHIFT_TEXTURE: u32 = 512u;
 
 const EPSILON: f32 = 0.00001;
 
-@fragment
-fn fragment (
-   in: VertexOutput,
-   @builtin(front_facing) is_front: bool,
-) -> @location(0) vec4<f32> {
+fn mtoon_shade(in: VertexOutput, is_front: bool) -> vec4<f32> {
     let double_sided = (material.flags & MTOON_FLAGS_DOUBLE_SIDED) != 0;
     var pbr_input = pbr_input_from_vertex_output(in, is_front, double_sided);
 
@@ -199,6 +197,14 @@ fn fragment (
     mtoon_rgb += rim;
 
     return vec4<f32>(mtoon_rgb, base_color.a);
+}
+
+@fragment
+fn fragment(
+    in: VertexOutput,
+    @builtin(front_facing) is_front: bool,
+) -> @location(0) vec4<f32> {
+    return mtoon_shade(in, is_front);
 }
 
 fn linear_step(a: f32, b: f32, t: f32) -> f32 {

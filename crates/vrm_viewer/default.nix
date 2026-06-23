@@ -20,8 +20,6 @@ _: {
         ]
       );
 
-      nativeBuildInputs = pkgs.lib.optionals pkgs.stdenv.isLinux (with pkgs; [ pkg-config ]);
-
       src = lib.fileset.toSource rec {
         root = ../..;
         fileset = lib.fileset.unions [
@@ -42,9 +40,10 @@ _: {
 
       cargoArgs = {
         inherit buildInputs;
-        inherit nativeBuildInputs;
         inherit pname;
         inherit src;
+
+        nativeBuildInputs = with pkgs; [ pkg-config ];
 
         runtimeDependencies = buildInputs;
 
@@ -77,8 +76,7 @@ _: {
             postInstall = ''
               mv $out/bin/* $out
               rm -r $out/bin
-              cp LICENSE-APACHE $out
-              cp LICENSE-MIT $out
+              cp LICENSE-* $out
             '';
           }
         );

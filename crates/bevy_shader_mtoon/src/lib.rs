@@ -31,8 +31,8 @@ pub struct MtoonBundle {
     pub outline_sync: OutlineSync,
 }
 
-/// Marks a [`DirectionalLight`] to be used for shading within the `MToon` shader.
-/// Only a single [`MtoonSun`] is allowed.
+/// Marks a [`DirectionalLight`] to be used for shading within the `MToon`
+/// shader. Only a single [`MtoonSun`] is allowed.
 #[derive(Component)]
 pub struct MtoonSun;
 
@@ -109,8 +109,9 @@ fn sync_outline(
 
                 // Outline width is in meters.
                 // The meter -> pixel conversion is different for each camera, but we do not get
-                // that level of control with the outline shader. So instead, we just approximate
-                // the pixel width using the distance from closest camera.
+                // that level of control with the outline shader. So instead, we just
+                // approximate the pixel width using the distance from closest
+                // camera.
                 let distance = cameras
                     .iter()
                     .map(|camera| (camera.translation() - transform.translation()).length())
