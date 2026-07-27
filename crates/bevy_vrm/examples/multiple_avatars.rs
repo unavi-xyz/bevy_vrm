@@ -1,14 +1,21 @@
 use std::f32::consts::PI;
 
 use bevy::prelude::*;
-use bevy_panorbit_camera::{PanOrbitCamera, PanOrbitCameraPlugin};
-use bevy_vrm::{VrmInstance, VrmPlugins, mtoon::MtoonSun};
+use bevy_panorbit_camera::{
+    PanOrbitCamera,
+    PanOrbitCameraPlugin,
+};
+use bevy_vrm::{
+    VrmInstance,
+    VrmPlugins,
+    mtoon::MtoonSun,
+};
 
 #[derive(Component)]
 struct LinearMotion {
     amplitude: f32,
-    offset: f32,
-    speed: f32,
+    offset:    f32,
+    speed:     f32,
 }
 
 fn main() {
@@ -41,7 +48,7 @@ fn setup_scene(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands.spawn((
         DirectionalLight {
             illuminance: 10_000.0,
-            shadows_enabled: true,
+            shadow_maps_enabled: true,
             ..default()
         },
         Transform::from_rotation(Quat::from_rotation_x(-PI / 3.0)),
@@ -54,8 +61,8 @@ fn setup_scene(mut commands: Commands, asset_server: Res<AssetServer>) {
         VrmInstance(asset_server.load("suzuha.vrm")),
         LinearMotion {
             amplitude: 3.0,
-            speed: 1.0,
-            offset: 0.0,
+            speed:     1.0,
+            offset:    0.0,
         },
     ));
 
@@ -65,8 +72,8 @@ fn setup_scene(mut commands: Commands, asset_server: Res<AssetServer>) {
         VrmInstance(asset_server.load("suzuha.vrm")),
         LinearMotion {
             amplitude: 4.0,
-            speed: 0.7,
-            offset: PI / 2.0,
+            speed:     0.7,
+            offset:    PI / 2.0,
         },
     ));
 
@@ -76,8 +83,8 @@ fn setup_scene(mut commands: Commands, asset_server: Res<AssetServer>) {
         VrmInstance(asset_server.load("suzuha.vrm")),
         LinearMotion {
             amplitude: 2.5,
-            speed: 1.5,
-            offset: PI,
+            speed:     1.5,
+            offset:    PI,
         },
     ));
 }

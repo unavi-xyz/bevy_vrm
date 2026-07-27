@@ -1,4 +1,7 @@
-use bevy::{animation::AnimationTargetId, ecs::name::Name};
+use bevy::{
+    animation::AnimationTargetId,
+    ecs::name::Name,
+};
 
 /// Utility for creating chains of [`AnimationTargetId`]s.
 #[derive(Default, Clone)]

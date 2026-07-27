@@ -1,22 +1,22 @@
 use bevy::{
-    ecs::{entity::MapEntities, reflect::ReflectMapEntities},
+    ecs::entity::MapEntities,
     prelude::*,
 };
 
 #[derive(Component, Default, Reflect)]
-#[reflect(Component, MapEntities)]
-pub struct SpringBones(pub Vec<SpringBone>);
+#[reflect(Component)]
+pub struct SpringBones(#[entities] pub Vec<SpringBone>);
 
 #[derive(Reflect)]
 pub struct SpringBone {
-    pub bones: Vec<Entity>,
-    pub bone_names: Vec<String>,
-    pub center: f32,
-    pub drag_force: f32,
-    pub gravity_dir: Vec3,
+    pub bones:         Vec<Entity>,
+    pub bone_names:    Vec<String>,
+    pub center:        f32,
+    pub drag_force:    f32,
+    pub gravity_dir:   Vec3,
     pub gravity_power: f32,
-    pub hit_radius: f32,
-    pub stiffness: f32,
+    pub hit_radius:    f32,
+    pub stiffness:     f32,
 }
 
 impl MapEntities for SpringBone {
@@ -27,22 +27,14 @@ impl MapEntities for SpringBone {
     }
 }
 
-impl MapEntities for SpringBones {
-    fn map_entities<M: EntityMapper>(&mut self, entity_mapper: &mut M) {
-        for bones in &mut self.0 {
-            bones.map_entities(entity_mapper);
-        }
-    }
-}
-
 #[derive(Component, Reflect)]
 #[reflect(Component)]
 pub struct SpringBoneLogicState {
-    pub prev_tail: Vec3,
-    pub current_tail: Vec3,
-    pub bone_axis: Vec3,
-    pub bone_length: f32,
-    pub initial_local_matrix: Mat4,
+    pub prev_tail:              Vec3,
+    pub current_tail:           Vec3,
+    pub bone_axis:              Vec3,
+    pub bone_length:            f32,
+    pub initial_local_matrix:   Mat4,
     pub initial_local_rotation: Quat,
 }
 
@@ -54,8 +46,101 @@ impl Plugin for SpringBonePlugin {
             .register_type::<SpringBones>()
             .add_systems(
                 Update,
-                (remap_spring_bone_entities, do_springbone_logic).chain(),
+                (
+                    remap_spring_bone_entities,
+                    expand_spring_bones,
+                    initialize_spring_bone_logic,
+                    do_springbone_logic,
+                )
+                    .chain(),
             );
+    }
+}
+
+fn expand_spring_bones(
+    mut spring_boness: Query<&mut SpringBones>,
+    children: Query<&Children>,
+    names: Query<&Name>,
+) {
+    for mut spring_bones in &mut spring_boness {
+        for spring_bone in &mut spring_bones.0 {
+            for bone in spring_bone.bones.clone() {
+                for child in children.iter_descendants(bone) {
+                    if names.get(child).is_ok_and(|n| n.as_str() == "donotaddmore") {
+                        continue;
+                    }
+                    if !spring_bone.bones.contains(&child) {
+                        spring_bone.bones.push(child);
+                        if let Ok(name) = names.get(child) {
+                            spring_bone.bone_names.push(name.to_string());
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+fn initialize_spring_bone_logic(
+    children: Query<&Children>,
+    global_transforms: Query<&GlobalTransform>,
+    local_transforms: Query<&Transform>,
+    logic_states: Query<&SpringBoneLogicState>,
+    mut commands: Commands,
+    names: Query<&Name>,
+    spring_boness: Query<&SpringBones>,
+) {
+    for spring_bones in spring_boness.iter() {
+        for spring_bone in &spring_bones.0 {
+            for bone in &spring_bone.bones {
+                if logic_states.contains(*bone) {
+                    continue;
+                }
+
+                let Ok(child) = children.get(*bone) else {
+                    if names.get(*bone).is_ok_and(|n| n.as_str() == "donotaddmore") {
+                        continue;
+                    }
+                    let child = commands
+                        .spawn((
+                            Transform::from_xyz(0.0, -0.07, 0.0),
+                            Name::new("donotaddmore"),
+                        ))
+                        .id();
+                    commands.entity(*bone).add_child(child);
+                    continue;
+                };
+
+                let Some(next_bone) = child.iter().next() else {
+                    continue;
+                };
+                let Ok(global_this_bone) = global_transforms.get(*bone) else {
+                    continue;
+                };
+                let Ok(local_next_bone) = local_transforms.get(next_bone) else {
+                    continue;
+                };
+                let Ok(local_this_bone) = local_transforms.get(*bone) else {
+                    continue;
+                };
+
+                let bone_axis = local_next_bone.translation.normalize_or_zero();
+                let bone_length = local_next_bone.translation.length();
+                let initial_local_matrix = local_this_bone.to_matrix();
+                let initial_local_rotation = local_this_bone.rotation;
+                let current_tail = global_this_bone.translation()
+                    + (global_this_bone.rotation() * bone_axis * bone_length);
+
+                commands.entity(*bone).insert(SpringBoneLogicState {
+                    prev_tail: current_tail,
+                    current_tail,
+                    bone_axis,
+                    bone_length,
+                    initial_local_matrix,
+                    initial_local_rotation,
+                });
+            }
+        }
     }
 }
 

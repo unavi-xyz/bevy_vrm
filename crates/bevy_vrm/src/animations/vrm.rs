@@ -1,4 +1,7 @@
-use std::{collections::HashMap, sync::LazyLock};
+use std::{
+    collections::HashMap,
+    sync::LazyLock,
+};
 
 use bevy::animation::AnimationTargetId;
 use serde_vrm::vrm0::BoneName;

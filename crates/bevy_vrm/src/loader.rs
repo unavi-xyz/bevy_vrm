@@ -1,73 +1,54 @@
-use std::fmt::Debug;
-
 use bevy::{
     asset::{
-        AssetLoader, LoadContext,
-        io::{Reader, VecReader},
+        AssetLoader,
+        LoadContext,
+        io::Reader,
+    },
+    gltf::{
+        Gltf,
+        GltfError,
+        GltfLoader,
+        GltfLoaderSettings,
     },
     prelude::*,
 };
-use bevy_gltf_kun::import::gltf::{
-    GltfKun,
-    loader::{GlbLoader, GltfError, GltfLoader, GltfLoaderSettings},
-};
 use thiserror::Error;
-
-use crate::extensions::VrmExtensions;
 
 #[derive(Asset, TypePath, Debug)]
 pub struct Vrm {
-    pub gltf: GltfKun,
+    pub gltf: Gltf,
 }
 
-#[derive(Default, TypePath)]
+#[derive(TypePath)]
 pub struct VrmLoader {
-    pub gltf_loader: GltfLoader<VrmExtensions>,
-    pub glb_loader: GlbLoader<VrmExtensions>,
+    pub gltf_loader: GltfLoader,
 }
 
 #[derive(Debug, Error)]
 pub enum VrmError {
+    #[error(transparent)]
+    Io(#[from] std::io::Error),
     #[error(transparent)]
     Gltf(#[from] GltfError),
 }
 
 impl AssetLoader for VrmLoader {
     type Asset = Vrm;
-    type Settings = ();
+    type Settings = GltfLoaderSettings;
     type Error = VrmError;
 
-    fn load(
+    async fn load(
         &self,
         reader: &mut dyn Reader,
-        _settings: &Self::Settings,
-        load_context: &mut LoadContext,
-    ) -> impl bevy::tasks::ConditionalSendFuture<Output = std::result::Result<Self::Asset, Self::Error>>
-    {
-        Box::pin(async move {
-            let mut bytes = Vec::new();
-            reader
-                .read_to_end(&mut bytes)
-                .await
-                .map_err(|e| VrmError::Gltf(GltfError::Io(e)))?;
+        settings: &Self::Settings,
+        load_context: &mut LoadContext<'_>,
+    ) -> Result<Vrm, VrmError> {
+        let mut bytes = Vec::new();
+        reader.read_to_end(&mut bytes).await?;
 
-            let is_glb = bytes.len() >= 4 && &bytes[0..4] == b"glTF";
+        let gltf = GltfLoader::load_gltf(&self.gltf_loader, &bytes, load_context, settings).await?;
 
-            let gltf_settings = GltfLoaderSettings::default();
-            let mut vec_reader = VecReader::new(bytes);
-
-            let gltf = if is_glb {
-                self.glb_loader
-                    .load(&mut vec_reader, &gltf_settings, load_context)
-                    .await?
-            } else {
-                self.gltf_loader
-                    .load(&mut vec_reader, &gltf_settings, load_context)
-                    .await?
-            };
-
-            Ok(Vrm { gltf })
-        })
+        Ok(Vrm { gltf })
     }
 
     fn extensions(&self) -> &[&str] {

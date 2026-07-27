@@ -24,17 +24,15 @@ type_complexity        = "allow"
 [workspace.dependencies]
 bevy_shader_mtoon = { path = "crates/bevy_shader_mtoon", version = "0.3.0" }
 bevy_vrm          = { path = "crates/bevy_vrm", version = "0.3.0" }
-gltf_kun_vrm      = { path = "crates/gltf_kun_vrm", version = "0.3.0" }
 serde_vrm         = { path = "crates/serde_vrm", version = "0.3.0" }
 
-bevy = { default-features = false, version = "0.18.1" }
+bevy = { default-features = false, version = "0.19.0" }
 bevy_egui = { default-features = false, features = [
   "default_fonts",
   "open_url",
   "render",
-], version = "0.39.1" }
-bevy_panorbit_camera = { features = ["bevy_egui"], version = "0.34.0" }
-gltf_kun = { default-features = false, version = "0.4.0" }
+], version = "0.41.1" }
+bevy_panorbit_camera = { features = ["bevy_egui"], version = "0.35.0" }
 serde = { features = ["derive"], version = "1.0.228" }
 serde_json = "1.0.149"
 thiserror = "2.0.18"

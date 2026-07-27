@@ -1,16 +1,32 @@
 //! Bevy plugin for loading [VRM](https://vrm.dev/en/) avatars.
 //! Aims to support both the VRM 0.0 and VRM 1.0 standards.
 
-use bevy::{app::PluginGroupBuilder, prelude::*, scene::InstanceId};
-use bevy_gltf_kun::{GltfKunPlugin, import::gltf::scene::GltfScene};
+use bevy::{
+    gltf::{
+        DefaultGltfImageSampler,
+        GltfLoader,
+        GltfSkinnedMeshBoundsPolicy,
+        convert_coordinates::GltfConvertCoordinates,
+        extensions::GltfExtensionHandlers,
+    },
+    image::{
+        CompressedImageFormatSupport,
+        CompressedImageFormats,
+    },
+    platform::collections::HashMap,
+    prelude::*,
+};
 use bevy_shader_mtoon::MtoonPlugin;
-use loader::{Vrm, VrmLoader};
+use extensions::VrmHandler;
+use loader::{
+    Vrm,
+    VrmLoader,
+};
 use serde_vrm::vrm0::FirstPersonFlag;
 
 use crate::spring_bones::SpringBonePlugin;
 
-#[cfg(feature = "animations")]
-pub mod animations;
+#[cfg(feature = "animations")] pub mod animations;
 pub mod extensions;
 pub mod first_person;
 pub mod loader;
@@ -25,8 +41,8 @@ pub use serde_vrm::vrm0::BoneName;
 pub struct VrmPlugins;
 
 impl PluginGroup for VrmPlugins {
-    fn build(self) -> PluginGroupBuilder {
-        PluginGroupBuilder::start::<Self>()
+    fn build(self) -> bevy::app::PluginGroupBuilder {
+        bevy::app::PluginGroupBuilder::start::<Self>()
             .add(VrmPlugin)
             .add(SpringBonePlugin)
     }
@@ -36,22 +52,53 @@ pub struct VrmPlugin;
 
 impl Plugin for VrmPlugin {
     fn build(&self, app: &mut App) {
-        // TODO: Dont use default GltfKunPlugin
-        app.add_plugins((GltfKunPlugin::default(), MtoonPlugin))
+        app.add_plugins(MtoonPlugin)
             .init_asset::<Vrm>()
-            .init_asset_loader::<VrmLoader>()
             .register_type::<BoneName>()
             .register_type::<FirstPersonFlag>()
             .add_observer(first_person::setup_first_person)
             .add_systems(Update, spawn_vrm_scenes);
     }
+
+    fn finish(&self, app: &mut App) {
+        {
+            let handlers = app.world().resource::<GltfExtensionHandlers>().0.clone();
+            #[cfg(not(target_family = "wasm"))]
+            handlers
+                .write_blocking()
+                .push(Box::new(VrmHandler::default()));
+            #[cfg(target_family = "wasm")]
+            bevy::tasks::block_on(async {
+                handlers.write().await.push(Box::new(VrmHandler::default()));
+            });
+        }
+
+        let supported_compressed_formats = app
+            .world()
+            .get_resource::<CompressedImageFormatSupport>()
+            .map_or(CompressedImageFormats::NONE, |r| r.0);
+        let default_sampler = app
+            .world()
+            .resource::<DefaultGltfImageSampler>()
+            .get_internal();
+        let extensions = app.world().resource::<GltfExtensionHandlers>().0.clone();
+
+        app.register_asset_loader(VrmLoader {
+            gltf_loader: GltfLoader {
+                supported_compressed_formats,
+                custom_vertex_attributes: HashMap::default(),
+                default_sampler,
+                default_convert_coordinates: GltfConvertCoordinates::default(),
+                extensions,
+                default_skinned_mesh_bounds_policy: GltfSkinnedMeshBoundsPolicy::default(),
+            },
+        });
+    }
 }
 
 fn spawn_vrm_scenes(
-    gltf_scenes: Res<Assets<GltfScene>>,
     mut commands: Commands,
-    mut scene_spawner: ResMut<SceneSpawner>,
-    to_spawn: Query<(Entity, &VrmInstance), Without<VrmInstanceId>>,
+    to_spawn: Query<(Entity, &VrmInstance), Without<VrmInstanceReady>>,
     vrms: Res<Assets<Vrm>>,
 ) {
     for (entity, vrm_handle) in to_spawn.iter() {
@@ -59,29 +106,23 @@ fn spawn_vrm_scenes(
             continue;
         };
 
-        let vrm_scene_handle = match &vrm.gltf.default_scene {
-            Some(handle) => handle,
+        let scene = match &vrm.gltf.default_scene {
+            Some(handle) => handle.clone(),
             None => match vrm.gltf.scenes.first() {
-                Some(handle) => handle,
+                Some(handle) => handle.clone(),
                 None => continue,
             },
         };
 
-        let Some(gltf_scene) = gltf_scenes.get(vrm_scene_handle) else {
-            continue;
-        };
-
-        // Spawn the scene as a child of this entity.
-        let id = scene_spawner.spawn_as_child(gltf_scene.scene.clone(), entity);
-
-        // Mark as spawned.
-        commands.entity(entity).insert(VrmInstanceId(id));
+        commands
+            .entity(entity)
+            .insert((WorldAssetRoot(scene), VrmInstanceReady));
     }
 }
 
 #[derive(Component, Default)]
 pub struct VrmInstance(pub Handle<Vrm>);
 
-/// Instance ID of the spawned VRM scene.
+/// Marks a [`VrmInstance`] whose scene has been spawned.
 #[derive(Component)]
-pub struct VrmInstanceId(pub InstanceId);
+pub struct VrmInstanceReady;

@@ -1,11 +1,19 @@
 use std::{
-    collections::{HashMap, HashSet},
+    collections::{
+        HashMap,
+        HashSet,
+    },
     sync::LazyLock,
 };
 
 use bevy::{
     camera::visibility::RenderLayers,
-    mesh::{Indices, VertexAttributeValues, morph::MeshMorphWeights, skinning::SkinnedMesh},
+    mesh::{
+        Indices,
+        VertexAttributeValues,
+        morph::MeshMorphWeights,
+        skinning::SkinnedMesh,
+    },
     prelude::*,
 };
 use bevy_shader_mtoon::MtoonMaterial;
@@ -42,7 +50,7 @@ pub static DEFAULT_RENDER_LAYERS: LazyLock<HashMap<FirstPersonFlag, RenderLayers
 /// Add [`RenderLayers`] to each mesh in the VRM.
 #[derive(EntityEvent)]
 pub struct SetupFirstPerson {
-    pub entity: Entity,
+    pub entity:        Entity,
     /// Render layer values to use for each first person flag.
     /// Defaults to [`DEFAULT_RENDER_LAYERS`] if not provided.
     pub render_layers: Option<HashMap<FirstPersonFlag, RenderLayers>>,

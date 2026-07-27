@@ -2,13 +2,28 @@
 
 use std::f32::consts::PI;
 
-use bevy::{asset::AssetMetaCheck, camera::visibility::RenderLayers, prelude::*};
-use bevy_egui::{EguiPlugin, EguiPrimaryContextPass};
-use bevy_panorbit_camera::{PanOrbitCamera, PanOrbitCameraPlugin};
+use bevy::{
+    asset::AssetMetaCheck,
+    camera::visibility::RenderLayers,
+    prelude::*,
+    world_serialization::WorldInstanceReady,
+};
+use bevy_egui::{
+    EguiPlugin,
+    EguiPrimaryContextPass,
+};
+use bevy_panorbit_camera::{
+    PanOrbitCamera,
+    PanOrbitCameraPlugin,
+};
 use bevy_vrm::{
-    VrmInstance, VrmPlugins,
-    first_person::{DEFAULT_RENDER_LAYERS, FirstPersonFlag, SetupFirstPerson},
-    loader::Vrm,
+    VrmInstance,
+    VrmPlugins,
+    first_person::{
+        DEFAULT_RENDER_LAYERS,
+        FirstPersonFlag,
+        SetupFirstPerson,
+    },
     mtoon::MtoonSun,
 };
 use ui::RenderLayer;
@@ -35,6 +50,7 @@ impl Plugin for VrmViewerPlugin {
                 VrmPlugins,
             ))
             .add_systems(Startup, setup)
+            .add_observer(setup_first_person)
             .add_systems(EguiPrimaryContextPass, ui::update_ui)
             .add_systems(
                 Update,
@@ -45,7 +61,6 @@ impl Plugin for VrmViewerPlugin {
                     move_leg::move_leg,
                     read_dropped_files,
                     set_render_layers,
-                    setup_first_person,
                 ),
             );
     }
@@ -54,10 +69,10 @@ impl Plugin for VrmViewerPlugin {
 #[derive(Resource, Default)]
 struct Settings {
     pub draw_spring_bones: bool,
-    pub model: String,
-    pub move_avatar: bool,
-    pub move_leg: bool,
-    pub render_layer: RenderLayer,
+    pub model:             String,
+    pub move_avatar:       bool,
+    pub move_leg:          bool,
+    pub render_layer:      RenderLayer,
 }
 
 fn setup(mut commands: Commands, mut settings: ResMut<Settings>) {
@@ -72,7 +87,7 @@ fn setup(mut commands: Commands, mut settings: ResMut<Settings>) {
     commands.spawn((
         DirectionalLight {
             illuminance: 10_000.0,
-            shadows_enabled: true,
+            shadow_maps_enabled: true,
             ..default()
         },
         Transform::from_rotation(Quat::from_rotation_x(-PI / 3.0)),
@@ -107,22 +122,17 @@ fn set_render_layers(
 }
 
 fn setup_first_person(
+    event: On<WorldInstanceReady>,
     mut commands: Commands,
-    mut events: MessageReader<AssetEvent<Vrm>>,
-    vrms: Query<(Entity, &VrmInstance)>,
+    vrms: Query<(), With<VrmInstance>>,
 ) {
-    for event in events.read() {
-        if let AssetEvent::LoadedWithDependencies { id } = event {
-            let (entity, _) = vrms
-                .iter()
-                .find(|(_, handle)| handle.0.id() == *id)
-                .expect("VRM asset must have corresponding entity");
+    let entity = event.entity;
 
-            commands.entity(entity).trigger(|entity| SetupFirstPerson {
-                entity,
-                render_layers: None,
-            });
-        }
+    if vrms.contains(entity) {
+        commands.entity(entity).trigger(|entity| SetupFirstPerson {
+            entity,
+            render_layers: None,
+        });
     }
 }
 

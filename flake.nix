@@ -41,25 +41,21 @@
             system,
             ...
           }:
+          let
+            toolchain =
+              with inputs.fenix.packages.${system};
+              combine [
+                complete.toolchain
+                targets.wasm32-unknown-unknown.latest.rust-std
+              ];
+          in
           {
             _module.args.pkgs = import inputs.nixpkgs {
               inherit system;
               overlays = [
                 inputs.fenix.overlays.default
 
-                (
-                  self: _:
-                  let
-                    toolchain = with self.fenix;
-                      combine [
-                        complete.toolchain
-                        targets.wasm32-unknown-unknown.latest.rust-std
-                      ];
-                  in
-                  {
-                    crane = (inputs.crane.mkLib self).overrideToolchain toolchain;
-                  }
-                )
+                (self: _: { crane = (inputs.crane.mkLib self).overrideToolchain toolchain; })
               ];
             };
 
@@ -79,7 +75,10 @@
                 enable = true;
                 strict = true;
               };
-              rustfmt.enable = true;
+              rustfmt = {
+                enable = true;
+                package = toolchain;
+              };
               statix.enable = true;
               taplo.enable = true;
               yamlfmt.enable = true;

@@ -1,14 +1,25 @@
 //! Bevy plugin implementing the [MToon](https://vrm.dev/en/univrm/shaders/shader_mtoon.html) shader.
 
 use bevy::{
-    asset::{load_internal_asset, uuid_handle},
+    asset::{
+        load_internal_asset,
+        uuid_handle,
+    },
     prelude::*,
 };
 
 mod shader;
 
-use bevy_mod_outline::{OutlineMode, OutlinePlugin, OutlineStencil, OutlineVolume};
-pub use shader::{MtoonMaterial, OutlineMode as VrmOutlineMode};
+use bevy_mod_outline::{
+    OutlineMode,
+    OutlinePlugin,
+    OutlineStencil,
+    OutlineVolume,
+};
+pub use shader::{
+    MtoonMaterial,
+    OutlineMode as VrmOutlineMode,
+};
 
 const SHADER_HANDLE: Handle<Shader> = uuid_handle!("88901104-e489-4263-b974-94885e37a3a7");
 
@@ -20,14 +31,17 @@ impl Plugin for MtoonPlugin {
         load_internal_asset!(app, SHADER_HANDLE, "mtoon.wgsl", Shader::from_wgsl);
 
         app.register_type::<OutlineSync>()
-            .add_plugins((OutlinePlugin, MaterialPlugin::<MtoonMaterial>::default()))
+            .add_plugins((
+                OutlinePlugin::EXTRUDE_VERTEX,
+                MaterialPlugin::<MtoonMaterial>::default(),
+            ))
             .add_systems(Update, (update_mtoon_shader, add_outline, sync_outline));
     }
 }
 
 #[derive(Bundle, Clone, Default)]
 pub struct MtoonBundle {
-    pub mtoon: MeshMaterial3d<MtoonMaterial>,
+    pub mtoon:        MeshMaterial3d<MtoonMaterial>,
     pub outline_sync: OutlineSync,
 }
 

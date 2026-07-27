@@ -2,16 +2,37 @@ use std::f32::consts::PI;
 
 use bevy::{
     asset::RenderAssetUsages,
-    color::palettes::css::{BISQUE, SALMON},
+    color::palettes::css::{
+        BISQUE,
+        SALMON,
+    },
     prelude::*,
-    render::render_resource::{Extent3d, TextureDimension, TextureFormat},
+    render::render_resource::{
+        Extent3d,
+        TextureDimension,
+        TextureFormat,
+    },
 };
 use bevy_egui::{
-    EguiContexts, EguiPlugin, EguiPrimaryContextPass,
-    egui::{Slider, Window},
+    EguiContexts,
+    EguiPlugin,
+    EguiPrimaryContextPass,
+    egui::{
+        Slider,
+        Window,
+    },
 };
-use bevy_panorbit_camera::{PanOrbitCamera, PanOrbitCameraPlugin};
-use bevy_shader_mtoon::{MtoonBundle, MtoonMaterial, MtoonPlugin, MtoonSun, VrmOutlineMode};
+use bevy_panorbit_camera::{
+    PanOrbitCamera,
+    PanOrbitCameraPlugin,
+};
+use bevy_shader_mtoon::{
+    MtoonBundle,
+    MtoonMaterial,
+    MtoonPlugin,
+    MtoonSun,
+    VrmOutlineMode,
+};
 
 fn main() {
     App::new()
@@ -48,7 +69,7 @@ fn setup(
     commands.spawn((
         DirectionalLight {
             illuminance: 10_000.0,
-            shadows_enabled: true,
+            shadow_maps_enabled: true,
             ..default()
         },
         Transform::from_rotation(Quat::from_rotation_x(-PI / 3.0)),
@@ -200,8 +221,8 @@ fn uv_debug_texture() -> Image {
 
     Image::new_fill(
         Extent3d {
-            width: TEXTURE_SIZE as u32,
-            height: TEXTURE_SIZE as u32,
+            width:                 TEXTURE_SIZE as u32,
+            height:                TEXTURE_SIZE as u32,
             depth_or_array_layers: 1,
         },
         TextureDimension::D2,

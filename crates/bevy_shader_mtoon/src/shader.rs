@@ -4,7 +4,12 @@ use bevy::{
     prelude::*,
     render::{
         render_asset::RenderAssets,
-        render_resource::{AsBindGroup, AsBindGroupShaderType, Face, ShaderType},
+        render_resource::{
+            AsBindGroup,
+            AsBindGroupShaderType,
+            Face,
+            ShaderType,
+        },
         texture::GpuImage,
     },
     shader::ShaderRef,
@@ -18,47 +23,47 @@ use crate::SHADER_HANDLE;
 #[reflect(PartialEq)]
 pub struct MtoonMaterial {
     pub outline_color: Color,
-    pub outline_mode: OutlineMode,
+    pub outline_mode:  OutlineMode,
     pub outline_width: f32,
 
-    pub alpha_mode: AlphaMode,
-    pub base_color: Color,
-    pub double_sided: bool,
-    pub emissive_factor: Color,
-    pub gi_equalization_factor: f32,
-    pub light_color: Color,
-    pub light_dir: Vec3,
-    pub matcap_factor: Vec3,
-    pub normal_map_scale: f32,
-    pub parametric_rim_color: Color,
+    pub alpha_mode:                   AlphaMode,
+    pub base_color:                   Color,
+    pub double_sided:                 bool,
+    pub emissive_factor:              Color,
+    pub gi_equalization_factor:       f32,
+    pub light_color:                  Color,
+    pub light_dir:                    Vec3,
+    pub matcap_factor:                Vec3,
+    pub normal_map_scale:             f32,
+    pub parametric_rim_color:         Color,
     pub parametric_rim_fresnel_power: f32,
-    pub parametric_rim_lift_factor: f32,
-    pub rim_lighting_mix_factor: f32,
-    pub shade_factor: Color,
-    pub shading_shift_factor: f32,
-    pub shading_toony_factor: f32,
-    pub view_dir: Vec3,
+    pub parametric_rim_lift_factor:   f32,
+    pub rim_lighting_mix_factor:      f32,
+    pub shade_factor:                 Color,
+    pub shading_shift_factor:         f32,
+    pub shading_toony_factor:         f32,
+    pub view_dir:                     Vec3,
 
     #[texture(1)]
     #[sampler(2)]
     #[dependency]
-    pub base_color_texture: Option<Handle<Image>>,
+    pub base_color_texture:     Option<Handle<Image>>,
     #[texture(3)]
     #[sampler(4)]
     #[dependency]
-    pub emissive_texture: Option<Handle<Image>>,
+    pub emissive_texture:       Option<Handle<Image>>,
     #[texture(5)]
     #[sampler(6)]
     #[dependency]
-    pub matcap_texture: Option<Handle<Image>>,
+    pub matcap_texture:         Option<Handle<Image>>,
     #[texture(7)]
     #[sampler(8)]
     #[dependency]
-    pub normal_map_texture: Option<Handle<Image>>,
+    pub normal_map_texture:     Option<Handle<Image>>,
     #[texture(9)]
     #[sampler(10)]
     #[dependency]
-    pub rim_multiply_texture: Option<Handle<Image>>,
+    pub rim_multiply_texture:   Option<Handle<Image>>,
     #[texture(11)]
     #[sampler(12)]
     #[dependency]
@@ -66,7 +71,7 @@ pub struct MtoonMaterial {
     #[texture(13)]
     #[sampler(14)]
     #[dependency]
-    pub shade_shift_texture: Option<Handle<Image>>,
+    pub shade_shift_texture:    Option<Handle<Image>>,
 }
 
 #[derive(Debug, Default, Clone, PartialEq, Eq, Reflect)]
@@ -81,57 +86,57 @@ impl Default for MtoonMaterial {
     fn default() -> Self {
         Self {
             outline_color: Color::BLACK,
-            outline_mode: OutlineMode::None,
+            outline_mode:  OutlineMode::None,
             outline_width: 0.0,
 
-            alpha_mode: AlphaMode::Opaque,
-            base_color: Color::WHITE,
-            double_sided: false,
-            emissive_factor: Color::BLACK,
-            gi_equalization_factor: 0.9,
-            light_color: Color::WHITE,
-            light_dir: Vec3::Y,
-            matcap_factor: Vec3::ZERO,
-            normal_map_scale: 1.0,
-            parametric_rim_color: Color::WHITE,
+            alpha_mode:                   AlphaMode::Opaque,
+            base_color:                   Color::WHITE,
+            double_sided:                 false,
+            emissive_factor:              Color::BLACK,
+            gi_equalization_factor:       0.9,
+            light_color:                  Color::WHITE,
+            light_dir:                    Vec3::Y,
+            matcap_factor:                Vec3::ZERO,
+            normal_map_scale:             1.0,
+            parametric_rim_color:         Color::WHITE,
             parametric_rim_fresnel_power: 5.0,
-            parametric_rim_lift_factor: 0.0,
-            rim_lighting_mix_factor: 1.0,
-            shade_factor: Color::BLACK,
-            shading_shift_factor: 0.0,
-            shading_toony_factor: 0.9,
-            view_dir: Vec3::ZERO,
+            parametric_rim_lift_factor:   0.0,
+            rim_lighting_mix_factor:      1.0,
+            shade_factor:                 Color::BLACK,
+            shading_shift_factor:         0.0,
+            shading_toony_factor:         0.9,
+            view_dir:                     Vec3::ZERO,
 
-            base_color_texture: None,
-            emissive_texture: None,
-            matcap_texture: None,
-            normal_map_texture: None,
-            rim_multiply_texture: None,
+            base_color_texture:     None,
+            emissive_texture:       None,
+            matcap_texture:         None,
+            normal_map_texture:     None,
+            rim_multiply_texture:   None,
             shade_multiply_texture: None,
-            shade_shift_texture: None,
+            shade_shift_texture:    None,
         }
     }
 }
 
 #[derive(Clone, Default, ShaderType)]
 pub struct MtoonShaderUniform {
-    pub alpha_cutoff: f32,
-    pub base_color: Vec4,
-    pub emissive_factor: Vec4,
-    pub flags: u32,
-    pub gi_equalization_factor: f32,
-    pub light_color: Vec3,
-    pub light_dir: Vec3,
-    pub matcap_factor: Vec3,
-    pub normal_map_scale: f32,
-    pub parametric_rim_color: Vec3,
+    pub alpha_cutoff:                 f32,
+    pub base_color:                   Vec4,
+    pub emissive_factor:              Vec4,
+    pub flags:                        u32,
+    pub gi_equalization_factor:       f32,
+    pub light_color:                  Vec3,
+    pub light_dir:                    Vec3,
+    pub matcap_factor:                Vec3,
+    pub normal_map_scale:             f32,
+    pub parametric_rim_color:         Vec3,
     pub parametric_rim_fresnel_power: f32,
-    pub parametric_rim_lift_factor: f32,
-    pub rim_lighting_mix_factor: f32,
-    pub shade_color: Vec3,
-    pub shading_shift_factor: f32,
-    pub shading_toony_factor: f32,
-    pub view_dir: Vec3,
+    pub parametric_rim_lift_factor:   f32,
+    pub rim_lighting_mix_factor:      f32,
+    pub shade_color:                  Vec3,
+    pub shading_shift_factor:         f32,
+    pub shading_toony_factor:         f32,
+    pub view_dir:                     Vec3,
 }
 
 impl AsBindGroupShaderType<MtoonShaderUniform> for MtoonMaterial {

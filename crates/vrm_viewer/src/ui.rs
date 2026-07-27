@@ -1,5 +1,8 @@
 use bevy::prelude::*;
-use bevy_egui::{EguiContexts, egui::ComboBox};
+use bevy_egui::{
+    EguiContexts,
+    egui::ComboBox,
+};
 
 use crate::Settings;
 

@@ -1,383 +1,288 @@
+use std::collections::{
+    HashMap,
+    HashSet,
+};
+
 use bevy::{
-    animation::AnimatedBy,
-    ecs::system::{RunSystemError, RunSystemOnce},
-    prelude::*,
-    transform::systems::{propagate_parent_transforms, sync_simple_transforms},
-};
-use bevy_gltf_kun::import::{extensions::BevyExtensionImport, gltf::document::ImportContext};
-use gltf_kun::{
-    extensions::ExtensionImport,
-    graph::{
-        ByteNode, Edge, Extensions, Graph, Weight,
-        gltf::{GltfDocument, GltfWeight, Material, Node, Primitive, Scene},
+    asset::LoadContext,
+    gltf::{
+        GltfLoaderSettings,
+        extensions::{
+            ErasedGltfExtensionHandler,
+            GltfExtensionHandler,
+        },
     },
-    io::format::gltf::GltfFormat,
+    prelude::*,
 };
-use gltf_kun_vrm::vrm0::{
+use bevy_shader_mtoon::{
+    MtoonMaterial,
+    OutlineSync,
+};
+use gltf::{
+    Material,
+    Mesh,
+    Node,
+    Primitive,
+    Scene,
+};
+use serde_vrm::vrm0::{
+    BoneName,
+    FirstPersonFlag,
+    MaterialProperty,
+    Shader,
     Vrm,
-    mesh_annotation::{MeshAnnotation, MeshAnnotationEdges},
-};
-use petgraph::{Direction, visit::EdgeRef};
-use serde_vrm::vrm0::{BoneName, FirstPersonFlag};
-
-use self::vrm0::{import_material, import_primitive_material};
-use crate::{
-    animations::vrm::VRM_ANIMATION_TARGETS,
-    spring_bones::{SpringBone, SpringBoneLogicState, SpringBones},
 };
 
-pub mod vrm0;
-pub mod vrm1;
+use crate::spring_bones::{
+    SpringBone,
+    SpringBones,
+};
 
-#[derive(TypePath)]
-pub struct VrmExtensions;
+pub mod mtoon;
 
-impl ExtensionImport<GltfDocument, GltfFormat> for VrmExtensions {
-    fn import(
-        graph: &mut Graph,
-        format: &mut GltfFormat,
-        doc: &GltfDocument,
-    ) -> Result<(), Box<dyn std::error::Error>> {
-        Vrm::import(graph, format, doc)?;
+#[derive(Default, Clone)]
+pub struct VrmHandler {
+    vrm:                 Option<Vrm>,
+    node_entities:       HashMap<usize, Entity>,
+    third_person_meshes: HashSet<usize>,
+}
 
-        Ok(())
+impl VrmHandler {
+    fn material_props(&self, index: Option<usize>) -> Option<&MaterialProperty> {
+        let index = index?;
+        self.vrm.as_ref()?.material_properties.as_ref()?.get(index)
+    }
+
+    fn first_person_flag(&self, mesh_index: usize) -> FirstPersonFlag {
+        let mut flag = self
+            .vrm
+            .as_ref()
+            .and_then(|v| v.first_person.as_ref())
+            .and_then(|fp| fp.mesh_annotations.as_ref())
+            .and_then(|anns| anns.iter().find(|a| a.mesh == Some(mesh_index as u32)))
+            .map(|a| a.first_person_flag)
+            .unwrap_or_default();
+
+        if flag == FirstPersonFlag::Auto && self.third_person_meshes.contains(&mesh_index) {
+            flag = FirstPersonFlag::ThirdPersonOnly;
+        }
+
+        flag
     }
 }
 
-impl BevyExtensionImport<GltfDocument> for VrmExtensions {
-    fn import_material(
-        context: &mut ImportContext,
-        _standard_material: &mut StandardMaterial,
-        material: Material,
-    ) {
-        if let Some(ext) = context.doc.get_extension::<Vrm>(context.graph) {
-            import_material(context, material, ext);
-        }
+impl GltfExtensionHandler for VrmHandler {
+    fn dyn_clone(&self) -> Box<dyn ErasedGltfExtensionHandler> {
+        Box::new(self.clone())
     }
 
-    fn import_node(_context: &mut ImportContext, _entity: &mut EntityWorldMut, _node: Node) {}
-
-    fn import_primitive(
-        context: &mut ImportContext,
-        entity: &mut EntityWorldMut,
-        primitive: Primitive,
+    fn on_root(
+        &mut self,
+        _load_context: &mut LoadContext<'_>,
+        gltf: &gltf::Gltf,
+        _settings: &GltfLoaderSettings,
     ) {
-        if let Some(ext) = context.doc.get_extension::<Vrm>(context.graph) {
-            import_primitive_material(context, entity, ext, primitive);
-        }
-
-        let mut flag = context
-            .graph
-            .edges_directed(primitive.0, Direction::Incoming)
-            .find_map(|edge| {
-                if let Edge::Other(name) = edge.weight()
-                    && name == MeshAnnotationEdges::Mesh.to_string().as_str()
-                {
-                    let annotation = MeshAnnotation(edge.source());
-                    let weight = annotation.read(context.graph);
-                    return Some(weight.first_person_flag);
-                }
-
-                None
-            })
-            .unwrap_or_default();
-
-        if flag == FirstPersonFlag::Auto {
-            let mesh = primitive
-                .mesh(context.graph)
-                .expect("VRM primitive must have valid mesh reference");
-            let nodes = mesh.nodes(context.graph);
-
-            let Some(ext) = get_vrm_extension(context.graph) else {
-                warn!("VRM extension not found");
-                return;
-            };
-
-            let head = ext
-                .human_bones(context.graph)
-                .into_iter()
-                .find(|b| {
-                    let b_weight = b.read(context.graph);
-                    b_weight.name == Some(BoneName::Head)
-                })
-                .expect("VRM file must contain Head bone");
-
-            let head_node = head
-                .node(context.graph)
-                .expect("VRM Head bone must reference valid node");
-
-            for node in nodes {
-                let is_child = find_child(context.graph, node, head_node);
-
-                if is_child {
-                    flag = FirstPersonFlag::ThirdPersonOnly;
-                    break;
-                }
-            }
-        }
-
-        entity.insert(flag);
-    }
-
-    fn import_root(_context: &mut ImportContext) {}
-
-    #[allow(clippy::too_many_lines)]
-    fn import_scene(context: &mut ImportContext, _scene: Scene, world: &mut World) {
-        let _ = world.run_system_once(sync_simple_transforms);
-        let _ = world.run_system_once(propagate_parent_transforms);
-
-        let graph = &context.graph;
-
-        let names: Result<Vec<(Entity, Name)>, RunSystemError> =
-            world.run_system_once(|names: Query<(Entity, &Name)>| -> Vec<(Entity, Name)> {
-                names
-                    .iter()
-                    .map(|(a, b)| (a, b.clone()))
-                    .collect::<Vec<_>>()
-            });
-
-        let Ok(names) = names else {
-            error!("Error running names system");
+        let Some(value) = gltf.extensions().and_then(|e| e.get("VRM")) else {
             return;
         };
 
-        let Some(ext) = get_vrm_extension(graph) else {
-            warn!("VRM extension not found");
+        match serde_json::from_value::<Vrm>(value.clone()) {
+            Ok(vrm) => {
+                self.third_person_meshes = third_person_meshes(gltf, &vrm);
+                self.vrm = Some(vrm);
+            }
+            Err(err) => warn!("Failed to parse VRM extension: {err}"),
+        }
+    }
+
+    fn on_material(
+        &mut self,
+        load_context: &mut LoadContext<'_>,
+        gltf_material: &Material,
+        _material: Handle<bevy::gltf::GltfMaterial>,
+        _material_asset: &bevy::gltf::GltfMaterial,
+        material_label: &str,
+    ) {
+        let Some(props) = self.material_props(gltf_material.index()) else {
+            return;
+        };
+
+        if props.shader != Some(Shader::MToon) {
+            return;
+        }
+
+        let material = mtoon::build_mtoon_material(load_context, props);
+        load_context.add_labeled_asset(mtoon_label(material_label), material);
+    }
+
+    fn on_gltf_node(
+        &mut self,
+        _load_context: &mut LoadContext<'_>,
+        gltf_node: &Node,
+        entity: &mut EntityWorldMut,
+    ) {
+        self.node_entities.insert(gltf_node.index(), entity.id());
+    }
+
+    fn on_spawn_mesh_and_material(
+        &mut self,
+        load_context: &mut LoadContext<'_>,
+        _primitive: &Primitive,
+        mesh: &Mesh,
+        material: &Material,
+        entity: &mut EntityWorldMut,
+        material_label: &str,
+    ) {
+        if self.vrm.is_none() {
+            return;
+        }
+
+        if let Some(props) = self.material_props(material.index())
+            && props.shader == Some(Shader::MToon)
+        {
+            let handle =
+                load_context.get_label_handle::<MtoonMaterial>(mtoon_label(material_label));
+            entity.remove::<MeshMaterial3d<StandardMaterial>>();
+            entity.insert((MeshMaterial3d(handle), OutlineSync));
+        }
+
+        let flag = self.first_person_flag(mesh.index());
+        entity.insert(flag);
+    }
+
+    fn on_scene_completed(
+        &mut self,
+        _load_context: &mut LoadContext<'_>,
+        _scene: &Scene,
+        world_root_id: Entity,
+        scene_world: &mut World,
+    ) {
+        let Some(vrm) = self.vrm.clone() else {
             return;
         };
 
         let mut spring_bones = vec![];
 
-        for bone_group in ext.bone_groups(graph) {
-            let (bone_entities, bone_names): (Vec<_>, Vec<_>) = bone_group
-                .bones(graph)
-                .into_iter()
-                .filter_map(|node| {
-                    let node_handle = context.gltf.node_handles.get(&node)?;
-                    let node_name =
-                        context
-                            .gltf
-                            .named_nodes
-                            .iter()
-                            .find_map(|(name, gltf_node)| {
-                                (gltf_node == node_handle).then(|| name.clone())
-                            })?;
-                    let (entity, _) = names.iter().find(|(_, name)| name.as_str() == node_name)?;
-                    Some((*entity, node_name))
-                })
-                .unzip();
+        if let Some(groups) = vrm
+            .secondary_animation
+            .as_ref()
+            .and_then(|sa| sa.bone_groups.as_ref())
+        {
+            for group in groups {
+                let mut bones = vec![];
+                let mut bone_names = vec![];
 
-            let weight = bone_group.read(graph);
+                for node in group.bones.iter().flatten() {
+                    let Some(&entity) = self.node_entities.get(&(*node as usize)) else {
+                        continue;
+                    };
+                    let Some(name) = scene_world.get::<Name>(entity) else {
+                        continue;
+                    };
+                    bones.push(entity);
+                    bone_names.push(name.to_string());
+                }
 
-            let gravity_dir = Vec3::new(
-                weight.gravity_dir.x,
-                weight.gravity_dir.y,
-                weight.gravity_dir.z,
-            );
+                let gravity_dir = group
+                    .gravity_dir
+                    .as_ref()
+                    .map(|d| Vec3::new(d.x, d.y, d.z))
+                    .unwrap_or_default();
 
-            spring_bones.push(SpringBone {
-                bones: bone_entities,
-                bone_names,
-                center: weight.center.unwrap_or_default(),
-                drag_force: weight.drag_force.unwrap_or_default(),
-                gravity_dir,
-                gravity_power: weight.gravity_power.unwrap_or_default(),
-                hit_radius: weight.hit_radius.unwrap_or_default(),
-                stiffness: weight.stiffiness.unwrap_or_default(),
-            });
+                spring_bones.push(SpringBone {
+                    bones,
+                    bone_names,
+                    center: group.center.unwrap_or_default(),
+                    drag_force: group.drag_force.unwrap_or_default(),
+                    gravity_dir,
+                    gravity_power: group.gravity_power.unwrap_or_default(),
+                    hit_radius: group.hit_radius.unwrap_or_default(),
+                    stiffness: group.stiffiness.unwrap_or_default(),
+                });
+            }
         }
 
-        let _ = world.run_system_once_with(
-            |In(spring_bones): In<Vec<SpringBone>>,
-             mut commands: Commands,
-             query: Query<Entity, Without<ChildOf>>| {
-                commands
-                    .entity(
-                        query
-                            .single()
-                            .expect("Scene must have exactly one root entity"),
-                    )
-                    .insert(SpringBones(spring_bones));
-            },
-            spring_bones,
-        );
-
-        let _ = world.run_system_once(
-            |mut spring_boness: Query<&mut SpringBones>,
-             children: Query<&Children>,
-             names: Query<&Name>| {
-                for mut spring_bones in &mut spring_boness {
-                    for spring_bone in &mut spring_bones.0 {
-                        let original_bones = spring_bone.bones.clone();
-                        for bone in original_bones {
-                            for child in children.iter_descendants(bone) {
-                                if !spring_bone.bones.contains(&child) {
-                                    spring_bone.bones.push(child);
-                                    if let Ok(name) = names.get(child) {
-                                        spring_bone.bone_names.push(name.to_string());
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            },
-        );
-
-        let _ = world.run_system_once(add_springbone_logic_state);
-
-        for bone in ext.human_bones(graph) {
-            let Some(node) = bone.node(graph) else {
-                continue;
-            };
-
-            let weight = bone.read(graph);
-
-            let Some(bone_name) = weight.name else {
-                continue;
-            };
-
-            let Some(node_handle) = context.gltf.node_handles.get(&node).cloned() else {
-                continue;
-            };
-
-            let node_name = context.gltf.named_nodes.iter().find_map(|(name, n)| {
-                if *n == node_handle {
-                    Some(name.clone())
-                } else {
-                    None
-                }
-            });
-
-            let Some(node_name) = node_name else {
-                continue;
-            };
-
-            let _ = world.run_system_once_with(
-                |In((node_name, bone_name)): In<(String, BoneName)>,
-                 mut commands: Commands,
-                 names: Query<(Entity, &Name)>,
-                 parents: Query<&ChildOf>| {
-                    let Some(node_entity) = names.iter().find_map(|(entity, name)| {
-                        if name.as_str() == node_name.as_str() {
-                            Some(entity)
-                        } else {
-                            None
-                        }
-                    }) else {
-                        warn!("Could not find entity for bone: {}", bone_name);
-                        return;
-                    };
-
-                    let mut root_entity = node_entity;
-                    while let Ok(parent) = parents.get(root_entity) {
-                        root_entity = parent.parent();
-                    }
-
-                    commands
-                        .entity(root_entity)
-                        .insert(AnimationPlayer::default());
-
-                    let id = VRM_ANIMATION_TARGETS[&bone_name];
-
-                    commands
-                        .entity(node_entity)
-                        .insert((id, AnimatedBy(root_entity), bone_name));
-                },
-                (node_name, bone_name),
-            );
+        if !spring_bones.is_empty() {
+            scene_world
+                .entity_mut(world_root_id)
+                .insert(SpringBones(spring_bones));
         }
-    }
-}
 
-fn find_child(graph: &Graph, target: Node, parent: Node) -> bool {
-    if target == parent {
-        return true;
-    }
-
-    for child in parent.children(graph) {
-        if find_child(graph, target, child) {
-            return true;
-        }
-    }
-
-    false
-}
-
-fn get_vrm_extension(graph: &Graph) -> Option<Vrm> {
-    let doc_idx = graph.node_indices().find(|n| {
-        let weight = graph.node_weight(*n);
-        matches!(weight, Some(Weight::Gltf(GltfWeight::Document)))
-    })?;
-
-    let doc = GltfDocument(doc_idx);
-
-    let ext = doc.get_extension::<Vrm>(graph)?;
-
-    Some(ext)
-}
-
-fn add_springbone_logic_state(
-    children: Query<&Children>,
-    global_transforms: Query<&GlobalTransform>,
-    local_transforms: Query<&Transform>,
-    logic_states: Query<&mut SpringBoneLogicState>,
-    mut commands: Commands,
-    names: Query<&Name>,
-    spring_boness: Query<(Entity, &SpringBones)>,
-) {
-    for (_skel_e, spring_bones) in spring_boness.iter() {
-        for spring_bone in &spring_bones.0 {
-            for bone in &spring_bone.bones {
-                if !logic_states.contains(*bone) {
-                    let Ok(child) = children.get(*bone) else {
-                        // Adds an extra spring bone below it to make it look even better.
-                        if let Ok(name) = names.get(*bone)
-                            && name.as_str() == "donotaddmore"
-                        {
-                            continue;
-                        }
-                        let child = commands
-                            .spawn((
-                                Transform::from_xyz(0.0, -0.07, 0.0),
-                                Name::new("donotaddmore"),
-                            ))
-                            .id();
-
-                        commands.entity(*bone).add_child(child);
-                        continue;
-                    };
-
-                    let Some(next_bone) = child.iter().next() else {
-                        continue;
-                    };
-                    let Ok(global_this_bone) = global_transforms.get(*bone) else {
-                        continue;
-                    };
-                    let Ok(local_next_bone) = local_transforms.get(next_bone) else {
-                        continue;
-                    };
-                    let Ok(local_this_bone) = local_transforms.get(*bone) else {
-                        continue;
-                    };
-
-                    let bone_axis = local_next_bone.translation.normalize_or_zero();
-                    let bone_length = local_next_bone.translation.length();
-                    let initial_local_matrix = local_this_bone.to_matrix();
-                    let initial_local_rotation = local_this_bone.rotation;
-                    let current_tail = global_this_bone.translation()
-                        + (global_this_bone.rotation() * bone_axis * bone_length);
-
-                    commands.entity(*bone).insert(SpringBoneLogicState {
-                        prev_tail: current_tail,
-                        current_tail,
-                        bone_axis,
-                        bone_length,
-                        initial_local_matrix,
-                        initial_local_rotation,
-                    });
-                }
+        if let Some(bones) = vrm.humanoid.as_ref().and_then(|h| h.human_bones.as_ref()) {
+            for bone in bones {
+                let (Some(node), Some(bone_name)) = (bone.node, bone.bone) else {
+                    continue;
+                };
+                let Some(&entity) = self.node_entities.get(&(node as usize)) else {
+                    continue;
+                };
+                setup_bone(scene_world, entity, bone_name);
             }
         }
     }
+}
+
+fn setup_bone(world: &mut World, entity: Entity, bone_name: BoneName) {
+    world.entity_mut(entity).insert(bone_name);
+
+    #[cfg(feature = "animations")]
+    {
+        let mut root = entity;
+        while let Some(child_of) = world.get::<ChildOf>(root) {
+            root = child_of.parent();
+        }
+
+        world
+            .entity_mut(root)
+            .insert(bevy::animation::AnimationPlayer::default());
+
+        if let Some(target) = crate::animations::vrm::VRM_ANIMATION_TARGETS.get(&bone_name) {
+            world
+                .entity_mut(entity)
+                .insert((*target, bevy::animation::AnimatedBy(root)));
+        }
+    }
+}
+
+fn third_person_meshes(gltf: &gltf::Gltf, vrm: &Vrm) -> HashSet<usize> {
+    let mut meshes = HashSet::new();
+
+    let Some(head_node) = vrm
+        .humanoid
+        .as_ref()
+        .and_then(|h| h.human_bones.as_ref())
+        .and_then(|bones| bones.iter().find(|b| b.bone == Some(BoneName::Head)))
+        .and_then(|b| b.node)
+    else {
+        return meshes;
+    };
+
+    let nodes = gltf.nodes().collect::<Vec<_>>();
+
+    let mut descendants = HashSet::new();
+    let mut stack = vec![head_node as usize];
+    while let Some(idx) = stack.pop() {
+        if !descendants.insert(idx) {
+            continue;
+        }
+        if let Some(node) = nodes.get(idx) {
+            for child in node.children() {
+                stack.push(child.index());
+            }
+        }
+    }
+
+    for node in &nodes {
+        if descendants.contains(&node.index())
+            && let Some(mesh) = node.mesh()
+        {
+            meshes.insert(mesh.index());
+        }
+    }
+
+    meshes
+}
+
+fn mtoon_label(material_label: &str) -> String {
+    format!("{material_label}/mtoon")
 }
