@@ -16,7 +16,7 @@ bevy = { default-features = false, features = [
   "bevy_pbr",
   "bevy_window",
 ], workspace = true }
-bitflags = "2.11.0"
+bitflags = "2.13.1"
 
 [dev-dependencies]
 bevy                           = { default-features = true, workspace = true }
