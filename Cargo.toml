@@ -6,7 +6,7 @@ resolver = "2"
 edition    = "2024"
 license    = "MIT OR Apache-2.0"
 repository = "https://github.com/unavi-xyz/bevy_vrm"
-version    = "0.3.0"
+version    = "0.4.0"
 
 [workspace.lints.clippy]
 cast_possible_truncation = "allow"
@@ -22,9 +22,9 @@ too_many_arguments     = "allow"
 type_complexity        = "allow"
 
 [workspace.dependencies]
-bevy_shader_mtoon = { path = "crates/bevy_shader_mtoon", version = "0.3.0" }
-bevy_vrm          = { path = "crates/bevy_vrm", version = "0.3.0" }
-serde_vrm         = { path = "crates/serde_vrm", version = "0.3.0" }
+bevy_shader_mtoon = { path = "crates/bevy_shader_mtoon", version = "0.4.0" }
+bevy_vrm          = { path = "crates/bevy_vrm", version = "0.4.0" }
+serde_vrm         = { path = "crates/serde_vrm", version = "0.4.0" }
 
 bevy = { default-features = false, version = "0.19.0" }
 bevy_egui = { default-features = false, features = [
