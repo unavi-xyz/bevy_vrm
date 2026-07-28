@@ -7,15 +7,9 @@
 }
 
 #ifdef PREPASS_PIPELINE
-#import bevy_pbr::{
-    prepass_io::{VertexOutput, FragmentOutput},
-    pbr_deferred_functions::deferred_output,
-}
+#import bevy_pbr::prepass_io::VertexOutput
 #else
-#import bevy_pbr::{
-    forward_io::{VertexOutput, FragmentOutput},
-    pbr_functions::{apply_pbr_lighting, main_pass_post_lighting_processing},
-}
+#import bevy_pbr::forward_io::VertexOutput
 #endif
 
 struct MtoonMaterialUniform {
@@ -69,7 +63,7 @@ const MTOON_FLAGS_SHADING_SHIFT_TEXTURE: u32 = 512u;
 const EPSILON: f32 = 0.00001;
 
 fn mtoon_shade(in: VertexOutput, is_front: bool) -> vec4<f32> {
-    let double_sided = (material.flags & MTOON_FLAGS_DOUBLE_SIDED) != 0;
+    let double_sided = (material.flags & MTOON_FLAGS_DOUBLE_SIDED) != 0u;
     var pbr_input = pbr_input_from_vertex_output(in, is_front, double_sided);
 
     pbr_input.material.metallic = 0.0;
@@ -93,110 +87,84 @@ fn mtoon_shade(in: VertexOutput, is_front: bool) -> vec4<f32> {
         }
     }
 
-    // Normals.
-    // Adapted from Bevy pbr_functions.
+    // Normal mapping. The mikktspace method requires the world normal is NOT re-normalized before
+    // applying the tangent-space normal. http://www.mikktspace.com/
 #ifndef LOAD_PREPASS_NORMALS
-    // NOTE: The mikktspace method of normal mapping explicitly requires that the world normal NOT
-    // be re-normalized in the fragment shader. This is primarily to match the way mikktspace
-    // bakes vertex tangents and normal maps so that this is the exact inverse. Blender, Unity,
-    // Unreal Engine, Godot, and more all use the mikktspace method. Do not change this code
-    // unless you really know what you are doing.
-    // http://www.mikktspace.com/
-    var N: vec3<f32> = pbr_input.world_normal;
-
+    var N = pbr_input.world_normal;
     if (material.flags & MTOON_FLAGS_NORMAL_MAP_TEXTURE) != 0u {
-
-#ifdef VERTEX_TANGENTS
-      // NOTE: The mikktspace method of normal mapping explicitly requires that these NOT be
-      // normalized nor any Gram-Schmidt applied to ensure the vertex normal is orthogonal to the
-      // vertex tangent! Do not change this code unless you really know what you are doing.
-      // http://www.mikktspace.com/
-      var T: vec3<f32> = in.world_tangent.xyz;
-      var B: vec3<f32> = in.world_tangent.w * cross(N, T);
-#endif
-
 #ifdef VERTEX_TANGENTS
 #ifdef VERTEX_UVS
-      // Nt is the tangent-space normal.
-      var Nt = textureSampleBias(normal_map_texture, normal_map_sampler, in.uv, view.mip_bias).rgb;
-      Nt = Nt * 2.0 - 1.0;
-
-      if double_sided && !is_front {
-          Nt = -Nt;
-      }
-
-      // NOTE: The mikktspace method of normal mapping applies maps the tangent-space normal from
-      // the normal map texture in this way to be an EXACT inverse of how the normal map baker
-      // calculates the normal maps so there is no error introduced. Do not change this code
-      // unless you really know what you are doing.
-      // http://www.mikktspace.com/
-      N = Nt.x * T + Nt.y * B + Nt.z * N;
+        let T = in.world_tangent.xyz;
+        let B = in.world_tangent.w * cross(N, T);
+        var Nt = textureSampleBias(normal_map_texture, normal_map_sampler, in.uv, view.mip_bias).rgb * 2.0 - 1.0;
+        Nt = vec3<f32>(Nt.xy * material.normal_map_scale, Nt.z);
+        if double_sided && !is_front {
+            Nt = -Nt;
+        }
+        N = Nt.x * T + Nt.y * B + Nt.z * N;
 #endif
 #endif
-
-      pbr_input.N = normalize(N);
+        pbr_input.N = normalize(N);
     }
 #endif
 
-    // Emissive.
-    var emissive = material.emissive_factor;
-    if (material.flags & MTOON_FLAGS_EMISSIVE_TEXTURE) != 0u {
-        emissive = vec4<f32>(emissive.rgb * textureSampleBias(emissive_texture, emissive_sampler, in.uv, view.mip_bias).rgb, 1.0);
-    }
-    pbr_input.material.emissive = emissive;
+    let n = pbr_input.N;
+    let v = pbr_input.V;
+    let n_dot_v = max(dot(n, v), 0.0001);
+    let occlusion = pbr_input.diffuse_occlusion;
+    let roughness = pbr_input.material.perceptual_roughness;
 
-    // Shading.
-    var shading = dot(pbr_input.N, material.light_dir);
-    shading = shading + material.shading_shift_factor;
-    if (material.flags & MTOON_FLAGS_SHADING_SHIFT_TEXTURE) != 0u {
-        // Is grabbing the alpha correct here?
-        shading = shading + textureSampleBias(shade_shift_texture, shade_shift_sampler, in.uv, view.mip_bias).a;
-    }
-    shading = 1.0 - linear_step(material.shading_toony_factor - 1.0, 1.0 - material.shading_toony_factor, shading);
+    // Toon shading: interpolate base and shade colors by how lit the surface is.
     var shade_color = material.shade_color;
     if (material.flags & MTOON_FLAGS_SHADE_COLOR_TEXTURE) != 0u {
         shade_color *= textureSampleBias(shade_color_texture, shade_color_sampler, in.uv, view.mip_bias).rgb;
     }
-    var mtoon_rgb = mix(base_color.rgb, shade_color, shading);
-    mtoon_rgb *= material.light_color;
 
-    // Global illumination.
-    pbr_input.material.base_color = vec4<f32>(mtoon_rgb, base_color.a);
-    let pbr_lighting_color = apply_pbr_lighting(pbr_input);
-    let n_dot_v = max(dot(pbr_input.N, pbr_input.V), 0.0001);
+    var shading = dot(n, material.light_dir) + material.shading_shift_factor;
+    if (material.flags & MTOON_FLAGS_SHADING_SHIFT_TEXTURE) != 0u {
+        shading += textureSampleBias(shade_shift_texture, shade_shift_sampler, in.uv, view.mip_bias).r;
+    }
+    shading = linear_step(-1.0 + material.shading_toony_factor, 1.0 - material.shading_toony_factor, shading);
 
-    let diffuse_color = mtoon_rgb.rgb;
-    let F0 = base_color.rgb;
-    let perceptual_roughness = pbr_input.material.perceptual_roughness;
-    let diffuse_occlusion = pbr_input.diffuse_occlusion;
-    var uniform_gi = ambient_light(pbr_input.world_position, pbr_input.N, pbr_input.V, n_dot_v, diffuse_color, F0, perceptual_roughness, diffuse_occlusion);
+    var color = mix(shade_color, base_color.rgb, shading);
+    color *= material.light_color;
 
-    uniform_gi *= base_color.rgb;
-    uniform_gi *= view.exposure;
+    // Global illumination, equalized so shaded regions keep constant ambient regardless of facing.
+    // MToon is diffuse-only, so the specular ambient term is suppressed with a zero F0.
+    let f0 = vec3<f32>(0.0);
+    let raw_gi = ambient_light(pbr_input.world_position, n, v, n_dot_v, base_color.rgb, f0, roughness, occlusion);
+    let gi_up = ambient_light(pbr_input.world_position, vec3<f32>(0.0, 1.0, 0.0), v, n_dot_v, base_color.rgb, f0, roughness, occlusion);
+    let gi_down = ambient_light(pbr_input.world_position, vec3<f32>(0.0, -1.0, 0.0), v, n_dot_v, base_color.rgb, f0, roughness, occlusion);
+    let uniformed_gi = (gi_up + gi_down) * 0.5;
+    color += mix(raw_gi, uniformed_gi, material.gi_equalization_factor) * view.exposure;
 
-    let gi = mix(pbr_lighting_color.rgb, uniform_gi, material.gi_equalization_factor);
-    mtoon_rgb += gi;
+    let lighting = color;
+
+    // Emissive.
+    var emissive = material.emissive_factor.rgb;
+    if (material.flags & MTOON_FLAGS_EMISSIVE_TEXTURE) != 0u {
+        emissive *= textureSampleBias(emissive_texture, emissive_sampler, in.uv, view.mip_bias).rgb;
+    }
+    color += emissive;
 
     // Rim lighting.
-    var rim = vec3(0.0);
+    var rim = vec3<f32>(0.0);
     if (material.flags & MTOON_FLAGS_MATCAP_TEXTURE) != 0u {
-        let world_view_x = normalize(vec3<f32>(pbr_input.V.z, 0.0, -pbr_input.V.x));
-        let world_view_y = cross(pbr_input.V, world_view_x);
-        let matcap_uv = vec2<f32>(dot(world_view_x, pbr_input.N), dot(world_view_y, pbr_input.N)) * 0.495 + 0.5;
-        let matcap_color = textureSampleBias(matcap_texture, matcap_sampler, matcap_uv, view.mip_bias);
-        rim = material.matcap_factor * matcap_color.rgb;
+        let world_view_x = normalize(vec3<f32>(v.z, 0.0, -v.x));
+        let world_view_y = cross(v, world_view_x);
+        let matcap_uv = vec2<f32>(dot(world_view_x, n), dot(world_view_y, n)) * 0.495 + 0.5;
+        rim = material.matcap_factor * textureSampleBias(matcap_texture, matcap_sampler, matcap_uv, view.mip_bias).rgb;
     }
-    var parametric_rim = saturate(1.0 - dot(pbr_input.N, pbr_input.V) + material.parametric_rim_lift_factor);
+    var parametric_rim = saturate(1.0 - dot(n, v) + material.parametric_rim_lift_factor);
     parametric_rim = pow(parametric_rim, max(material.parametric_rim_fresnel_power, EPSILON));
     rim += parametric_rim * material.parametric_rim_color;
     if (material.flags & MTOON_FLAGS_RIM_MULTIPLY_TEXTURE) != 0u {
-        let rim_multiply = textureSampleBias(rim_multiply_texture, rim_multiply_sampler, in.uv, view.mip_bias);
-        rim *= rim_multiply.rgb;
+        rim *= textureSampleBias(rim_multiply_texture, rim_multiply_sampler, in.uv, view.mip_bias).rgb;
     }
-    rim *= mix(vec3(1.0), pbr_lighting_color.rgb, material.rim_lighting_mix_factor);
-    mtoon_rgb += rim;
+    rim *= mix(vec3<f32>(1.0), lighting, material.rim_lighting_mix_factor);
+    color += rim;
 
-    return vec4<f32>(mtoon_rgb, base_color.a);
+    return vec4<f32>(color, base_color.a);
 }
 
 @fragment

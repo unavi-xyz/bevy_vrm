@@ -16,7 +16,6 @@ bevy = { default-features = false, features = [
   "bevy_pbr",
   "bevy_window",
 ], workspace = true }
-bevy_mod_outline = "0.13.0"
 bitflags = "2.11.0"
 
 [dev-dependencies]

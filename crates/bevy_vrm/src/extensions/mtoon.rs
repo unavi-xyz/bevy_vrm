@@ -65,12 +65,20 @@ pub fn build_mtoon_material(
         mtoon.outline_color = LinearRgba::from_f32_array(value).into();
     }
 
-    if let Some(value) = keyword.and_then(|k| k.outline_width_world) {
-        mtoon.outline_mode = if value {
-            VrmOutlineMode::World
-        } else {
-            VrmOutlineMode::Screen
-        };
+    mtoon.outline_mode = match float.and_then(|f| f.outline_width_mode).map(|m| m as u32) {
+        Some(1) => VrmOutlineMode::World,
+        Some(2) => VrmOutlineMode::Screen,
+        Some(_) => VrmOutlineMode::None,
+        None => match keyword.and_then(|k| k.outline_width_world) {
+            Some(true) => VrmOutlineMode::World,
+            Some(false) => VrmOutlineMode::Screen,
+            None => VrmOutlineMode::None,
+        },
+    };
+
+    // VRM 0.0 authors outline width in centimeters.
+    if mtoon.outline_mode != VrmOutlineMode::None {
+        mtoon.outline_width *= 0.01;
     }
 
     if let Some(value) = float.and_then(|f| f.gi_intensity_factor) {

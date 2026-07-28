@@ -47,7 +47,9 @@ pub static DEFAULT_RENDER_LAYERS: LazyLock<HashMap<FirstPersonFlag, RenderLayers
         map
     });
 
-/// Add [`RenderLayers`] to each mesh in the VRM.
+/// Splits each VRM mesh into first- and third-person variants and assigns their
+/// [`RenderLayers`]. Cameras must render
+/// [`FIRST_PERSON_LAYER`]/[`THIRD_PERSON_LAYER`] to see the split meshes.
 #[derive(EntityEvent)]
 pub struct SetupFirstPerson {
     pub entity:        Entity,

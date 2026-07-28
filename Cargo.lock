@@ -1242,22 +1242,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bff34eb29ff4b8a8688bc7299f14fb6b597461ca80fec03ed7d22939ab33e48f"
 
 [[package]]
-name = "bevy_mod_outline"
-version = "0.13.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "97f2e45781f64d23a3fecfd86d13efbb5256832b8091fe3b48cecd5875c538b9"
-dependencies = [
- "bevy",
- "bitfield",
- "indexmap",
- "interpolation",
- "itertools",
- "nonmax",
- "thiserror 1.0.69",
- "wgpu-types",
-]
-
-[[package]]
 name = "bevy_panorbit_camera"
 version = "0.35.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1555,7 +1539,6 @@ version = "0.3.0"
 dependencies = [
  "bevy",
  "bevy_egui 0.41.1",
- "bevy_mod_outline",
  "bevy_panorbit_camera",
  "bitflags 2.13.1",
 ]
@@ -1938,12 +1921,6 @@ name = "bit-vec"
 version = "0.9.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b71798fca2c1fe1086445a7258a4bc81e6e49dcd24c8d0dd9a1e57395b603f51"
-
-[[package]]
-name = "bitfield"
-version = "0.15.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c821a6e124197eb56d907ccc2188eab1038fb919c914f47976e64dd8dbc855d1"
 
 [[package]]
 name = "bitflags"
@@ -3450,12 +3427,6 @@ checksum = "e05c02b5e89bff3b946cedeca278abc628fe811e604f027c45a8aa3cf793d0eb"
 dependencies = [
  "libc",
 ]
-
-[[package]]
-name = "interpolation"
-version = "0.3.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e9c13ae9d91148fcb4aab6654c4c2a7d02a15395ea9e23f65170f175f8b269ce"
 
 [[package]]
 name = "inventory"

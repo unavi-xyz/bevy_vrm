@@ -90,7 +90,7 @@ fn setup(
         mtoon: MeshMaterial3d(mtoon_materials.add(MtoonMaterial {
             base_color: BISQUE.into(),
             shade_factor: SALMON.into(),
-            outline_width: 0.2,
+            outline_width: 0.02,
             outline_mode: VrmOutlineMode::World,
             ..default()
         })),

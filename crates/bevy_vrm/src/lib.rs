@@ -1,5 +1,5 @@
 //! Bevy plugin for loading [VRM](https://vrm.dev/en/) avatars.
-//! Aims to support both the VRM 0.0 and VRM 1.0 standards.
+//! Currently loads VRM 0.0 avatars; VRM 1.0 support is in progress.
 
 use bevy::{
     gltf::{

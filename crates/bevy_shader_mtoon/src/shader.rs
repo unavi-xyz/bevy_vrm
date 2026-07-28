@@ -42,7 +42,6 @@ pub struct MtoonMaterial {
     pub shade_factor:                 Color,
     pub shading_shift_factor:         f32,
     pub shading_toony_factor:         f32,
-    pub view_dir:                     Vec3,
 
     #[texture(1)]
     #[sampler(2)]
@@ -74,7 +73,7 @@ pub struct MtoonMaterial {
     pub shade_shift_texture:    Option<Handle<Image>>,
 }
 
-#[derive(Debug, Default, Clone, PartialEq, Eq, Reflect)]
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Reflect)]
 pub enum OutlineMode {
     #[default]
     None,
@@ -105,7 +104,6 @@ impl Default for MtoonMaterial {
             shade_factor:                 Color::BLACK,
             shading_shift_factor:         0.0,
             shading_toony_factor:         0.9,
-            view_dir:                     Vec3::ZERO,
 
             base_color_texture:     None,
             emissive_texture:       None,
@@ -136,13 +134,15 @@ pub struct MtoonShaderUniform {
     pub shade_color:                  Vec3,
     pub shading_shift_factor:         f32,
     pub shading_toony_factor:         f32,
-    pub view_dir:                     Vec3,
 }
 
 impl AsBindGroupShaderType<MtoonShaderUniform> for MtoonMaterial {
     fn as_bind_group_shader_type(&self, _images: &RenderAssets<GpuImage>) -> MtoonShaderUniform {
         let mut flags = MtoonMaterialFlags::empty();
 
+        if self.double_sided {
+            flags |= MtoonMaterialFlags::DOUBLE_SIDED;
+        }
         if self.base_color_texture.is_some() {
             flags |= MtoonMaterialFlags::BASE_COLOR_TEXTURE;
         }
@@ -207,7 +207,6 @@ impl AsBindGroupShaderType<MtoonShaderUniform> for MtoonMaterial {
             shade_color,
             shading_shift_factor: self.shading_shift_factor,
             shading_toony_factor: self.shading_toony_factor,
-            view_dir: self.view_dir,
         }
     }
 }

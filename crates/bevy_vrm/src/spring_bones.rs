@@ -38,6 +38,16 @@ pub struct SpringBoneLogicState {
     pub initial_local_rotation: Quat,
 }
 
+/// Synthetic leaf appended to a spring bone chain so the final joint has a tail
+/// to follow.
+#[derive(Component)]
+struct SpringBoneTail;
+
+/// Marks a [`SpringBones`] whose chains have been expanded to include
+/// descendants.
+#[derive(Component)]
+struct SpringBonesExpanded;
+
 pub struct SpringBonePlugin;
 
 impl Plugin for SpringBonePlugin {
@@ -58,17 +68,15 @@ impl Plugin for SpringBonePlugin {
 }
 
 fn expand_spring_bones(
-    mut spring_boness: Query<&mut SpringBones>,
+    mut commands: Commands,
+    mut spring_boness: Query<(Entity, &mut SpringBones), Without<SpringBonesExpanded>>,
     children: Query<&Children>,
     names: Query<&Name>,
 ) {
-    for mut spring_bones in &mut spring_boness {
+    for (entity, mut spring_bones) in &mut spring_boness {
         for spring_bone in &mut spring_bones.0 {
             for bone in spring_bone.bones.clone() {
                 for child in children.iter_descendants(bone) {
-                    if names.get(child).is_ok_and(|n| n.as_str() == "donotaddmore") {
-                        continue;
-                    }
                     if !spring_bone.bones.contains(&child) {
                         spring_bone.bones.push(child);
                         if let Ok(name) = names.get(child) {
@@ -78,6 +86,7 @@ fn expand_spring_bones(
                 }
             }
         }
+        commands.entity(entity).insert(SpringBonesExpanded);
     }
 }
 
@@ -87,8 +96,8 @@ fn initialize_spring_bone_logic(
     local_transforms: Query<&Transform>,
     logic_states: Query<&SpringBoneLogicState>,
     mut commands: Commands,
-    names: Query<&Name>,
     spring_boness: Query<&SpringBones>,
+    tails: Query<(), With<SpringBoneTail>>,
 ) {
     for spring_bones in spring_boness.iter() {
         for spring_bone in &spring_bones.0 {
@@ -98,14 +107,11 @@ fn initialize_spring_bone_logic(
                 }
 
                 let Ok(child) = children.get(*bone) else {
-                    if names.get(*bone).is_ok_and(|n| n.as_str() == "donotaddmore") {
+                    if tails.contains(*bone) {
                         continue;
                     }
                     let child = commands
-                        .spawn((
-                            Transform::from_xyz(0.0, -0.07, 0.0),
-                            Name::new("donotaddmore"),
-                        ))
+                        .spawn((Transform::from_xyz(0.0, -0.07, 0.0), SpringBoneTail))
                         .id();
                     commands.entity(*bone).add_child(child);
                     continue;
@@ -215,7 +221,7 @@ fn do_springbone_logic(
                 let mut next_tail =
                     spring_bone_logic_state.current_tail + inertia + stiffness + external;
                 next_tail = global.translation()
-                    + (next_tail - global.translation()).normalize()
+                    + (next_tail - global.translation()).normalize_or_zero()
                         * spring_bone_logic_state.bone_length;
 
                 spring_bone_logic_state.prev_tail = spring_bone_logic_state.current_tail;
