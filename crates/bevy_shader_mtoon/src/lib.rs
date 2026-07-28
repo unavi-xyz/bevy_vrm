@@ -7,6 +7,7 @@ use bevy::{
         load_internal_asset,
         uuid_handle,
     },
+    camera::visibility::RenderLayers,
     mesh::{
         VertexAttributeValues,
         morph::MeshMorphWeights,
@@ -129,12 +130,13 @@ fn sync_outline(
             Option<&OutlineChild>,
             Option<&SkinnedMesh>,
             Option<&MeshMorphWeights>,
+            Option<&RenderLayers>,
         ),
         With<OutlineSync>,
     >,
     child_materials: Query<&MeshMaterial3d<OutlineMaterial>>,
 ) {
-    for (entity, mtoon_handle, mesh, child, skin, morph) in &query {
+    for (entity, mtoon_handle, mesh, child, skin, morph, layers) in &query {
         let Some(mtoon) = mtoons.get(mtoon_handle.id()) else {
             continue;
         };
@@ -156,6 +158,14 @@ fn sync_outline(
             {
                 *existing = params;
             }
+            match layers {
+                Some(layers) => {
+                    commands.entity(child.0).insert(layers.clone());
+                }
+                None => {
+                    commands.entity(child.0).remove::<RenderLayers>();
+                }
+            }
             continue;
         }
 
@@ -175,6 +185,9 @@ fn sync_outline(
         }
         if let Some(morph) = morph {
             child_commands.insert(morph.clone());
+        }
+        if let Some(layers) = layers {
+            child_commands.insert(layers.clone());
         }
         let child_id = child_commands.id();
         commands

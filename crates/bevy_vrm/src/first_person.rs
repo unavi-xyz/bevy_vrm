@@ -16,7 +16,10 @@ use bevy::{
     },
     prelude::*,
 };
-use bevy_shader_mtoon::MtoonMaterial;
+use bevy_shader_mtoon::{
+    MtoonMaterial,
+    OutlineSync,
+};
 use serde_vrm::vrm0::BoneName;
 pub use serde_vrm::vrm0::FirstPersonFlag;
 
@@ -69,6 +72,7 @@ pub(crate) fn setup_first_person(
         Option<&MeshMaterial3d<StandardMaterial>>,
         Option<&MeshMaterial3d<MtoonMaterial>>,
         Option<&MeshMorphWeights>,
+        Option<&OutlineSync>,
     )>,
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
@@ -89,98 +93,50 @@ pub(crate) fn setup_first_person(
         .find(|(e, name)| **name == BoneName::Head && is_child(*e, event.entity, &parents))
         .expect("VRM must have Head bone");
 
-    for (ent, mut flag, mesh_handle, name, standard_material, mtoon_material, morph_weights) in
-        &mut flags
+    for (
+        ent,
+        mut flag,
+        mesh_handle,
+        name,
+        standard_material,
+        mtoon_material,
+        morph_weights,
+        outline_sync,
+    ) in &mut flags
     {
         // Skip if not a child of this VRM entity.
         if !is_child(ent, event.entity, &parents) {
             continue;
         }
-        // If auto, split the mesh into first-person and third-person variants.
-        // Each vertex that is weighted to the head bone gets removed from the
-        // first-person variant.
+        // Auto splits into a head-removed first-person variant plus the full
+        // third-person original, each on its own render layer.
         if *flag == FirstPersonFlag::Auto {
             let Some(mesh) = meshes.get(mesh_handle) else {
                 warn!("Mesh not found");
                 continue;
             };
-
-            let mut mesh = mesh.clone();
-
-            let Some(VertexAttributeValues::Uint16x4(joints)) =
-                mesh.attribute(Mesh::ATTRIBUTE_JOINT_INDEX)
-            else {
-                continue;
-            };
-
-            let Some(VertexAttributeValues::Float32x4(weights)) =
-                mesh.attribute(Mesh::ATTRIBUTE_JOINT_WEIGHT)
-            else {
-                continue;
-            };
-
             let Ok(skin) = skins.get(ent) else {
                 continue;
             };
-
-            let mut to_remove = HashSet::<usize>::default();
-
-            for (i, item) in joints.iter().enumerate() {
-                for (j, idx) in item.iter().enumerate() {
-                    let joint_ent = skin.joints[*idx as usize];
-
-                    if is_child(joint_ent, head_ent, &parents) {
-                        let weight = weights[i];
-                        let weight = weight[j];
-
-                        if weight > 0.0 {
-                            to_remove.insert(i);
-                        }
-                    }
-                }
-            }
-
-            let mut to_remove = to_remove.into_iter().collect::<Vec<_>>();
-            to_remove.sort_by(|a, b| b.cmp(a));
-
-            if let Some(indices) = mesh.indices_mut() {
-                match indices {
-                    Indices::U16(vec) => {
-                        clean_indices(vec, &to_remove);
-                    }
-                    Indices::U32(vec) => {
-                        clean_indices(vec, &to_remove);
-                    }
-                }
-            }
-
-            let mut new_skin = skin.clone();
-            let new_mesh_handle = meshes.add(mesh);
+            let Some(first_person) = strip_head_vertices(mesh, skin, head_ent, &parents) else {
+                continue;
+            };
 
             let new_ent = commands
                 .spawn((
                     Transform::default(),
-                    Mesh3d(new_mesh_handle),
+                    Mesh3d(meshes.add(first_person)),
                     render_layers[&FirstPersonFlag::FirstPersonOnly].clone(),
                 ))
                 .id();
 
-            if let Some(v) = mtoon_material {
-                commands.entity(new_ent).insert(v.clone());
-            }
+            insert_cloned(&mut commands, new_ent, mtoon_material);
+            insert_cloned(&mut commands, new_ent, standard_material);
+            insert_cloned(&mut commands, new_ent, name);
+            insert_cloned(&mut commands, new_ent, morph_weights);
+            insert_cloned(&mut commands, new_ent, outline_sync);
 
-            if let Some(v) = standard_material {
-                commands.entity(new_ent).insert(v.clone());
-            }
-
-            if let Some(v) = name {
-                commands.entity(new_ent).insert(v.clone());
-            }
-
-            if let Some(v) = morph_weights {
-                commands.entity(new_ent).insert(v.clone());
-            }
-
+            let mut new_skin = skin.clone();
             for (i, e) in new_skin.joints.iter().enumerate() {
                 if *e == ent {
                     new_skin.joints.insert(i, new_ent);
@@ -198,6 +154,56 @@ pub(crate) fn setup_first_person(
             .entity(ent)
             .insert(render_layers[flag.as_ref()].clone());
     }
+}
+
+fn insert_cloned<T: Component + Clone>(
+    commands: &mut Commands,
+    entity: Entity,
+    component: Option<&T>,
+) {
+    if let Some(component) = component {
+        commands.entity(entity).insert(component.clone());
+    }
+}
+
+/// Clones a mesh with every triangle touching a head-weighted vertex removed.
+fn strip_head_vertices(
+    mesh: &Mesh,
+    skin: &SkinnedMesh,
+    head_ent: Entity,
+    parents: &Query<&ChildOf>,
+) -> Option<Mesh> {
+    let Some(VertexAttributeValues::Uint16x4(joints)) = mesh.attribute(Mesh::ATTRIBUTE_JOINT_INDEX)
+    else {
+        return None;
+    };
+    let Some(VertexAttributeValues::Float32x4(weights)) =
+        mesh.attribute(Mesh::ATTRIBUTE_JOINT_WEIGHT)
+    else {
+        return None;
+    };
+
+    let mut to_remove = HashSet::<usize>::default();
+    for (i, item) in joints.iter().enumerate() {
+        for (j, idx) in item.iter().enumerate() {
+            let joint_ent = skin.joints[*idx as usize];
+            if is_child(joint_ent, head_ent, parents) && weights[i][j] > 0.0 {
+                to_remove.insert(i);
+            }
+        }
+    }
+
+    let mut to_remove = to_remove.into_iter().collect::<Vec<_>>();
+    to_remove.sort_by(|a, b| b.cmp(a));
+
+    let mut mesh = mesh.clone();
+    if let Some(indices) = mesh.indices_mut() {
+        match indices {
+            Indices::U16(vec) => clean_indices(vec, &to_remove),
+            Indices::U32(vec) => clean_indices(vec, &to_remove),
+        }
+    }
+    Some(mesh)
 }
 
 trait ToUsize {

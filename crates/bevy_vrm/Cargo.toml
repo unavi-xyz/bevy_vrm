@@ -17,6 +17,7 @@ default    = ["animations"]
 [dependencies]
 bevy = { features = [
   "bevy_gltf",
+  "bevy_log",
   "bevy_pbr",
   "bevy_world_serialization",
 ], workspace = true }
