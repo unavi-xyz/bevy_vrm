@@ -94,11 +94,7 @@
                   cargo-release
                   cargo-workspaces
                 ])
-                ++ (
-                  config.packages
-                  |> lib.attrValues
-                  |> lib.flip pkgs.lib.forEach (x: x.buildInputs ++ x.nativeBuildInputs)
-                );
+                ++ lib.concatMap (x: x.buildInputs ++ x.nativeBuildInputs) (lib.attrValues config.packages);
 
               LD_LIBRARY_PATH =
                 config.packages

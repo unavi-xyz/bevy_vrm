@@ -4,7 +4,7 @@ _: {
     let
       pname = "vrm_viewer";
 
-      buildInputs = pkgs.lib.optionals pkgs.stdenv.isLinux (
+      buildInputs = pkgs.lib.optionals pkgs.stdenv.hostPlatform.isLinux (
         with pkgs;
         [
           alsa-lib
