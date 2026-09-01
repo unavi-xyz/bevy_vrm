@@ -1,5 +1,8 @@
 //! Bevy plugin implementing the [MToon](https://vrm.dev/en/univrm/shaders/shader_mtoon.html) shader.
 
+// Bevy`s `AsBindGroup` needs higher limit
+#![recursion_limit = "256"]
+
 use std::collections::HashMap;
 
 use bevy::{
