@@ -60,8 +60,7 @@ impl VrmHandler {
             .and_then(|v| v.first_person.as_ref())
             .and_then(|fp| fp.mesh_annotations.as_ref())
             .and_then(|anns| anns.iter().find(|a| a.mesh == Some(mesh_index as u32)))
-            .map(|a| a.first_person_flag)
-            .unwrap_or_default();
+            .map_or_default(|a| a.first_person_flag);
 
         if flag == FirstPersonFlag::Auto && self.third_person_meshes.contains(&mesh_index) {
             flag = FirstPersonFlag::ThirdPersonOnly;
@@ -186,8 +185,7 @@ impl GltfExtensionHandler for VrmHandler {
                 let gravity_dir = group
                     .gravity_dir
                     .as_ref()
-                    .map(|d| Vec3::new(d.x, d.y, d.z))
-                    .unwrap_or_default();
+                    .map_or_default(|d| Vec3::new(d.x, d.y, d.z));
 
                 spring_bones.push(SpringBone {
                     bones,

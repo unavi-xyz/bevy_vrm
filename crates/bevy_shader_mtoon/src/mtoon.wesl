@@ -1,18 +1,16 @@
-#define_import_path bevy_shader_mtoon::mtoon
+import bevy_pbr::{
+    render::{
+        pbr_fragment::pbr_input_from_vertex_output,
+        mesh_view_bindings::view,
+        pbr_ambient::ambient_light,
+    },
+    prepass::{io as prepass_io, bindings::previous_view_uniforms},
+};
 
-#import bevy_pbr::{
-    pbr_fragment::pbr_input_from_vertex_output,
-    mesh_view_bindings::view,
-    ambient::ambient_light,
-    prepass_io,
-    prepass_bindings::previous_view_uniforms,
-}
-
-#ifdef PREPASS_PIPELINE
-#import bevy_pbr::prepass_io::VertexOutput
-#else
-#import bevy_pbr::forward_io::VertexOutput
-#endif
+@if(PREPASS_PIPELINE)
+import bevy_pbr::prepass::io::VertexOutput;
+@else
+import bevy_pbr::render::forward_io::VertexOutput;
 
 struct MtoonMaterialUniform {
     alpha_cutoff: f32,
@@ -33,23 +31,23 @@ struct MtoonMaterialUniform {
     shading_toony_factor: f32,
 };
 
-@group(#{MATERIAL_BIND_GROUP}) @binding(0)
+@group(constants::MATERIAL_BIND_GROUP) @binding(0)
 var<uniform> material: MtoonMaterialUniform;
 
-@group(#{MATERIAL_BIND_GROUP}) @binding(1) var base_color_texture: texture_2d<f32>;
-@group(#{MATERIAL_BIND_GROUP}) @binding(2) var base_color_sampler: sampler;
-@group(#{MATERIAL_BIND_GROUP}) @binding(3) var emissive_texture: texture_2d<f32>;
-@group(#{MATERIAL_BIND_GROUP}) @binding(4) var emissive_sampler: sampler;
-@group(#{MATERIAL_BIND_GROUP}) @binding(5) var matcap_texture: texture_2d<f32>;
-@group(#{MATERIAL_BIND_GROUP}) @binding(6) var matcap_sampler: sampler;
-@group(#{MATERIAL_BIND_GROUP}) @binding(7) var normal_map_texture: texture_2d<f32>;
-@group(#{MATERIAL_BIND_GROUP}) @binding(8) var normal_map_sampler: sampler;
-@group(#{MATERIAL_BIND_GROUP}) @binding(9) var rim_multiply_texture: texture_2d<f32>;
-@group(#{MATERIAL_BIND_GROUP}) @binding(10) var rim_multiply_sampler: sampler;
-@group(#{MATERIAL_BIND_GROUP}) @binding(11) var shade_color_texture: texture_2d<f32>;
-@group(#{MATERIAL_BIND_GROUP}) @binding(12) var shade_color_sampler: sampler;
-@group(#{MATERIAL_BIND_GROUP}) @binding(13) var shade_shift_texture: texture_2d<f32>;
-@group(#{MATERIAL_BIND_GROUP}) @binding(14) var shade_shift_sampler: sampler;
+@group(constants::MATERIAL_BIND_GROUP) @binding(1) var base_color_texture: texture_2d<f32>;
+@group(constants::MATERIAL_BIND_GROUP) @binding(2) var base_color_sampler: sampler;
+@group(constants::MATERIAL_BIND_GROUP) @binding(3) var emissive_texture: texture_2d<f32>;
+@group(constants::MATERIAL_BIND_GROUP) @binding(4) var emissive_sampler: sampler;
+@group(constants::MATERIAL_BIND_GROUP) @binding(5) var matcap_texture: texture_2d<f32>;
+@group(constants::MATERIAL_BIND_GROUP) @binding(6) var matcap_sampler: sampler;
+@group(constants::MATERIAL_BIND_GROUP) @binding(7) var normal_map_texture: texture_2d<f32>;
+@group(constants::MATERIAL_BIND_GROUP) @binding(8) var normal_map_sampler: sampler;
+@group(constants::MATERIAL_BIND_GROUP) @binding(9) var rim_multiply_texture: texture_2d<f32>;
+@group(constants::MATERIAL_BIND_GROUP) @binding(10) var rim_multiply_sampler: sampler;
+@group(constants::MATERIAL_BIND_GROUP) @binding(11) var shade_color_texture: texture_2d<f32>;
+@group(constants::MATERIAL_BIND_GROUP) @binding(12) var shade_color_sampler: sampler;
+@group(constants::MATERIAL_BIND_GROUP) @binding(13) var shade_shift_texture: texture_2d<f32>;
+@group(constants::MATERIAL_BIND_GROUP) @binding(14) var shade_shift_sampler: sampler;
 
 const MTOON_FLAGS_ALPHA_MODE_MASK: u32 = 1u;
 const MTOON_FLAGS_ALPHA_MODE_OPAQUE: u32 = 2u;
@@ -84,7 +82,7 @@ fn mtoon_resolve_base_color(in: VertexOutput) -> vec4<f32> {
     return base_color;
 }
 
-#ifndef PREPASS_PIPELINE
+@if(!PREPASS_PIPELINE)
 fn mtoon_shade(in: VertexOutput, is_front: bool) -> vec4<f32> {
     let double_sided = (material.flags & MTOON_FLAGS_DOUBLE_SIDED) != 0u;
     var pbr_input = pbr_input_from_vertex_output(in, is_front, double_sided);
@@ -100,11 +98,10 @@ fn mtoon_shade(in: VertexOutput, is_front: bool) -> vec4<f32> {
 
     // Normal mapping. The mikktspace method requires the world normal is NOT re-normalized before
     // applying the tangent-space normal. http://www.mikktspace.com/
-#ifndef LOAD_PREPASS_NORMALS
+@if(!LOAD_PREPASS_NORMALS) {
     var N = pbr_input.world_normal;
     if (material.flags & MTOON_FLAGS_NORMAL_MAP_TEXTURE) != 0u {
-#ifdef VERTEX_TANGENTS
-#ifdef VERTEX_UVS
+@if(VERTEX_TANGENTS && VERTEX_UVS) {
         let T = in.world_tangent.xyz;
         let B = in.world_tangent.w * cross(N, T);
         var Nt = textureSampleBias(normal_map_texture, normal_map_sampler, in.uv, view.mip_bias).rgb * 2.0 - 1.0;
@@ -113,11 +110,10 @@ fn mtoon_shade(in: VertexOutput, is_front: bool) -> vec4<f32> {
             Nt = -Nt;
         }
         N = Nt.x * T + Nt.y * B + Nt.z * N;
-#endif
-#endif
+}
         pbr_input.N = normalize(N);
     }
-#endif
+}
 
     let n = pbr_input.N;
     let v = pbr_input.V;
@@ -178,20 +174,18 @@ fn mtoon_shade(in: VertexOutput, is_front: bool) -> vec4<f32> {
     return vec4<f32>(color, base_color.a);
 }
 
+@if(!PREPASS_PIPELINE)
 fn linear_step(a: f32, b: f32, t: f32) -> f32 {
     return saturate((t - a) / (b - a));
 }
-#endif // PREPASS_PIPELINE
 
 // The prepass fragment shader. AlphaMode::Mask surfaces must discard here too;
 // if they don't, the prepass writes full-coverage depth for the cutout regions,
 // which then occludes whatever renders behind them (e.g. a hair cutout in front
 // of the face). The stock prepass shader has no discard, so this mirrors bevy's
-// pbr_prepass.wgsl: same alpha handling as the main pass, plus the normal and
+// pbr_prepass.wesl: same alpha handling as the main pass, plus the normal and
 // motion-vector targets TAA and SSAO need.
-#ifdef PREPASS_PIPELINE
-
-#ifdef PREPASS_FRAGMENT
+@if(PREPASS_PIPELINE && PREPASS_FRAGMENT)
 @fragment
 fn fragment(
     in: VertexOutput,
@@ -201,38 +195,37 @@ fn fragment(
 
     var out: prepass_io::FragmentOutput;
 
-#ifdef NORMAL_PREPASS
+@if(NORMAL_PREPASS) {
     let double_sided = (material.flags & MTOON_FLAGS_DOUBLE_SIDED) != 0u;
     var world_normal = in.world_normal;
     if double_sided && !is_front {
         world_normal = -world_normal;
     }
     out.normal = vec4<f32>(world_normal * 0.5 + vec3<f32>(0.5), 1.0);
-#endif
+}
 
-#ifdef MOTION_VECTOR_PREPASS
+@if(MOTION_VECTOR_PREPASS) {
     let clip_position_t = view.unjittered_clip_from_world * in.world_position;
     let clip_position = clip_position_t.xy / clip_position_t.w;
-    let previous_clip_position_t = previous_view_uniforms.clip_from_world * in.previous_world_position;
+    let previous_clip_position_t = previous_view_uniforms.unjittered_clip_from_world * in.previous_world_position;
     let previous_clip_position = previous_clip_position_t.xy / previous_clip_position_t.w;
     out.motion_vector = (clip_position - previous_clip_position) * vec2<f32>(0.5, -0.5);
-#endif
+}
 
-#ifdef UNCLIPPED_DEPTH_ORTHO_EMULATION
+@if(UNCLIPPED_DEPTH_ORTHO_EMULATION)
     out.frag_depth = in.unclipped_depth;
-#endif
 
     return out;
 }
-#else // PREPASS_FRAGMENT (depth-only prepass)
+
+// Depth-only prepass.
+@if(PREPASS_PIPELINE && !PREPASS_FRAGMENT)
 @fragment
 fn fragment(in: VertexOutput) {
     mtoon_resolve_base_color(in);
 }
-#endif // PREPASS_FRAGMENT
 
-#else // PREPASS_PIPELINE
-
+@if(!PREPASS_PIPELINE)
 @fragment
 fn fragment(
     in: VertexOutput,
@@ -240,5 +233,3 @@ fn fragment(
 ) -> @location(0) vec4<f32> {
     return mtoon_shade(in, is_front);
 }
-
-#endif // PREPASS_PIPELINE

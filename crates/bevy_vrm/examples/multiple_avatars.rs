@@ -1,15 +1,17 @@
 use std::f32::consts::PI;
 
-use bevy::prelude::*;
-use bevy_panorbit_camera::{
-    PanOrbitCamera,
-    PanOrbitCameraPlugin,
+use bevy::{
+    camera_controller::pan_orbit_camera::prelude::PanOrbitCamera,
+    prelude::*,
 };
 use bevy_vrm::{
     VrmInstance,
     VrmPlugins,
     mtoon::MtoonSun,
 };
+use camera::OrbitCameraPlugin;
+
+#[path = "../../vrm_viewer/src/camera.rs"] mod camera;
 
 #[derive(Component)]
 struct LinearMotion {
@@ -26,7 +28,7 @@ fn main() {
                 ..default()
             }),
             VrmPlugins,
-            PanOrbitCameraPlugin,
+            OrbitCameraPlugin,
         ))
         .add_systems(Startup, setup_scene)
         .add_systems(Update, animate_linear_motion)
@@ -35,13 +37,13 @@ fn main() {
 
 fn setup_scene(mut commands: Commands, asset_server: Res<AssetServer>) {
     // Camera.
+    let focus = Vec3::new(0.0, 1.0, 0.0);
+    let transform = Transform::from_xyz(0.0, 2.0, 10.0).looking_at(focus, Vec3::Y);
     commands.spawn((
         Camera3d::default(),
-        Transform::from_xyz(0.0, 2.0, 10.0).looking_at(Vec3::new(0.0, 1.0, 0.0), Vec3::Y),
-        PanOrbitCamera {
-            focus: Vec3::new(0.0, 1.0, 0.0),
-            ..default()
-        },
+        PanOrbitCamera::default()
+            .with_initial_anchor_depth(f64::from(transform.translation.distance(focus))),
+        transform,
     ));
 
     // Light.

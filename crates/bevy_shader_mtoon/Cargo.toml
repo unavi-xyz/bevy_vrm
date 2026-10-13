@@ -19,8 +19,9 @@ bevy = { default-features = false, features = [
 bitflags = "2.13.1"
 
 [dev-dependencies]
-bevy                           = { default-features = true, workspace = true }
-bevy_egui.workspace            = true
-bevy_panorbit_camera.workspace = true
-naga                           = "=29.0.4"
-naga_oil                       = "=0.22.0"
+bevy = { default-features = true, features = [
+  "pan_orbit_camera",
+], workspace = true }
+bevy_egui.workspace = true
+naga = { features = ["wgsl-in"], version = "30.0.1" }
+wesl = { features = ["naga-ext"], version = "0.6.0" }

@@ -10,7 +10,7 @@ use bevy::{
 
 use crate::{
     MtoonMaterial,
-    OUTLINE_SHADER_HANDLE,
+    OUTLINE_SHADER_PATH,
     shader::OutlineMode,
 };
 
@@ -60,11 +60,11 @@ impl bevy::render::render_resource::AsBindGroupShaderType<OutlineShaderUniform>
 
 impl Material for OutlineMaterial {
     fn vertex_shader() -> ShaderRef {
-        OUTLINE_SHADER_HANDLE.into()
+        OUTLINE_SHADER_PATH.into()
     }
 
     fn fragment_shader() -> ShaderRef {
-        OUTLINE_SHADER_HANDLE.into()
+        OUTLINE_SHADER_PATH.into()
     }
 
     fn specialize(

@@ -15,7 +15,7 @@ use bevy::{
     shader::ShaderRef,
 };
 
-use crate::SHADER_HANDLE;
+use crate::SHADER_PATH;
 
 #[derive(Asset, AsBindGroup, PartialEq, Debug, Clone, Component, Reflect)]
 #[bind_group_data(MtoonMaterialKey)]
@@ -230,11 +230,11 @@ impl From<&MtoonMaterial> for MtoonMaterialKey {
 
 impl Material for MtoonMaterial {
     fn fragment_shader() -> ShaderRef {
-        SHADER_HANDLE.into()
+        SHADER_PATH.into()
     }
 
     fn deferred_fragment_shader() -> ShaderRef {
-        SHADER_HANDLE.into()
+        SHADER_PATH.into()
     }
 
     // Route the depth/normal/motion-vector prepass through the MToon shader:
@@ -242,7 +242,7 @@ impl Material for MtoonMaterial {
     // so mask-mode materials would write full coverage depth and punch holes
     // in whatever renders behind them (e.g. hair cutouts over the face).
     fn prepass_fragment_shader() -> ShaderRef {
-        SHADER_HANDLE.into()
+        SHADER_PATH.into()
     }
 
     fn alpha_mode(&self) -> AlphaMode {

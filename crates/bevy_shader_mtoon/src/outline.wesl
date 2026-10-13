@@ -1,14 +1,12 @@
-#define_import_path bevy_shader_mtoon::outline
-
-#import bevy_pbr::{
+import bevy_pbr::render::{
     mesh_bindings::mesh,
     mesh_functions,
     skinning,
     morph::{morph_position, morph_normal},
-    forward_io::Vertex,
+    forward_io::{Vertex, UncompressedVertex, decompress_vertex},
     view_transformations::{position_world_to_clip, direction_world_to_view},
     mesh_view_bindings::view,
-}
+};
 
 struct OutlineMaterialUniform {
     color: vec4<f32>,
@@ -16,53 +14,53 @@ struct OutlineMaterialUniform {
     mode: u32,
 };
 
-@group(#{MATERIAL_BIND_GROUP}) @binding(0)
+@group(constants::MATERIAL_BIND_GROUP) @binding(0)
 var<uniform> outline: OutlineMaterialUniform;
 
 const OUTLINE_MODE_WORLD: u32 = 1u;
 const OUTLINE_MODE_SCREEN: u32 = 2u;
 const EPSILON: f32 = 0.0001;
 
-#ifdef MORPH_TARGETS
-fn morph_vertex(vertex_in: Vertex, instance_index: u32) -> Vertex {
+@if(MORPH_TARGETS)
+fn morph_vertex(vertex_in: UncompressedVertex, instance_index: u32) -> UncompressedVertex {
     var vertex = vertex_in;
     let first_vertex = mesh[instance_index].first_vertex_index;
     let vertex_index = vertex.index - first_vertex;
+    let morph_descriptor_index = mesh[instance_index].morph_descriptor_index;
 
-    let weight_count = bevy_pbr::morph::layer_count(instance_index);
+    let weight_count = bevy_pbr::render::morph::layer_count(morph_descriptor_index);
     for (var i: u32 = 0u; i < weight_count; i++) {
-        let weight = bevy_pbr::morph::weight_at(i, instance_index);
+        let weight = bevy_pbr::render::morph::weight_at(i, morph_descriptor_index);
         if weight == 0.0 {
             continue;
         }
-        vertex.position += weight * morph_position(vertex_index, i, instance_index);
-#ifdef VERTEX_NORMALS
-        vertex.normal += weight * morph_normal(vertex_index, i, instance_index);
-#endif
+        vertex.position += weight * morph_position(vertex_index, i, morph_descriptor_index);
+        @if(VERTEX_NORMALS)
+        vertex.normal += weight * morph_normal(vertex_index, i, morph_descriptor_index);
     }
     return vertex;
 }
-#endif
 
 @vertex
 fn vertex(vertex_no_morph: Vertex) -> @builtin(position) vec4<f32> {
-#ifdef MORPH_TARGETS
-    var vertex = morph_vertex(vertex_no_morph, vertex_no_morph.instance_index);
-#else
-    var vertex = vertex_no_morph;
-#endif
+    let uncompressed_vertex_no_morph = decompress_vertex(vertex_no_morph, vertex_no_morph.instance_index);
+@if(MORPH_TARGETS)
+    var vertex = morph_vertex(uncompressed_vertex_no_morph, vertex_no_morph.instance_index);
+@else
+    var vertex = uncompressed_vertex_no_morph;
 
-#ifdef SKINNED
+@if(SKINNED)
     let world_from_local = skinning::skin_model(
         vertex.joint_indices,
         vertex.joint_weights,
         vertex_no_morph.instance_index
     );
-    let world_normal = skinning::skin_normals(world_from_local, vertex.normal);
-#else
+@else
     let world_from_local = mesh_functions::get_world_from_local(vertex_no_morph.instance_index);
+@if(SKINNED)
+    let world_normal = skinning::skin_normals(world_from_local, vertex.normal);
+@else
     let world_normal = mesh_functions::mesh_normal_local_to_world(vertex.normal, vertex_no_morph.instance_index);
-#endif
 
     let world_position = mesh_functions::mesh_position_local_to_world(
         world_from_local,

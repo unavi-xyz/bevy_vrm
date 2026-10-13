@@ -35,6 +35,7 @@ serde_vrm = { features = ["bevy"], workspace = true }
 thiserror.workspace = true
 
 [dev-dependencies]
-bevy                           = { default-features = true, workspace = true }
-bevy_egui.workspace            = true
-bevy_panorbit_camera.workspace = true
+bevy = { default-features = true, features = [
+  "pan_orbit_camera",
+], workspace = true }
+bevy_egui.workspace = true

@@ -13,6 +13,7 @@ use bevy::{
         CompressedImageFormatSupport,
         CompressedImageFormats,
     },
+    mesh::MeshCompressionArgs,
     platform::collections::HashMap,
     prelude::*,
 };
@@ -91,6 +92,8 @@ impl Plugin for VrmPlugin {
                 default_convert_coordinates: GltfConvertCoordinates::default(),
                 extensions,
                 default_skinned_mesh_bounds_policy: GltfSkinnedMeshBoundsPolicy::default(),
+                // The MToon outline reads uncompressed `Float32x3` normals.
+                default_mesh_compression: MeshCompressionArgs::none(),
             },
         });
     }

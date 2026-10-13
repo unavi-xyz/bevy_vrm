@@ -5,16 +5,13 @@ use std::f32::consts::PI;
 use bevy::{
     asset::AssetMetaCheck,
     camera::visibility::RenderLayers,
+    camera_controller::pan_orbit_camera::prelude::PanOrbitCamera,
     prelude::*,
     world_serialization::WorldInstanceReady,
 };
 use bevy_egui::{
     EguiPlugin,
     EguiPrimaryContextPass,
-};
-use bevy_panorbit_camera::{
-    PanOrbitCamera,
-    PanOrbitCameraPlugin,
 };
 use bevy_vrm::{
     VrmInstance,
@@ -26,8 +23,10 @@ use bevy_vrm::{
     },
     mtoon::MtoonSun,
 };
+use camera::OrbitCameraPlugin;
 use ui::RenderLayer;
 
+pub mod camera;
 mod draw_spring_bones;
 mod move_leg;
 mod ui;
@@ -46,7 +45,7 @@ impl Plugin for VrmViewerPlugin {
                     ..default()
                 }),
                 EguiPlugin::default(),
-                PanOrbitCameraPlugin,
+                OrbitCameraPlugin,
                 VrmPlugins,
             ))
             .add_systems(Startup, setup)
@@ -76,12 +75,13 @@ struct Settings {
 }
 
 fn setup(mut commands: Commands, mut settings: ResMut<Settings>) {
+    let focus = Vec3::new(0.0, 0.8, 0.0);
+    let transform = Transform::from_xyz(1.0, 2.0, 5.0).looking_at(focus, Vec3::Y);
     commands.spawn((
-        Transform::from_xyz(1.0, 2.0, 5.0),
-        PanOrbitCamera {
-            focus: Vec3::new(0.0, 0.8, 0.0),
-            ..default()
-        },
+        Camera3d::default(),
+        PanOrbitCamera::default()
+            .with_initial_anchor_depth(f64::from(transform.translation.distance(focus))),
+        transform,
     ));
 
     commands.spawn((

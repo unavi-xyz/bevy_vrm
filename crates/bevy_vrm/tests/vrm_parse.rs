@@ -23,13 +23,11 @@ fn alicia_has_expected_data() {
         .as_ref()
         .and_then(|s| s.bone_groups.as_ref());
     let group_count = bone_groups.map_or(0, Vec::len);
-    let bone_count: usize = bone_groups
-        .map(|gs| {
-            gs.iter()
-                .map(|g| g.bones.as_ref().map_or(0, Vec::len))
-                .sum()
-        })
-        .unwrap_or_default();
+    let bone_count: usize = bone_groups.map_or_default(|gs| {
+        gs.iter()
+            .map(|g| g.bones.as_ref().map_or(0, Vec::len))
+            .sum()
+    });
 
     let human_bones = vrm.humanoid.as_ref().and_then(|h| h.human_bones.as_ref());
     let human_bone_count = human_bones.map_or(0, Vec::len);

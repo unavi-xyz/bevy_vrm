@@ -6,10 +6,6 @@
 use std::collections::HashMap;
 
 use bevy::{
-    asset::{
-        load_internal_asset,
-        uuid_handle,
-    },
     camera::visibility::RenderLayers,
     mesh::{
         VertexAttributeValues,
@@ -17,6 +13,7 @@ use bevy::{
         skinning::SkinnedMesh,
     },
     prelude::*,
+    shader::load_shader_library,
 };
 
 mod outline;
@@ -28,21 +25,17 @@ pub use shader::{
     OutlineMode as VrmOutlineMode,
 };
 
-const SHADER_HANDLE: Handle<Shader> = uuid_handle!("88901104-e489-4263-b974-94885e37a3a7");
-const OUTLINE_SHADER_HANDLE: Handle<Shader> = uuid_handle!("2f1c3d6e-9a4b-4f8c-8c2a-1b7e4d5a6c90");
+/// Importable from other WESL shaders as `bevy_shader_mtoon::mtoon`.
+const SHADER_PATH: &str = "embedded://bevy_shader_mtoon/mtoon.wesl";
+const OUTLINE_SHADER_PATH: &str = "embedded://bevy_shader_mtoon/outline.wesl";
 
 #[derive(Default)]
 pub struct MtoonPlugin;
 
 impl Plugin for MtoonPlugin {
     fn build(&self, app: &mut App) {
-        load_internal_asset!(app, SHADER_HANDLE, "mtoon.wgsl", Shader::from_wgsl);
-        load_internal_asset!(
-            app,
-            OUTLINE_SHADER_HANDLE,
-            "outline.wgsl",
-            Shader::from_wgsl
-        );
+        load_shader_library!(app, "mtoon.wesl");
+        load_shader_library!(app, "outline.wesl");
 
         app.register_type::<OutlineSync>()
             .add_plugins((

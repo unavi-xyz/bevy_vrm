@@ -10,11 +10,12 @@ version.workspace    = true
 workspace = true
 
 [dependencies]
-bevy                           = { default-features = true, workspace = true }
-bevy_egui.workspace            = true
-bevy_panorbit_camera.workspace = true
-bevy_vrm.workspace             = true
+bevy = { default-features = true, features = [
+  "pan_orbit_camera",
+], workspace = true }
+bevy_egui.workspace = true
+bevy_vrm.workspace = true
 
 [target.'cfg(target_family = "wasm")'.dependencies]
 libm         = "0.2.16"
-wasm-bindgen = "=0.2.114"
+wasm-bindgen = "=0.2.129"

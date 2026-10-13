@@ -2,6 +2,7 @@ use std::f32::consts::PI;
 
 use bevy::{
     asset::RenderAssetUsages,
+    camera_controller::pan_orbit_camera::prelude::PanOrbitCamera,
     color::palettes::css::{
         BISQUE,
         SALMON,
@@ -22,10 +23,6 @@ use bevy_egui::{
         Window,
     },
 };
-use bevy_panorbit_camera::{
-    PanOrbitCamera,
-    PanOrbitCameraPlugin,
-};
 use bevy_shader_mtoon::{
     MtoonBundle,
     MtoonMaterial,
@@ -33,6 +30,9 @@ use bevy_shader_mtoon::{
     MtoonSun,
     VrmOutlineMode,
 };
+use camera::OrbitCameraPlugin;
+
+#[path = "../../vrm_viewer/src/camera.rs"] mod camera;
 
 fn main() {
     App::new()
@@ -41,7 +41,7 @@ fn main() {
             DefaultPlugins.set(ImagePlugin::default_nearest()),
             EguiPlugin::default(),
             MtoonPlugin,
-            PanOrbitCameraPlugin,
+            OrbitCameraPlugin,
         ))
         .add_systems(Startup, setup)
         .add_systems(EguiPrimaryContextPass, ui)
@@ -58,12 +58,13 @@ fn setup(
     mut mtoon_materials: ResMut<Assets<MtoonMaterial>>,
     mut meshes: ResMut<Assets<Mesh>>,
 ) {
+    let focus = Vec3::new(0.0, 1.0, 0.0);
+    let transform = Transform::from_xyz(0.0, 8.0, 14.0).looking_at(focus, Vec3::Y);
     commands.spawn((
-        Transform::from_xyz(0.0, 8.0, 14.0),
-        PanOrbitCamera {
-            focus: Vec3::new(0.0, 1.0, 0.0),
-            ..default()
-        },
+        Camera3d::default(),
+        PanOrbitCamera::default()
+            .with_initial_anchor_depth(f64::from(transform.translation.distance(focus))),
+        transform,
     ));
 
     commands.spawn((

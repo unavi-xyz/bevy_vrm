@@ -20,7 +20,7 @@ pub struct Vrm {
     pub material_properties: Option<Vec<MaterialProperty>>,
 }
 
-#[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
+#[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Meta {
     pub title:                 Option<String>,
@@ -65,7 +65,7 @@ pub struct Humanoid {
     pub has_translation_dof: Option<bool>,
 }
 
-#[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
+#[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Bone {
     pub bone:               Option<BoneName>,
@@ -216,7 +216,7 @@ pub struct FirstPerson {
     pub look_at_vertical_up:      Option<LookAtCurve>,
 }
 
-#[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
+#[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct MeshAnnotation {
     pub mesh:              Option<u32>,
@@ -434,7 +434,7 @@ pub struct FloatProperties {
     pub uv_animation_rotation_speed_factor: Option<f32>,
 }
 
-#[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
+#[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
 pub struct TextureProperties {
     #[serde(rename = "_MainTex")]
     pub base_color:                     Option<u32>,
@@ -468,7 +468,7 @@ pub struct VectorProperties {
     pub rim_factor:      Option<[f32; 4]>,
 }
 
-#[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
+#[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
 pub struct TagMap {
     #[serde(rename = "RenderType")]
     pub render_type: Option<RenderType>,
@@ -481,7 +481,7 @@ pub enum RenderType {
     TransparentCutout,
 }
 
-#[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
+#[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
 pub struct KeywordMap {
     #[serde(rename = "_ALPHABLEND_ON")]
     pub alpha_blend:         Option<bool>,

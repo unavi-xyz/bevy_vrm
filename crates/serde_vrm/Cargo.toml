@@ -7,6 +7,9 @@ name                 = "serde_vrm"
 repository.workspace = true
 version.workspace    = true
 
+[lints]
+workspace = true
+
 [features]
 bevy = ["dep:bevy"]
 
