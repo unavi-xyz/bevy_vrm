@@ -130,7 +130,7 @@ fn sync_outline(
         ),
         With<OutlineSync>,
     >,
-    child_materials: Query<&MeshMaterial3d<OutlineMaterial>>,
+    outline_children: Query<(&MeshMaterial3d<OutlineMaterial>, Option<&RenderLayers>)>,
 ) {
     for (entity, mtoon_handle, mesh, child, skin, morph, layers) in &query {
         let Some(mtoon) = mtoons.get(mtoon_handle.id()) else {
@@ -139,7 +139,7 @@ fn sync_outline(
 
         if mtoon.outline_mode == VrmOutlineMode::None {
             if let Some(child) = child {
-                commands.entity(child.0).despawn();
+                commands.entity(child.0).try_despawn();
                 commands.entity(entity).remove::<OutlineChild>();
             }
             continue;
@@ -148,18 +148,26 @@ fn sync_outline(
         let params = OutlineMaterial::from_mtoon(mtoon);
 
         if let Some(child) = child {
-            if let Ok(material) = child_materials.get(child.0)
+            let Ok((material, child_layers)) = outline_children.get(child.0) else {
+                continue;
+            };
+            if outlines
+                .get(material.id())
+                .is_some_and(|existing| *existing != params)
                 && let Some(mut existing) = outlines.get_mut(material.id())
-                && *existing != params
             {
                 *existing = params;
             }
-            match layers {
-                Some(layers) => {
-                    commands.entity(child.0).insert(layers.clone());
-                }
-                None => {
-                    commands.entity(child.0).remove::<RenderLayers>();
+            // The child dies with its parent, which may be despawned later this
+            // frame.
+            if layers != child_layers {
+                match layers {
+                    Some(layers) => {
+                        commands.entity(child.0).try_insert(layers.clone());
+                    }
+                    None => {
+                        commands.entity(child.0).try_remove::<RenderLayers>();
+                    }
                 }
             }
             continue;
@@ -171,25 +179,34 @@ fn sync_outline(
 
         let mesh_handle = meshes.add(outline_mesh);
         let handle = outlines.add(params);
-        let mut child_commands = commands.spawn((
-            Mesh3d(mesh_handle),
-            MeshMaterial3d(handle),
-            Transform::default(),
-        ));
-        if let Some(skin) = skin {
-            child_commands.insert(skin.clone());
-        }
-        if let Some(morph) = morph {
-            child_commands.insert(morph.clone());
-        }
-        if let Some(layers) = layers {
-            child_commands.insert(layers.clone());
-        }
-        let child_id = child_commands.id();
+        let skin = skin.cloned();
+        let morph = morph.cloned();
+        let layers = layers.cloned();
+
+        // Spawned only if the mesh still exists when the command applies, so a
+        // mesh despawned this frame leaves no orphaned outline behind.
         commands
             .entity(entity)
-            .insert(OutlineChild(child_id))
-            .add_child(child_id);
+            .queue_silenced(move |mut parent: EntityWorldMut| {
+                let child = parent.world_scope(|world| {
+                    let mut child = world.spawn((
+                        Mesh3d(mesh_handle),
+                        MeshMaterial3d(handle),
+                        Transform::default(),
+                    ));
+                    if let Some(skin) = skin {
+                        child.insert(skin);
+                    }
+                    if let Some(morph) = morph {
+                        child.insert(morph);
+                    }
+                    if let Some(layers) = layers {
+                        child.insert(layers);
+                    }
+                    child.id()
+                });
+                parent.insert(OutlineChild(child)).add_child(child);
+            });
     }
 }
 

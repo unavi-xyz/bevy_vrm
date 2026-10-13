@@ -1,3 +1,5 @@
+//! Asset loader reading `.vrm` files as glTF.
+
 use bevy::{
     asset::{
         AssetLoader,

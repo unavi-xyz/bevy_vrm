@@ -14,16 +14,20 @@ pub fn draw_spring_bones(
     }
 
     for spring_bones in spring_bones.iter() {
-        for spring_bone in &spring_bones.0 {
-            for bone_entity in &spring_bone.bones {
-                let Ok(transform) = transforms.get(*bone_entity) else {
+        for chain in &spring_bones.0 {
+            for joint in &chain.joints {
+                let Ok(transform) = transforms.get(joint.bone) else {
                     continue;
                 };
 
                 gizmos.sphere(
                     Isometry3d::from_translation(transform.translation()),
-                    spring_bone.hit_radius + 0.01,
-                    Color::linear_rgb(spring_bone.stiffness, 1.0 - spring_bone.stiffness, 0.1),
+                    joint.settings.hit_radius + 0.01,
+                    Color::linear_rgb(
+                        joint.settings.stiffness,
+                        1.0 - joint.settings.stiffness,
+                        0.1,
+                    ),
                 );
             }
         }

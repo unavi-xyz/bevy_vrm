@@ -14,6 +14,8 @@ workspace = true
 bevy = ["dep:bevy"]
 
 [dependencies]
-bevy                 = { optional = true, workspace = true }
-serde.workspace      = true
+bevy            = { optional = true, workspace = true }
+serde.workspace = true
+
+[dev-dependencies]
 serde_json.workspace = true

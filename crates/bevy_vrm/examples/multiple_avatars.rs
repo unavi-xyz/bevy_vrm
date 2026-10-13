@@ -4,10 +4,10 @@ use bevy::{
     camera_controller::pan_orbit_camera::prelude::PanOrbitCamera,
     prelude::*,
 };
+use bevy_shader_mtoon::MtoonSun;
 use bevy_vrm::{
-    VrmInstance,
     VrmPlugins,
-    mtoon::MtoonSun,
+    instance::VrmInstance,
 };
 use camera::OrbitCameraPlugin;
 

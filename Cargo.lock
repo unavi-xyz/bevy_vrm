@@ -5801,8 +5801,10 @@ version = "0.4.0"
 dependencies = [
  "bevy",
  "bevy_egui",
+ "bevy_shader_mtoon",
  "bevy_vrm",
  "libm",
+ "serde_vrm",
  "wasm-bindgen",
 ]
 

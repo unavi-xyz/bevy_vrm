@@ -1,5 +1,10 @@
 //! Bevy plugin for loading [VRM](https://vrm.dev/en/) avatars.
-//! Currently loads VRM 0.0 avatars; VRM 1.0 support is in progress.
+//! Loads VRM 0.0 and 1.0 avatars into a single 1.0-shaped component model.
+//!
+//! Supports humanoid bones, MToon materials, first person and spring
+//! bones.
+//! Not yet supported: expressions, look-at, node constraints and spring
+//! colliders.
 
 use bevy::{
     gltf::{
@@ -19,25 +24,24 @@ use bevy::{
 };
 use bevy_shader_mtoon::MtoonPlugin;
 use extensions::VrmHandler;
+use instance::spawn_vrm_scenes;
 use loader::{
     Vrm,
     VrmLoader,
 };
-use serde_vrm::vrm0::FirstPersonFlag;
+use serde_vrm::vrm1::vrmc_vrm::{
+    first_person::FirstPersonType,
+    humanoid::HumanBoneName,
+};
 
 use crate::spring_bones::SpringBonePlugin;
 
 #[cfg(feature = "animations")] pub mod animations;
 pub mod extensions;
 pub mod first_person;
+pub mod instance;
 pub mod loader;
 pub mod spring_bones;
-
-pub mod mtoon {
-    pub use bevy_shader_mtoon::*;
-}
-
-pub use serde_vrm::vrm0::BoneName;
 
 pub struct VrmPlugins;
 
@@ -55,8 +59,8 @@ impl Plugin for VrmPlugin {
     fn build(&self, app: &mut App) {
         app.add_plugins(MtoonPlugin)
             .init_asset::<Vrm>()
-            .register_type::<BoneName>()
-            .register_type::<FirstPersonFlag>()
+            .register_type::<HumanBoneName>()
+            .register_type::<FirstPersonType>()
             .add_observer(first_person::setup_first_person)
             .add_systems(Update, spawn_vrm_scenes);
     }
@@ -98,34 +102,3 @@ impl Plugin for VrmPlugin {
         });
     }
 }
-
-fn spawn_vrm_scenes(
-    mut commands: Commands,
-    to_spawn: Query<(Entity, &VrmInstance), Without<VrmInstanceReady>>,
-    vrms: Res<Assets<Vrm>>,
-) {
-    for (entity, vrm_handle) in to_spawn.iter() {
-        let Some(vrm) = vrms.get(&vrm_handle.0) else {
-            continue;
-        };
-
-        let scene = match &vrm.gltf.default_scene {
-            Some(handle) => handle.clone(),
-            None => match vrm.gltf.scenes.first() {
-                Some(handle) => handle.clone(),
-                None => continue,
-            },
-        };
-
-        commands
-            .entity(entity)
-            .insert((WorldAssetRoot(scene), VrmInstanceReady));
-    }
-}
-
-#[derive(Component, Default)]
-pub struct VrmInstance(pub Handle<Vrm>);
-
-/// Marks a [`VrmInstance`] whose scene has been spawned.
-#[derive(Component)]
-pub struct VrmInstanceReady;

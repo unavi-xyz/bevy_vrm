@@ -1,7 +1,7 @@
+//! `MToon` material from the VRM 0.0 `materialProperties`.
+
 use bevy::{
     asset::LoadContext,
-    gltf::GltfAssetLabel,
-    image::Image,
     prelude::*,
 };
 use bevy_shader_mtoon::{
@@ -10,14 +10,9 @@ use bevy_shader_mtoon::{
 };
 use serde_vrm::vrm0::MaterialProperty;
 
-fn texture_handle(load_context: &mut LoadContext, index: u32) -> Handle<Image> {
-    load_context.get_label_handle(GltfAssetLabel::Texture(index as usize).to_string())
-}
+use super::texture_handle;
 
-pub fn build_mtoon_material(
-    load_context: &mut LoadContext,
-    props: &MaterialProperty,
-) -> MtoonMaterial {
+pub fn from_vrm0(load_context: &mut LoadContext, props: &MaterialProperty) -> MtoonMaterial {
     let mut mtoon = MtoonMaterial::default();
 
     let float = props.float.as_ref();
@@ -39,7 +34,7 @@ pub fn build_mtoon_material(
 
     mtoon.base_color_texture = texture
         .and_then(|t| t.base_color)
-        .map(|i| texture_handle(load_context, i));
+        .map(|i| texture_handle(load_context, i as usize));
 
     if let Some(value) = float.and_then(|f| f.normal_scale) {
         mtoon.normal_map_scale = value;
@@ -47,7 +42,7 @@ pub fn build_mtoon_material(
 
     mtoon.normal_map_texture = texture
         .and_then(|t| t.normal)
-        .map(|i| texture_handle(load_context, i));
+        .map(|i| texture_handle(load_context, i as usize));
 
     if let Some(value) = vector.and_then(|v| v.emissive_factor) {
         mtoon.emissive_factor = LinearRgba::from_f32_array(value).into();
@@ -55,7 +50,7 @@ pub fn build_mtoon_material(
 
     mtoon.emissive_texture = texture
         .and_then(|t| t.emissive)
-        .map(|i| texture_handle(load_context, i));
+        .map(|i| texture_handle(load_context, i as usize));
 
     if let Some(value) = float.and_then(|f| f.outline_factor) {
         mtoon.outline_width = value;
@@ -99,7 +94,7 @@ pub fn build_mtoon_material(
 
     mtoon.shade_multiply_texture = texture
         .and_then(|t| t.shade)
-        .map(|i| texture_handle(load_context, i));
+        .map(|i| texture_handle(load_context, i as usize));
 
     mtoon
 }

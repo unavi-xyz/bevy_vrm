@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use bevy_vrm::BoneName;
+use serde_vrm::vrm1::vrmc_vrm::humanoid::HumanBoneName;
 
 use crate::Settings;
 
@@ -7,10 +7,10 @@ pub fn move_leg(
     mut original_transform: Local<Option<Transform>>,
     settings: Res<Settings>,
     time: Res<Time>,
-    mut bones: Query<(&mut Transform, &BoneName)>,
+    mut bones: Query<(&mut Transform, &HumanBoneName)>,
 ) {
     for (mut transform, bone) in &mut bones {
-        if !matches!(bone, BoneName::RightUpperLeg) {
+        if !matches!(bone, HumanBoneName::RightUpperLeg) {
             continue;
         }
 

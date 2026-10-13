@@ -1,4 +1,4 @@
-//! Drag and drop [VRM](https://vrm.dev/) viewer using [bevy_vrm](https://github.com/unavi-xyz/bevy_vrm).
+//! Drag and drop [VRM](https://vrm.dev/) 0.0 and 1.0 viewer using [bevy_vrm](https://github.com/unavi-xyz/bevy_vrm).
 
 use std::f32::consts::PI;
 
@@ -13,17 +13,17 @@ use bevy_egui::{
     EguiPlugin,
     EguiPrimaryContextPass,
 };
+use bevy_shader_mtoon::MtoonSun;
 use bevy_vrm::{
-    VrmInstance,
     VrmPlugins,
     first_person::{
-        DEFAULT_RENDER_LAYERS,
-        FirstPersonFlag,
+        FirstPersonLayers,
         SetupFirstPerson,
     },
-    mtoon::MtoonSun,
+    instance::VrmInstance,
 };
 use camera::OrbitCameraPlugin;
+use serde_vrm::vrm1::vrmc_vrm::first_person::FirstPersonType;
 use ui::RenderLayer;
 
 pub mod camera;
@@ -103,19 +103,19 @@ fn setup(mut commands: Commands, mut settings: ResMut<Settings>) {
 fn set_render_layers(
     cameras: Query<Entity, With<Camera>>,
     mut commands: Commands,
-    mut prev: Local<FirstPersonFlag>,
+    mut prev: Local<FirstPersonType>,
     settings: Res<Settings>,
 ) {
     for entity in cameras.iter() {
         let flag = match settings.render_layer {
-            RenderLayer::FirstPerson => FirstPersonFlag::FirstPersonOnly,
-            RenderLayer::ThirdPerson => FirstPersonFlag::ThirdPersonOnly,
+            RenderLayer::FirstPerson => FirstPersonType::FirstPersonOnly,
+            RenderLayer::ThirdPerson => FirstPersonType::ThirdPersonOnly,
         };
 
         if flag != *prev {
             *prev = flag;
 
-            let layers = RenderLayers::layer(0).union(&DEFAULT_RENDER_LAYERS[&flag]);
+            let layers = RenderLayers::layer(0).union(FirstPersonLayers::default().get(flag));
             commands.entity(entity).insert(layers);
         }
     }
@@ -131,7 +131,7 @@ fn setup_first_person(
     if vrms.contains(entity) {
         commands.entity(entity).trigger(|entity| SetupFirstPerson {
             entity,
-            render_layers: None,
+            layers: FirstPersonLayers::default(),
         });
     }
 }

@@ -1,3 +1,5 @@
+//! Spring bone components and the simulation driving them.
+
 use bevy::{
     ecs::entity::MapEntities,
     prelude::*,
@@ -5,26 +7,38 @@ use bevy::{
 
 #[derive(Component, Default, Reflect)]
 #[reflect(Component)]
-pub struct SpringBones(#[entities] pub Vec<SpringBone>);
+pub struct SpringBones(#[entities] pub Vec<SpringChain>);
 
+/// Joints ordered so that every parent precedes its children.
 #[derive(Reflect)]
-pub struct SpringBone {
-    pub bones:         Vec<Entity>,
-    pub bone_names:    Vec<String>,
-    pub center:        f32,
-    pub drag_force:    f32,
-    pub gravity_dir:   Vec3,
-    pub gravity_power: f32,
-    pub hit_radius:    f32,
-    pub stiffness:     f32,
+pub struct SpringChain {
+    pub joints: Vec<SpringJoint>,
 }
 
-impl MapEntities for SpringBone {
+impl MapEntities for SpringChain {
     fn map_entities<M: EntityMapper>(&mut self, entity_mapper: &mut M) {
-        for bone in &mut self.bones {
-            *bone = entity_mapper.get_mapped(*bone);
+        for joint in &mut self.joints {
+            joint.bone = entity_mapper.get_mapped(joint.bone);
+            joint.tail = entity_mapper.get_mapped(joint.tail);
         }
     }
+}
+
+/// Simulates `bone` swinging toward `tail`, a descendant of `bone`.
+#[derive(Reflect)]
+pub struct SpringJoint {
+    pub bone:     Entity,
+    pub tail:     Entity,
+    pub settings: SpringSettings,
+}
+
+#[derive(Clone, Copy, Debug, Reflect, PartialEq)]
+pub struct SpringSettings {
+    pub stiffness:     f32,
+    pub drag_force:    f32,
+    pub gravity_power: f32,
+    pub gravity_dir:   Vec3,
+    pub hit_radius:    f32,
 }
 
 #[derive(Component, Reflect)]
@@ -38,16 +52,6 @@ pub struct SpringBoneLogicState {
     pub initial_local_rotation: Quat,
 }
 
-/// Synthetic leaf appended to a spring bone chain so the final joint has a tail
-/// to follow.
-#[derive(Component)]
-struct SpringBoneTail;
-
-/// Marks a [`SpringBones`] whose chains have been expanded to include
-/// descendants.
-#[derive(Component)]
-struct SpringBonesExpanded;
-
 pub struct SpringBonePlugin;
 
 impl Plugin for SpringBonePlugin {
@@ -56,88 +60,68 @@ impl Plugin for SpringBonePlugin {
             .register_type::<SpringBones>()
             .add_systems(
                 Update,
-                (
-                    remap_spring_bone_entities,
-                    expand_spring_bones,
-                    initialize_spring_bone_logic,
-                    do_springbone_logic,
-                )
-                    .chain(),
+                (initialize_spring_bone_logic, do_springbone_logic).chain(),
             );
     }
 }
 
-fn expand_spring_bones(
-    mut commands: Commands,
-    mut spring_boness: Query<(Entity, &mut SpringBones), Without<SpringBonesExpanded>>,
-    children: Query<&Children>,
-    names: Query<&Name>,
-) {
-    for (entity, mut spring_bones) in &mut spring_boness {
-        for spring_bone in &mut spring_bones.0 {
-            for bone in spring_bone.bones.clone() {
-                for child in children.iter_descendants(bone) {
-                    if !spring_bone.bones.contains(&child) {
-                        spring_bone.bones.push(child);
-                        if let Ok(name) = names.get(child) {
-                            spring_bone.bone_names.push(name.to_string());
-                        }
-                    }
-                }
-            }
-        }
-        commands.entity(entity).insert(SpringBonesExpanded);
+/// Position of `tail` in `bone`'s local space, composed from local
+/// transforms. `None` unless `bone` is a strict ancestor of `tail`.
+fn tail_offset(
+    bone: Entity,
+    tail: Entity,
+    parents: &Query<&ChildOf>,
+    local_transforms: &Query<&Transform>,
+) -> Option<Vec3> {
+    let mut accumulated = Transform::IDENTITY;
+    let mut current = tail;
+
+    while current != bone {
+        let local = local_transforms.get(current).ok()?;
+        accumulated = local.mul_transform(accumulated);
+        current = parents.get(current).ok()?.parent();
     }
+
+    (tail != bone).then_some(accumulated.translation)
 }
 
 fn initialize_spring_bone_logic(
-    children: Query<&Children>,
     global_transforms: Query<&GlobalTransform>,
     local_transforms: Query<&Transform>,
     logic_states: Query<&SpringBoneLogicState>,
     mut commands: Commands,
+    parents: Query<&ChildOf>,
     spring_boness: Query<&SpringBones>,
-    tails: Query<(), With<SpringBoneTail>>,
 ) {
     for spring_bones in spring_boness.iter() {
-        for spring_bone in &spring_bones.0 {
-            for bone in &spring_bone.bones {
-                if logic_states.contains(*bone) {
+        for chain in &spring_bones.0 {
+            for joint in &chain.joints {
+                if logic_states.contains(joint.bone) {
                     continue;
                 }
 
-                let Ok(child) = children.get(*bone) else {
-                    if tails.contains(*bone) {
-                        continue;
-                    }
-                    let child = commands
-                        .spawn((Transform::from_xyz(0.0, -0.07, 0.0), SpringBoneTail))
-                        .id();
-                    commands.entity(*bone).add_child(child);
+                let Some(offset) = tail_offset(joint.bone, joint.tail, &parents, &local_transforms)
+                else {
+                    continue;
+                };
+                if offset == Vec3::ZERO {
+                    continue;
+                }
+                let Ok(global_this_bone) = global_transforms.get(joint.bone) else {
+                    continue;
+                };
+                let Ok(local_this_bone) = local_transforms.get(joint.bone) else {
                     continue;
                 };
 
-                let Some(next_bone) = child.iter().next() else {
-                    continue;
-                };
-                let Ok(global_this_bone) = global_transforms.get(*bone) else {
-                    continue;
-                };
-                let Ok(local_next_bone) = local_transforms.get(next_bone) else {
-                    continue;
-                };
-                let Ok(local_this_bone) = local_transforms.get(*bone) else {
-                    continue;
-                };
-
-                let bone_axis = local_next_bone.translation.normalize_or_zero();
-                let bone_length = local_next_bone.translation.length();
+                let bone_axis = offset.normalize_or_zero();
+                let bone_length = offset.length();
                 let initial_local_matrix = local_this_bone.to_matrix();
                 let initial_local_rotation = local_this_bone.rotation;
                 let current_tail = global_this_bone.translation()
                     + (global_this_bone.rotation() * bone_axis * bone_length);
 
-                commands.entity(*bone).insert(SpringBoneLogicState {
+                commands.entity(joint.bone).insert(SpringBoneLogicState {
                     prev_tail: current_tail,
                     current_tail,
                     bone_axis,
@@ -150,37 +134,6 @@ fn initialize_spring_bone_logic(
     }
 }
 
-fn remap_spring_bone_entities(
-    mut spring_bones_query: Query<&mut SpringBones, Added<SpringBones>>,
-    names: Query<(Entity, &Name)>,
-    existing_entities: Query<Entity>,
-) {
-    for mut spring_bones in &mut spring_bones_query {
-        let needs_remapping = spring_bones
-            .0
-            .iter()
-            .flat_map(|spring_bone| &spring_bone.bones)
-            .any(|&entity| !existing_entities.contains(entity));
-
-        if !needs_remapping {
-            continue;
-        }
-
-        let name_to_entity: std::collections::HashMap<&str, Entity> = names
-            .iter()
-            .map(|(entity, name)| (name.as_str(), entity))
-            .collect();
-
-        for spring_bone in &mut spring_bones.0 {
-            spring_bone.bones = spring_bone
-                .bone_names
-                .iter()
-                .filter_map(|name| name_to_entity.get(name.as_str()).copied())
-                .collect();
-        }
-    }
-}
-
 fn do_springbone_logic(
     mut global_transforms: Query<(&mut GlobalTransform, &mut Transform)>,
     mut spring_bone_logic_states: Query<&mut SpringBoneLogicState>,
@@ -189,8 +142,11 @@ fn do_springbone_logic(
     time: Res<Time>,
 ) {
     for spring_bones in spring_boness.iter() {
-        for spring_bone in &spring_bones.0 {
-            for &bone in &spring_bone.bones {
+        for chain in &spring_bones.0 {
+            for joint in &chain.joints {
+                let bone = joint.bone;
+                let settings = &joint.settings;
+
                 let Ok((global, _)) = global_transforms.get(bone) else {
                     continue;
                 };
@@ -211,12 +167,11 @@ fn do_springbone_logic(
 
                 let inertia = (spring_bone_logic_state.current_tail
                     - spring_bone_logic_state.prev_tail)
-                    * (1.0 - spring_bone.drag_force);
+                    * (1.0 - settings.drag_force);
                 let stiffness = time.delta_secs()
                     * (parent_world_rotation * spring_bone_logic_state.bone_axis)
-                    * spring_bone.stiffness;
-                let external =
-                    time.delta_secs() * spring_bone.gravity_dir * spring_bone.gravity_power;
+                    * settings.stiffness;
+                let external = time.delta_secs() * settings.gravity_dir * settings.gravity_power;
 
                 let mut next_tail =
                     spring_bone_logic_state.current_tail + inertia + stiffness + external;
@@ -227,10 +182,13 @@ fn do_springbone_logic(
                 spring_bone_logic_state.prev_tail = spring_bone_logic_state.current_tail;
                 spring_bone_logic_state.current_tail = next_tail;
 
-                let to = ((parent_matrix * spring_bone_logic_state.initial_local_matrix)
+                let Some(to) = (parent_matrix * spring_bone_logic_state.initial_local_matrix)
                     .inverse()
-                    .transform_point3(next_tail))
-                .normalize();
+                    .transform_point3(next_tail)
+                    .try_normalize()
+                else {
+                    continue;
+                };
 
                 let Ok((mut global, mut local)) = global_transforms.get_mut(bone) else {
                     continue;

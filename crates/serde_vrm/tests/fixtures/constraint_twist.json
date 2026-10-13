@@ -1,0 +1,2239 @@
+{
+  "extensions": {
+    "VRMC_springBone": {
+      "colliderGroups": [
+        {
+          "name": "Spine",
+          "colliders": [
+            0
+          ]
+        },
+        {
+          "name": "UpperChest",
+          "colliders": [
+            1,
+            2
+          ]
+        },
+        {
+          "name": "Neck",
+          "colliders": [
+            3
+          ]
+        },
+        {
+          "name": "Head",
+          "colliders": [
+            4
+          ]
+        },
+        {
+          "name": "LeftUpperArm",
+          "colliders": [
+            5
+          ]
+        },
+        {
+          "name": "leftLowerArm",
+          "colliders": [
+            6
+          ]
+        },
+        {
+          "name": "LeftHand",
+          "colliders": [
+            7
+          ]
+        },
+        {
+          "name": "RightUpperArm",
+          "colliders": [
+            8
+          ]
+        },
+        {
+          "name": "RightLowerArm",
+          "colliders": [
+            9
+          ]
+        },
+        {
+          "name": "RightHand",
+          "colliders": [
+            10
+          ]
+        },
+        {
+          "name": "LeftUpperLeg",
+          "colliders": [
+            11
+          ]
+        },
+        {
+          "name": "RightUpperLeg",
+          "colliders": [
+            12
+          ]
+        }
+      ],
+      "colliders": [
+        {
+          "node": 21,
+          "shape": {
+            "sphere": {
+              "offset": [
+                0,
+                0,
+                0
+              ],
+              "radius": 0.114335559
+            }
+          }
+        },
+        {
+          "node": 23,
+          "shape": {
+            "sphere": {
+              "offset": [
+                0,
+                0.003161192,
+                -0.008988261
+              ],
+              "radius": 0.095279634
+            }
+          }
+        },
+        {
+          "node": 23,
+          "shape": {
+            "capsule": {
+              "offset": [
+                0.047639817,
+                0.0552625656,
+                0.0295360126
+              ],
+              "radius": 0.06669574,
+              "tail": [
+                -0.047639817,
+                0.0552625656,
+                0.0295360126
+              ]
+            }
+          }
+        },
+        {
+          "node": 24,
+          "shape": {
+            "sphere": {
+              "offset": [
+                0,
+                0.0269027948,
+                -0.0157066863
+              ],
+              "radius": 0.047639817
+            }
+          }
+        },
+        {
+          "node": 25,
+          "shape": {
+            "sphere": {
+              "offset": [
+                0.100349069,
+                -0.0133434664,
+                0
+              ],
+              "radius": 0.100198768
+            }
+          }
+        },
+        {
+          "node": 96,
+          "shape": {
+            "capsule": {
+              "offset": [
+                0,
+                -0.009527922,
+                0
+              ],
+              "radius": 0.04763983,
+              "tail": [
+                0.142919481,
+                -0.009527922,
+                0
+              ]
+            }
+          }
+        },
+        {
+          "node": 97,
+          "shape": {
+            "capsule": {
+              "offset": [
+                0,
+                0,
+                0
+              ],
+              "radius": 0.0285838936,
+              "tail": [
+                0.142919272,
+                0,
+                -0.000249436125
+              ]
+            }
+          }
+        },
+        {
+          "node": 98,
+          "shape": {
+            "sphere": {
+              "offset": [
+                -0.019055903,
+                0,
+                0
+              ],
+              "radius": 0.0285838936
+            }
+          }
+        },
+        {
+          "node": 130,
+          "shape": {
+            "capsule": {
+              "offset": [
+                0,
+                -0.009527922,
+                0
+              ],
+              "radius": 0.04763983,
+              "tail": [
+                -0.142919481,
+                -0.009527922,
+                0
+              ]
+            }
+          }
+        },
+        {
+          "node": 131,
+          "shape": {
+            "capsule": {
+              "offset": [
+                0,
+                0,
+                0
+              ],
+              "radius": 0.0285838936,
+              "tail": [
+                -0.142919272,
+                0,
+                -0.000249436125
+              ]
+            }
+          }
+        },
+        {
+          "node": 132,
+          "shape": {
+            "sphere": {
+              "offset": [
+                0.019055903,
+                0,
+                0
+              ],
+              "radius": 0.0285838936
+            }
+          }
+        },
+        {
+          "node": 160,
+          "shape": {
+            "capsule": {
+              "offset": [
+                0,
+                0,
+                0
+              ],
+              "radius": 0.0771765038,
+              "tail": [
+                0,
+                -0.209569335,
+                0.004385664
+              ]
+            }
+          }
+        },
+        {
+          "node": 165,
+          "shape": {
+            "capsule": {
+              "offset": [
+                0,
+                0,
+                0
+              ],
+              "radius": 0.0771765038,
+              "tail": [
+                0,
+                -0.209569335,
+                0.004385664
+              ]
+            }
+          }
+        }
+      ],
+      "specVersion": "1.0",
+      "springs": [
+        {
+          "colliderGroups": [
+            10,
+            11
+          ],
+          "joints": [
+            {
+              "dragForce": 0.05,
+              "hitRadius": 0.014418928,
+              "node": 7,
+              "stiffness": 0.5
+            },
+            {
+              "dragForce": 0.5,
+              "hitRadius": 0,
+              "node": 8,
+              "stiffness": 1
+            }
+          ],
+          "name": "TopsUpperLeg"
+        },
+        {
+          "colliderGroups": [
+            10,
+            11
+          ],
+          "joints": [
+            {
+              "dragForce": 0.05,
+              "hitRadius": 0.014418928,
+              "node": 9,
+              "stiffness": 0.5
+            },
+            {
+              "dragForce": 0.5,
+              "hitRadius": 0,
+              "node": 10,
+              "stiffness": 1
+            }
+          ],
+          "name": "TopsUpperLeg"
+        },
+        {
+          "colliderGroups": [
+            10,
+            11
+          ],
+          "joints": [
+            {
+              "dragForce": 0.05,
+              "hitRadius": 0.014418928,
+              "node": 11,
+              "stiffness": 0.5
+            },
+            {
+              "dragForce": 0.5,
+              "hitRadius": 0,
+              "node": 12,
+              "stiffness": 1
+            }
+          ],
+          "name": "TopsUpperLeg"
+        },
+        {
+          "colliderGroups": [
+            10,
+            11
+          ],
+          "joints": [
+            {
+              "dragForce": 0.05,
+              "hitRadius": 0.014418928,
+              "node": 15,
+              "stiffness": 0.5
+            },
+            {
+              "dragForce": 0.5,
+              "hitRadius": 0,
+              "node": 16,
+              "stiffness": 1
+            }
+          ],
+          "name": "TopsUpperLeg"
+        },
+        {
+          "colliderGroups": [
+            10,
+            11
+          ],
+          "joints": [
+            {
+              "dragForce": 0.05,
+              "hitRadius": 0.014418928,
+              "node": 17,
+              "stiffness": 0.5
+            },
+            {
+              "dragForce": 0.5,
+              "hitRadius": 0,
+              "node": 18,
+              "stiffness": 1
+            }
+          ],
+          "name": "TopsUpperLeg"
+        },
+        {
+          "colliderGroups": [
+            10,
+            11
+          ],
+          "joints": [
+            {
+              "dragForce": 0.05,
+              "hitRadius": 0.014418928,
+              "node": 19,
+              "stiffness": 0.5
+            },
+            {
+              "dragForce": 0.5,
+              "hitRadius": 0,
+              "node": 20,
+              "stiffness": 1
+            }
+          ],
+          "name": "TopsUpperLeg"
+        },
+        {
+          "joints": [
+            {
+              "dragForce": 0.05,
+              "hitRadius": 0.0159853827,
+              "node": 92,
+              "stiffness": 0.75
+            },
+            {
+              "dragForce": 0.5,
+              "hitRadius": 0,
+              "node": 93,
+              "stiffness": 1
+            }
+          ],
+          "name": "TopsUpperArm"
+        },
+        {
+          "joints": [
+            {
+              "dragForce": 0.05,
+              "hitRadius": 0.0159853827,
+              "node": 94,
+              "stiffness": 0.75
+            },
+            {
+              "dragForce": 0.5,
+              "hitRadius": 0,
+              "node": 95,
+              "stiffness": 1
+            }
+          ],
+          "name": "TopsUpperArm"
+        },
+        {
+          "joints": [
+            {
+              "dragForce": 0.05,
+              "hitRadius": 0.0159853827,
+              "node": 126,
+              "stiffness": 0.75
+            },
+            {
+              "dragForce": 0.5,
+              "hitRadius": 0,
+              "node": 127,
+              "stiffness": 1
+            }
+          ],
+          "name": "TopsUpperArm"
+        },
+        {
+          "joints": [
+            {
+              "dragForce": 0.05,
+              "hitRadius": 0.0159853827,
+              "node": 128,
+              "stiffness": 0.75
+            },
+            {
+              "dragForce": 0.5,
+              "hitRadius": 0,
+              "node": 129,
+              "stiffness": 1
+            }
+          ],
+          "name": "TopsUpperArm"
+        },
+        {
+          "colliderGroups": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "joints": [
+            {
+              "dragForce": 0.4,
+              "hitRadius": 0.0100198835,
+              "node": 29,
+              "stiffness": 0.6041667
+            },
+            {
+              "dragForce": 0.4,
+              "hitRadius": 0.0100198835,
+              "node": 30,
+              "stiffness": 0.6041667
+            },
+            {
+              "dragForce": 0.5,
+              "hitRadius": 0,
+              "node": 31,
+              "stiffness": 1
+            }
+          ],
+          "name": "Hair"
+        },
+        {
+          "colliderGroups": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "joints": [
+            {
+              "dragForce": 0.4,
+              "hitRadius": 0.0100198826,
+              "node": 32,
+              "stiffness": 0.7041662
+            },
+            {
+              "dragForce": 0.4,
+              "hitRadius": 0.0100198826,
+              "node": 33,
+              "stiffness": 0.7041662
+            },
+            {
+              "dragForce": 0.5,
+              "hitRadius": 0,
+              "node": 34,
+              "stiffness": 1
+            }
+          ],
+          "name": "Hair"
+        },
+        {
+          "colliderGroups": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "joints": [
+            {
+              "dragForce": 0.4,
+              "hitRadius": 0.0100198826,
+              "node": 35,
+              "stiffness": 0.704166651
+            },
+            {
+              "dragForce": 0.4,
+              "hitRadius": 0.0100198826,
+              "node": 36,
+              "stiffness": 0.704166651
+            },
+            {
+              "dragForce": 0.5,
+              "hitRadius": 0,
+              "node": 37,
+              "stiffness": 1
+            }
+          ],
+          "name": "Hair"
+        },
+        {
+          "colliderGroups": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "joints": [
+            {
+              "dragForce": 0.4,
+              "hitRadius": 0.0100198826,
+              "node": 38,
+              "stiffness": 0.5
+            },
+            {
+              "dragForce": 0.4,
+              "hitRadius": 0.0100198826,
+              "node": 39,
+              "stiffness": 0.5
+            },
+            {
+              "dragForce": 0.5,
+              "hitRadius": 0,
+              "node": 40,
+              "stiffness": 1
+            }
+          ],
+          "name": "Hair"
+        },
+        {
+          "colliderGroups": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "joints": [
+            {
+              "dragForce": 0.4,
+              "gravityPower": 0.09539474,
+              "hitRadius": 0.03164175,
+              "node": 41,
+              "stiffness": 0.498684227
+            },
+            {
+              "dragForce": 0.4,
+              "gravityPower": 0.09539474,
+              "hitRadius": 0.03164175,
+              "node": 42,
+              "stiffness": 0.498684227
+            },
+            {
+              "dragForce": 0.4,
+              "gravityPower": 0.09539474,
+              "hitRadius": 0.03164175,
+              "node": 43,
+              "stiffness": 0.498684227
+            },
+            {
+              "dragForce": 0.4,
+              "gravityPower": 0.09539474,
+              "hitRadius": 0.03164175,
+              "node": 44,
+              "stiffness": 0.498684227
+            },
+            {
+              "dragForce": 0.4,
+              "gravityPower": 0.09539474,
+              "hitRadius": 0.03164175,
+              "node": 45,
+              "stiffness": 0.498684227
+            },
+            {
+              "dragForce": 0.4,
+              "gravityPower": 0.09539474,
+              "hitRadius": 0.03164175,
+              "node": 46,
+              "stiffness": 0.498684227
+            },
+            {
+              "dragForce": 0.5,
+              "hitRadius": 0,
+              "node": 47,
+              "stiffness": 1
+            }
+          ],
+          "name": "Hair"
+        },
+        {
+          "colliderGroups": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "joints": [
+            {
+              "dragForce": 0.4,
+              "gravityPower": 0.1,
+              "hitRadius": 0.03206363,
+              "node": 48,
+              "stiffness": 0.5
+            },
+            {
+              "dragForce": 0.4,
+              "gravityPower": 0.1,
+              "hitRadius": 0.03206363,
+              "node": 49,
+              "stiffness": 0.5
+            },
+            {
+              "dragForce": 0.4,
+              "gravityPower": 0.1,
+              "hitRadius": 0.03206363,
+              "node": 50,
+              "stiffness": 0.5
+            },
+            {
+              "dragForce": 0.4,
+              "gravityPower": 0.1,
+              "hitRadius": 0.03206363,
+              "node": 51,
+              "stiffness": 0.5
+            },
+            {
+              "dragForce": 0.4,
+              "gravityPower": 0.1,
+              "hitRadius": 0.03206363,
+              "node": 52,
+              "stiffness": 0.5
+            },
+            {
+              "dragForce": 0.5,
+              "hitRadius": 0,
+              "node": 53,
+              "stiffness": 1
+            }
+          ],
+          "name": "Hair"
+        },
+        {
+          "colliderGroups": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "joints": [
+            {
+              "dragForce": 0.4,
+              "gravityPower": 0.1,
+              "hitRadius": 0.032063622,
+              "node": 54,
+              "stiffness": 0.5
+            },
+            {
+              "dragForce": 0.4,
+              "gravityPower": 0.1,
+              "hitRadius": 0.032063622,
+              "node": 55,
+              "stiffness": 0.5
+            },
+            {
+              "dragForce": 0.4,
+              "gravityPower": 0.1,
+              "hitRadius": 0.032063622,
+              "node": 56,
+              "stiffness": 0.5
+            },
+            {
+              "dragForce": 0.4,
+              "gravityPower": 0.1,
+              "hitRadius": 0.032063622,
+              "node": 57,
+              "stiffness": 0.5
+            },
+            {
+              "dragForce": 0.4,
+              "gravityPower": 0.1,
+              "hitRadius": 0.032063622,
+              "node": 58,
+              "stiffness": 0.5
+            },
+            {
+              "dragForce": 0.5,
+              "hitRadius": 0,
+              "node": 59,
+              "stiffness": 1
+            }
+          ],
+          "name": "Hair"
+        },
+        {
+          "colliderGroups": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "joints": [
+            {
+              "dragForce": 0.4,
+              "gravityPower": 0.1,
+              "hitRadius": 0.0320636332,
+              "node": 60,
+              "stiffness": 0.5
+            },
+            {
+              "dragForce": 0.4,
+              "gravityPower": 0.1,
+              "hitRadius": 0.0320636332,
+              "node": 61,
+              "stiffness": 0.5
+            },
+            {
+              "dragForce": 0.4,
+              "gravityPower": 0.1,
+              "hitRadius": 0.0320636332,
+              "node": 62,
+              "stiffness": 0.5
+            },
+            {
+              "dragForce": 0.4,
+              "gravityPower": 0.1,
+              "hitRadius": 0.0320636332,
+              "node": 63,
+              "stiffness": 0.5
+            },
+            {
+              "dragForce": 0.4,
+              "gravityPower": 0.1,
+              "hitRadius": 0.0320636332,
+              "node": 64,
+              "stiffness": 0.5
+            },
+            {
+              "dragForce": 0.5,
+              "hitRadius": 0,
+              "node": 65,
+              "stiffness": 1
+            }
+          ],
+          "name": "Hair"
+        },
+        {
+          "colliderGroups": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "joints": [
+            {
+              "dragForce": 0.4,
+              "gravityPower": 0.1,
+              "hitRadius": 0.03206362,
+              "node": 66,
+              "stiffness": 0.5
+            },
+            {
+              "dragForce": 0.4,
+              "gravityPower": 0.1,
+              "hitRadius": 0.03206362,
+              "node": 67,
+              "stiffness": 0.5
+            },
+            {
+              "dragForce": 0.4,
+              "gravityPower": 0.1,
+              "hitRadius": 0.03206362,
+              "node": 68,
+              "stiffness": 0.5
+            },
+            {
+              "dragForce": 0.4,
+              "gravityPower": 0.1,
+              "hitRadius": 0.03206362,
+              "node": 69,
+              "stiffness": 0.5
+            },
+            {
+              "dragForce": 0.4,
+              "gravityPower": 0.1,
+              "hitRadius": 0.03206362,
+              "node": 70,
+              "stiffness": 0.5
+            },
+            {
+              "dragForce": 0.5,
+              "hitRadius": 0,
+              "node": 71,
+              "stiffness": 1
+            }
+          ],
+          "name": "Hair"
+        },
+        {
+          "colliderGroups": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "joints": [
+            {
+              "dragForce": 0.4,
+              "gravityPower": 0.1,
+              "hitRadius": 0.03206363,
+              "node": 72,
+              "stiffness": 0.5
+            },
+            {
+              "dragForce": 0.4,
+              "gravityPower": 0.1,
+              "hitRadius": 0.03206363,
+              "node": 73,
+              "stiffness": 0.5
+            },
+            {
+              "dragForce": 0.4,
+              "gravityPower": 0.1,
+              "hitRadius": 0.03206363,
+              "node": 74,
+              "stiffness": 0.5
+            },
+            {
+              "dragForce": 0.4,
+              "gravityPower": 0.1,
+              "hitRadius": 0.03206363,
+              "node": 75,
+              "stiffness": 0.5
+            },
+            {
+              "dragForce": 0.4,
+              "gravityPower": 0.1,
+              "hitRadius": 0.03206363,
+              "node": 76,
+              "stiffness": 0.5
+            },
+            {
+              "dragForce": 0.5,
+              "hitRadius": 0,
+              "node": 77,
+              "stiffness": 1
+            }
+          ],
+          "name": "Hair"
+        },
+        {
+          "colliderGroups": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "joints": [
+            {
+              "dragForce": 0.4,
+              "hitRadius": 0.0100198835,
+              "node": 78,
+              "stiffness": 0.4
+            },
+            {
+              "dragForce": 0.4,
+              "hitRadius": 0.0100198835,
+              "node": 79,
+              "stiffness": 0.4
+            },
+            {
+              "dragForce": 0.4,
+              "hitRadius": 0.0100198835,
+              "node": 80,
+              "stiffness": 0.4
+            },
+            {
+              "dragForce": 0.4,
+              "hitRadius": 0.0100198835,
+              "node": 81,
+              "stiffness": 0.4
+            },
+            {
+              "dragForce": 0.5,
+              "hitRadius": 0,
+              "node": 82,
+              "stiffness": 1
+            }
+          ],
+          "name": "Hair"
+        },
+        {
+          "colliderGroups": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "joints": [
+            {
+              "dragForce": 0.4,
+              "hitRadius": 0.0100198826,
+              "node": 83,
+              "stiffness": 0.4
+            },
+            {
+              "dragForce": 0.4,
+              "hitRadius": 0.0100198826,
+              "node": 84,
+              "stiffness": 0.4
+            },
+            {
+              "dragForce": 0.4,
+              "hitRadius": 0.0100198826,
+              "node": 85,
+              "stiffness": 0.4
+            },
+            {
+              "dragForce": 0.4,
+              "hitRadius": 0.0100198826,
+              "node": 86,
+              "stiffness": 0.4
+            },
+            {
+              "dragForce": 0.5,
+              "hitRadius": 0,
+              "node": 87,
+              "stiffness": 1
+            }
+          ],
+          "name": "Hair"
+        }
+      ]
+    },
+    "VRMC_vrm": {
+      "expressions": {
+        "preset": {
+          "aa": {
+            "isBinary": false,
+            "morphTargetBinds": [
+              {
+                "index": 36,
+                "node": 1,
+                "weight": 1
+              }
+            ]
+          },
+          "angry": {
+            "isBinary": false,
+            "morphTargetBinds": [
+              {
+                "index": 1,
+                "node": 1,
+                "weight": 1
+              }
+            ]
+          },
+          "blink": {
+            "isBinary": false,
+            "morphTargetBinds": [
+              {
+                "index": 12,
+                "node": 1,
+                "weight": 1
+              }
+            ]
+          },
+          "blinkLeft": {
+            "isBinary": false,
+            "morphTargetBinds": [
+              {
+                "index": 13,
+                "node": 1,
+                "weight": 1
+              }
+            ]
+          },
+          "blinkRight": {
+            "isBinary": false,
+            "morphTargetBinds": [
+              {
+                "index": 14,
+                "node": 1,
+                "weight": 1
+              }
+            ]
+          },
+          "ee": {
+            "isBinary": false,
+            "morphTargetBinds": [
+              {
+                "index": 39,
+                "node": 1,
+                "weight": 1
+              }
+            ]
+          },
+          "happy": {
+            "isBinary": false,
+            "morphTargetBinds": [
+              {
+                "index": 3,
+                "node": 1,
+                "weight": 1
+              }
+            ],
+            "overrideBlink": "blend",
+            "overrideMouth": "blend"
+          },
+          "ih": {
+            "isBinary": false,
+            "morphTargetBinds": [
+              {
+                "index": 37,
+                "node": 1,
+                "weight": 1
+              }
+            ]
+          },
+          "lookDown": {
+            "isBinary": false
+          },
+          "lookLeft": {
+            "isBinary": false
+          },
+          "lookRight": {
+            "isBinary": false
+          },
+          "lookUp": {
+            "isBinary": false
+          },
+          "neutral": {
+            "isBinary": false,
+            "morphTargetBinds": [
+              {
+                "index": 0,
+                "node": 1,
+                "weight": 1
+              }
+            ]
+          },
+          "oh": {
+            "isBinary": false,
+            "morphTargetBinds": [
+              {
+                "index": 40,
+                "node": 1,
+                "weight": 1
+              }
+            ]
+          },
+          "ou": {
+            "isBinary": false,
+            "morphTargetBinds": [
+              {
+                "index": 38,
+                "node": 1,
+                "weight": 1
+              }
+            ]
+          },
+          "relaxed": {
+            "isBinary": false,
+            "morphTargetBinds": [
+              {
+                "index": 2,
+                "node": 1,
+                "weight": 1
+              }
+            ]
+          },
+          "sad": {
+            "isBinary": false,
+            "morphTargetBinds": [
+              {
+                "index": 4,
+                "node": 1,
+                "weight": 1
+              }
+            ],
+            "overrideMouth": "blend"
+          },
+          "surprised": {
+            "isBinary": false,
+            "morphTargetBinds": [
+              {
+                "index": 5,
+                "node": 1,
+                "weight": 1
+              }
+            ],
+            "overrideMouth": "blend"
+          }
+        }
+      },
+      "firstPerson": {
+        "meshAnnotations": [
+          {
+            "node": 0,
+            "type": "auto"
+          },
+          {
+            "node": 1,
+            "type": "auto"
+          },
+          {
+            "node": 2,
+            "type": "auto"
+          }
+        ]
+      },
+      "humanoid": {
+        "humanBones": {
+          "chest": {
+            "node": 22
+          },
+          "head": {
+            "node": 25
+          },
+          "hips": {
+            "node": 4
+          },
+          "leftEye": {
+            "node": 26
+          },
+          "leftFoot": {
+            "node": 162
+          },
+          "leftHand": {
+            "node": 98
+          },
+          "leftIndexDistal": {
+            "node": 101
+          },
+          "leftIndexIntermediate": {
+            "node": 100
+          },
+          "leftIndexProximal": {
+            "node": 99
+          },
+          "leftLittleDistal": {
+            "node": 105
+          },
+          "leftLittleIntermediate": {
+            "node": 104
+          },
+          "leftLittleProximal": {
+            "node": 103
+          },
+          "leftLowerArm": {
+            "node": 97
+          },
+          "leftLowerLeg": {
+            "node": 161
+          },
+          "leftMiddleDistal": {
+            "node": 109
+          },
+          "leftMiddleIntermediate": {
+            "node": 108
+          },
+          "leftMiddleProximal": {
+            "node": 107
+          },
+          "leftRingDistal": {
+            "node": 113
+          },
+          "leftRingIntermediate": {
+            "node": 112
+          },
+          "leftRingProximal": {
+            "node": 111
+          },
+          "leftShoulder": {
+            "node": 88
+          },
+          "leftThumbDistal": {
+            "node": 117
+          },
+          "leftThumbMetacarpal": {
+            "node": 115
+          },
+          "leftThumbProximal": {
+            "node": 116
+          },
+          "leftToes": {
+            "node": 163
+          },
+          "leftUpperArm": {
+            "node": 96
+          },
+          "leftUpperLeg": {
+            "node": 160
+          },
+          "neck": {
+            "node": 24
+          },
+          "rightEye": {
+            "node": 27
+          },
+          "rightFoot": {
+            "node": 167
+          },
+          "rightHand": {
+            "node": 132
+          },
+          "rightIndexDistal": {
+            "node": 135
+          },
+          "rightIndexIntermediate": {
+            "node": 134
+          },
+          "rightIndexProximal": {
+            "node": 133
+          },
+          "rightLittleDistal": {
+            "node": 139
+          },
+          "rightLittleIntermediate": {
+            "node": 138
+          },
+          "rightLittleProximal": {
+            "node": 137
+          },
+          "rightLowerArm": {
+            "node": 131
+          },
+          "rightLowerLeg": {
+            "node": 166
+          },
+          "rightMiddleDistal": {
+            "node": 143
+          },
+          "rightMiddleIntermediate": {
+            "node": 142
+          },
+          "rightMiddleProximal": {
+            "node": 141
+          },
+          "rightRingDistal": {
+            "node": 147
+          },
+          "rightRingIntermediate": {
+            "node": 146
+          },
+          "rightRingProximal": {
+            "node": 145
+          },
+          "rightShoulder": {
+            "node": 122
+          },
+          "rightThumbDistal": {
+            "node": 151
+          },
+          "rightThumbMetacarpal": {
+            "node": 149
+          },
+          "rightThumbProximal": {
+            "node": 150
+          },
+          "rightToes": {
+            "node": 168
+          },
+          "rightUpperArm": {
+            "node": 130
+          },
+          "rightUpperLeg": {
+            "node": 165
+          },
+          "spine": {
+            "node": 21
+          },
+          "upperChest": {
+            "node": 23
+          }
+        }
+      },
+      "lookAt": {
+        "offsetFromHeadBone": [
+          0.059,
+          0.061,
+          0
+        ],
+        "rangeMapHorizontalInner": {
+          "inputMaxValue": 90,
+          "outputScale": 10
+        },
+        "rangeMapHorizontalOuter": {
+          "inputMaxValue": 90,
+          "outputScale": 10
+        },
+        "rangeMapVerticalDown": {
+          "inputMaxValue": 90,
+          "outputScale": 10
+        },
+        "rangeMapVerticalUp": {
+          "inputMaxValue": 90,
+          "outputScale": 10
+        },
+        "type": "bone"
+      },
+      "meta": {
+        "allowAntisocialOrHateUsage": false,
+        "allowExcessivelySexualUsage": true,
+        "allowExcessivelyViolentUsage": true,
+        "allowPoliticalOrReligiousUsage": true,
+        "allowRedistribution": true,
+        "authors": [
+          "pixiv Inc."
+        ],
+        "avatarPermission": "everyone",
+        "commercialUsage": "corporation",
+        "copyrightInformation": "(c) 2022 pixiv Inc.",
+        "creditNotation": "unnecessary",
+        "licenseUrl": "https://vrm.dev/licenses/1.0/",
+        "modification": "allowModificationRedistribution",
+        "name": "VRM1_Constraint_Twist_Sample",
+        "thumbnailImage": 18,
+        "version": "v1.0.1"
+      },
+      "specVersion": "1.0"
+    }
+  },
+  "materials": [
+    {
+      "KHR_materials_unlit": {},
+      "VRMC_materials_mtoon": {
+        "giEqualizationFactor": 0.9,
+        "outlineColorFactor": [
+          0.0612459742,
+          0.0085681,
+          0.0144438017
+        ],
+        "outlineLightingMixFactor": 1,
+        "outlineWidthFactor": 8e-4,
+        "outlineWidthMode": "worldCoordinates",
+        "parametricRimColorFactor": [
+          0,
+          0,
+          0
+        ],
+        "parametricRimFresnelPowerFactor": 5,
+        "parametricRimLiftFactor": 0,
+        "renderQueueOffsetNumber": 0,
+        "rimLightingMixFactor": 1,
+        "shadeColorFactor": [
+          0.9301109,
+          0.623960435,
+          0.708375931
+        ],
+        "shadeMultiplyTexture": {
+          "index": 0
+        },
+        "shadingShiftFactor": -0.05,
+        "shadingToonyFactor": 0.9,
+        "specVersion": "1.0",
+        "transparentWithZWrite": false,
+        "uvAnimationRotationSpeedFactor": 0,
+        "uvAnimationScrollXSpeedFactor": 0,
+        "uvAnimationScrollYSpeedFactor": 0
+      }
+    },
+    {
+      "KHR_materials_unlit": {},
+      "VRMC_materials_mtoon": {
+        "giEqualizationFactor": 0.9,
+        "outlineColorFactor": [
+          0.0612459742,
+          0.0085681,
+          0.0144438017
+        ],
+        "outlineLightingMixFactor": 1,
+        "outlineWidthFactor": 8e-4,
+        "outlineWidthMode": "worldCoordinates",
+        "parametricRimColorFactor": [
+          0,
+          0,
+          0
+        ],
+        "parametricRimFresnelPowerFactor": 5,
+        "parametricRimLiftFactor": 0,
+        "renderQueueOffsetNumber": 0,
+        "rimLightingMixFactor": 1,
+        "shadeColorFactor": [
+          0.623960435,
+          0.6724432,
+          0.9301109
+        ],
+        "shadeMultiplyTexture": {
+          "index": 2
+        },
+        "shadingShiftFactor": -0.05,
+        "shadingToonyFactor": 0.9,
+        "specVersion": "1.0",
+        "transparentWithZWrite": false,
+        "uvAnimationRotationSpeedFactor": 0,
+        "uvAnimationScrollXSpeedFactor": 0,
+        "uvAnimationScrollYSpeedFactor": 0
+      }
+    },
+    {
+      "KHR_materials_unlit": {},
+      "VRMC_materials_mtoon": {
+        "giEqualizationFactor": 0.9,
+        "outlineColorFactor": [
+          0.0612459742,
+          0.0085681,
+          0.0144438017
+        ],
+        "outlineLightingMixFactor": 1,
+        "outlineWidthFactor": 8e-4,
+        "outlineWidthMode": "worldCoordinates",
+        "parametricRimColorFactor": [
+          0,
+          0,
+          0
+        ],
+        "parametricRimFresnelPowerFactor": 5,
+        "parametricRimLiftFactor": 0,
+        "renderQueueOffsetNumber": 0,
+        "rimLightingMixFactor": 1,
+        "shadeColorFactor": [
+          0.623960435,
+          0.6724432,
+          0.9301109
+        ],
+        "shadeMultiplyTexture": {
+          "index": 3
+        },
+        "shadingShiftFactor": -0.05,
+        "shadingToonyFactor": 0.9,
+        "specVersion": "1.0",
+        "transparentWithZWrite": false,
+        "uvAnimationRotationSpeedFactor": 0,
+        "uvAnimationScrollXSpeedFactor": 0,
+        "uvAnimationScrollYSpeedFactor": 0
+      }
+    },
+    {
+      "KHR_materials_unlit": {},
+      "VRMC_materials_mtoon": {
+        "giEqualizationFactor": 0.9,
+        "outlineColorFactor": [
+          0.0612459742,
+          0.0085681,
+          0.0144438017
+        ],
+        "outlineLightingMixFactor": 1,
+        "outlineWidthFactor": 8e-4,
+        "outlineWidthMode": "worldCoordinates",
+        "parametricRimColorFactor": [
+          0,
+          0,
+          0
+        ],
+        "parametricRimFresnelPowerFactor": 5,
+        "parametricRimLiftFactor": 0,
+        "renderQueueOffsetNumber": 0,
+        "rimLightingMixFactor": 1,
+        "shadeColorFactor": [
+          0.623960435,
+          0.6724432,
+          0.9301109
+        ],
+        "shadeMultiplyTexture": {
+          "index": 4
+        },
+        "shadingShiftFactor": -0.05,
+        "shadingToonyFactor": 0.9,
+        "specVersion": "1.0",
+        "transparentWithZWrite": false,
+        "uvAnimationRotationSpeedFactor": 0,
+        "uvAnimationScrollXSpeedFactor": 0,
+        "uvAnimationScrollYSpeedFactor": 0
+      }
+    },
+    {
+      "KHR_materials_unlit": {},
+      "VRMC_materials_mtoon": {
+        "giEqualizationFactor": 0.9,
+        "outlineColorFactor": [
+          0.0612459742,
+          0.0085681,
+          0.0144438017
+        ],
+        "outlineLightingMixFactor": 1,
+        "outlineWidthFactor": 8e-4,
+        "outlineWidthMode": "worldCoordinates",
+        "parametricRimColorFactor": [
+          0,
+          0,
+          0
+        ],
+        "parametricRimFresnelPowerFactor": 5,
+        "parametricRimLiftFactor": 0,
+        "renderQueueOffsetNumber": 0,
+        "rimLightingMixFactor": 1,
+        "shadeColorFactor": [
+          1,
+          1,
+          1
+        ],
+        "shadeMultiplyTexture": {
+          "index": 5
+        },
+        "shadingShiftFactor": -0.05,
+        "shadingToonyFactor": 0.9,
+        "specVersion": "1.0",
+        "transparentWithZWrite": false,
+        "uvAnimationRotationSpeedFactor": 0,
+        "uvAnimationScrollXSpeedFactor": 0,
+        "uvAnimationScrollYSpeedFactor": 0
+      }
+    },
+    {
+      "KHR_materials_unlit": {},
+      "VRMC_materials_mtoon": {
+        "giEqualizationFactor": 0.9,
+        "parametricRimColorFactor": [
+          0,
+          0,
+          0
+        ],
+        "parametricRimFresnelPowerFactor": 5,
+        "parametricRimLiftFactor": 0,
+        "renderQueueOffsetNumber": 0,
+        "rimLightingMixFactor": 1,
+        "shadeColorFactor": [
+          0.9301109,
+          0.623960435,
+          0.708375931
+        ],
+        "shadeMultiplyTexture": {
+          "index": 7
+        },
+        "shadingShiftFactor": -0.05,
+        "shadingToonyFactor": 0.9,
+        "specVersion": "1.0",
+        "transparentWithZWrite": false,
+        "uvAnimationRotationSpeedFactor": 0,
+        "uvAnimationScrollXSpeedFactor": 0,
+        "uvAnimationScrollYSpeedFactor": 0
+      }
+    },
+    {
+      "KHR_materials_unlit": {},
+      "VRMC_materials_mtoon": {
+        "giEqualizationFactor": 0.9,
+        "parametricRimColorFactor": [
+          0,
+          0,
+          0
+        ],
+        "parametricRimFresnelPowerFactor": 5,
+        "parametricRimLiftFactor": 0,
+        "renderQueueOffsetNumber": 0,
+        "rimLightingMixFactor": 1,
+        "shadeColorFactor": [
+          1,
+          1,
+          1
+        ],
+        "shadeMultiplyTexture": {
+          "index": 8
+        },
+        "shadingShiftFactor": -0.05,
+        "shadingToonyFactor": 0.9,
+        "specVersion": "1.0",
+        "transparentWithZWrite": false,
+        "uvAnimationRotationSpeedFactor": 0,
+        "uvAnimationScrollXSpeedFactor": 0,
+        "uvAnimationScrollYSpeedFactor": 0
+      }
+    },
+    {
+      "KHR_materials_unlit": {},
+      "VRMC_materials_mtoon": {
+        "giEqualizationFactor": 0.9,
+        "outlineColorFactor": [
+          0.0612459742,
+          0.0085681,
+          0.0144438017
+        ],
+        "outlineLightingMixFactor": 1,
+        "outlineWidthFactor": 8e-4,
+        "outlineWidthMode": "worldCoordinates",
+        "outlineWidthMultiplyTexture": {
+          "index": 10
+        },
+        "parametricRimColorFactor": [
+          0,
+          0,
+          0
+        ],
+        "parametricRimFresnelPowerFactor": 5,
+        "parametricRimLiftFactor": 0,
+        "renderQueueOffsetNumber": 0,
+        "rimLightingMixFactor": 1,
+        "shadeColorFactor": [
+          0.9301109,
+          0.623960435,
+          0.708375931
+        ],
+        "shadeMultiplyTexture": {
+          "index": 9
+        },
+        "shadingShiftFactor": -0.05,
+        "shadingToonyFactor": 0.9,
+        "specVersion": "1.0",
+        "transparentWithZWrite": false,
+        "uvAnimationRotationSpeedFactor": 0,
+        "uvAnimationScrollXSpeedFactor": 0,
+        "uvAnimationScrollYSpeedFactor": 0
+      }
+    },
+    {
+      "KHR_materials_unlit": {},
+      "VRMC_materials_mtoon": {
+        "giEqualizationFactor": 0.9,
+        "parametricRimColorFactor": [
+          0,
+          0,
+          0
+        ],
+        "parametricRimFresnelPowerFactor": 5,
+        "parametricRimLiftFactor": 0,
+        "renderQueueOffsetNumber": 0,
+        "rimLightingMixFactor": 1,
+        "shadeColorFactor": [
+          1,
+          1,
+          1
+        ],
+        "shadeMultiplyTexture": {
+          "index": 11
+        },
+        "shadingShiftFactor": -0.05,
+        "shadingToonyFactor": 0.9,
+        "specVersion": "1.0",
+        "transparentWithZWrite": false,
+        "uvAnimationRotationSpeedFactor": 0,
+        "uvAnimationScrollXSpeedFactor": 0,
+        "uvAnimationScrollYSpeedFactor": 0
+      }
+    },
+    {
+      "KHR_materials_unlit": {},
+      "VRMC_materials_mtoon": {
+        "giEqualizationFactor": 0.9,
+        "parametricRimColorFactor": [
+          0,
+          0,
+          0
+        ],
+        "parametricRimFresnelPowerFactor": 5,
+        "parametricRimLiftFactor": 0,
+        "renderQueueOffsetNumber": 0,
+        "rimLightingMixFactor": 1,
+        "shadeColorFactor": [
+          1,
+          1,
+          1
+        ],
+        "shadeMultiplyTexture": {
+          "index": 12
+        },
+        "shadingShiftFactor": -0.05,
+        "shadingToonyFactor": 0.9,
+        "specVersion": "1.0",
+        "transparentWithZWrite": false,
+        "uvAnimationRotationSpeedFactor": 0,
+        "uvAnimationScrollXSpeedFactor": 0,
+        "uvAnimationScrollYSpeedFactor": 0
+      }
+    },
+    {
+      "KHR_materials_unlit": {},
+      "VRMC_materials_mtoon": {
+        "giEqualizationFactor": 0.9,
+        "parametricRimColorFactor": [
+          0,
+          0,
+          0
+        ],
+        "parametricRimFresnelPowerFactor": 5,
+        "parametricRimLiftFactor": 0,
+        "renderQueueOffsetNumber": 0,
+        "rimLightingMixFactor": 1,
+        "shadeColorFactor": [
+          1,
+          1,
+          1
+        ],
+        "shadeMultiplyTexture": {
+          "index": 13
+        },
+        "shadingShiftFactor": -0.05,
+        "shadingToonyFactor": 0.9,
+        "specVersion": "1.0",
+        "transparentWithZWrite": false,
+        "uvAnimationRotationSpeedFactor": 0,
+        "uvAnimationScrollXSpeedFactor": 0,
+        "uvAnimationScrollYSpeedFactor": 0
+      }
+    },
+    {
+      "KHR_materials_unlit": {},
+      "VRMC_materials_mtoon": {
+        "giEqualizationFactor": 0.9,
+        "parametricRimColorFactor": [
+          0,
+          0,
+          0
+        ],
+        "parametricRimFresnelPowerFactor": 5,
+        "parametricRimLiftFactor": 0,
+        "renderQueueOffsetNumber": 0,
+        "rimLightingMixFactor": 1,
+        "shadeColorFactor": [
+          1,
+          1,
+          1
+        ],
+        "shadeMultiplyTexture": {
+          "index": 14
+        },
+        "shadingShiftFactor": -0.05,
+        "shadingToonyFactor": 0.9,
+        "specVersion": "1.0",
+        "transparentWithZWrite": false,
+        "uvAnimationRotationSpeedFactor": 0,
+        "uvAnimationScrollXSpeedFactor": 0,
+        "uvAnimationScrollYSpeedFactor": 0
+      }
+    },
+    {
+      "KHR_materials_unlit": {},
+      "VRMC_materials_mtoon": {
+        "giEqualizationFactor": 0.9,
+        "outlineColorFactor": [
+          0.0612459742,
+          0.0085681,
+          0.0144438017
+        ],
+        "outlineLightingMixFactor": 1,
+        "outlineWidthFactor": 8e-4,
+        "outlineWidthMode": "worldCoordinates",
+        "parametricRimColorFactor": [
+          0,
+          0,
+          0
+        ],
+        "parametricRimFresnelPowerFactor": 5,
+        "parametricRimLiftFactor": 0,
+        "renderQueueOffsetNumber": 0,
+        "rimLightingMixFactor": 1,
+        "shadeColorFactor": [
+          1,
+          1,
+          1
+        ],
+        "shadeMultiplyTexture": {
+          "index": 15
+        },
+        "shadingShiftFactor": -0.05,
+        "shadingToonyFactor": 0.9,
+        "specVersion": "1.0",
+        "transparentWithZWrite": false,
+        "uvAnimationRotationSpeedFactor": 0,
+        "uvAnimationScrollXSpeedFactor": 0,
+        "uvAnimationScrollYSpeedFactor": 0
+      }
+    }
+  ],
+  "nodes": [
+    {},
+    {},
+    {},
+    {},
+    {},
+    {
+      "VRMC_node_constraint": {
+        "constraint": {
+          "aim": {
+            "aimAxis": "NegativeY",
+            "source": 161,
+            "weight": 1
+          }
+        },
+        "specVersion": "1.0"
+      }
+    },
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {
+      "VRMC_node_constraint": {
+        "constraint": {
+          "aim": {
+            "aimAxis": "NegativeY",
+            "source": 166,
+            "weight": 1
+          }
+        },
+        "specVersion": "1.0"
+      }
+    },
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {
+      "VRMC_node_constraint": {
+        "constraint": {
+          "aim": {
+            "aimAxis": "PositiveX",
+            "source": 97,
+            "weight": 1
+          }
+        },
+        "specVersion": "1.0"
+      }
+    },
+    {
+      "VRMC_node_constraint": {
+        "constraint": {
+          "roll": {
+            "rollAxis": "X",
+            "source": 96,
+            "weight": 0.5
+          }
+        },
+        "specVersion": "1.0"
+      }
+    },
+    {
+      "VRMC_node_constraint": {
+        "constraint": {
+          "aim": {
+            "aimAxis": "PositiveX",
+            "source": 97,
+            "weight": 1
+          }
+        },
+        "specVersion": "1.0"
+      }
+    },
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {
+      "VRMC_node_constraint": {
+        "constraint": {
+          "roll": {
+            "rollAxis": "X",
+            "source": 98,
+            "weight": 1
+          }
+        },
+        "specVersion": "1.0"
+      }
+    },
+    {
+      "VRMC_node_constraint": {
+        "constraint": {
+          "roll": {
+            "rollAxis": "X",
+            "source": 98,
+            "weight": 0.5
+          }
+        },
+        "specVersion": "1.0"
+      }
+    },
+    {
+      "VRMC_node_constraint": {
+        "constraint": {
+          "roll": {
+            "rollAxis": "Y",
+            "source": 97,
+            "weight": 0.5
+          }
+        },
+        "specVersion": "1.0"
+      }
+    },
+    {},
+    {
+      "VRMC_node_constraint": {
+        "constraint": {
+          "aim": {
+            "aimAxis": "NegativeX",
+            "source": 131,
+            "weight": 1
+          }
+        },
+        "specVersion": "1.0"
+      }
+    },
+    {
+      "VRMC_node_constraint": {
+        "constraint": {
+          "roll": {
+            "rollAxis": "X",
+            "source": 130,
+            "weight": 0.5
+          }
+        },
+        "specVersion": "1.0"
+      }
+    },
+    {
+      "VRMC_node_constraint": {
+        "constraint": {
+          "aim": {
+            "aimAxis": "NegativeX",
+            "source": 131,
+            "weight": 1
+          }
+        },
+        "specVersion": "1.0"
+      }
+    },
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {
+      "VRMC_node_constraint": {
+        "constraint": {
+          "roll": {
+            "rollAxis": "X",
+            "source": 132,
+            "weight": 1
+          }
+        },
+        "specVersion": "1.0"
+      }
+    },
+    {
+      "VRMC_node_constraint": {
+        "constraint": {
+          "roll": {
+            "rollAxis": "X",
+            "source": 132,
+            "weight": 0.5
+          }
+        },
+        "specVersion": "1.0"
+      }
+    },
+    {
+      "VRMC_node_constraint": {
+        "constraint": {
+          "roll": {
+            "rollAxis": "Y",
+            "source": 131,
+            "weight": 0.5
+          }
+        },
+        "specVersion": "1.0"
+      }
+    },
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {}
+  ]
+}

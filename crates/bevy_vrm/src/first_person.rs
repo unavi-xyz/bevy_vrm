@@ -1,10 +1,6 @@
-use std::{
-    collections::{
-        HashMap,
-        HashSet,
-    },
-    sync::LazyLock,
-};
+//! Splitting of avatar meshes into first- and third-person render layers.
+
+use std::collections::HashSet;
 
 use bevy::{
     camera::visibility::RenderLayers,
@@ -20,53 +16,63 @@ use bevy_shader_mtoon::{
     MtoonMaterial,
     OutlineSync,
 };
-use serde_vrm::vrm0::BoneName;
-pub use serde_vrm::vrm0::FirstPersonFlag;
+use serde_vrm::vrm1::vrmc_vrm::{
+    first_person::FirstPersonType,
+    humanoid::HumanBoneName,
+};
 
 pub const FIRST_PERSON_LAYER: usize = 7;
 pub const THIRD_PERSON_LAYER: usize = 8;
 
-pub static DEFAULT_RENDER_LAYERS: LazyLock<HashMap<FirstPersonFlag, RenderLayers>> =
-    LazyLock::new(|| {
-        let mut map = HashMap::default();
+#[derive(Clone, Debug)]
+pub struct FirstPersonLayers {
+    pub both:              RenderLayers,
+    pub first_person_only: RenderLayers,
+    pub third_person_only: RenderLayers,
+}
 
-        map.insert(
-            FirstPersonFlag::Auto,
-            RenderLayers::from_layers(&[0, FIRST_PERSON_LAYER, THIRD_PERSON_LAYER]),
-        );
-        map.insert(
-            FirstPersonFlag::Both,
-            RenderLayers::from_layers(&[0, FIRST_PERSON_LAYER, THIRD_PERSON_LAYER]),
-        );
-        map.insert(
-            FirstPersonFlag::FirstPersonOnly,
-            RenderLayers::layer(FIRST_PERSON_LAYER),
-        );
-        map.insert(
-            FirstPersonFlag::ThirdPersonOnly,
-            RenderLayers::layer(THIRD_PERSON_LAYER),
-        );
+impl Default for FirstPersonLayers {
+    fn default() -> Self {
+        Self {
+            both:              RenderLayers::from_layers(&[
+                0,
+                FIRST_PERSON_LAYER,
+                THIRD_PERSON_LAYER,
+            ]),
+            first_person_only: RenderLayers::layer(FIRST_PERSON_LAYER),
+            third_person_only: RenderLayers::layer(THIRD_PERSON_LAYER),
+        }
+    }
+}
 
-        map
-    });
+impl FirstPersonLayers {
+    /// [`FirstPersonType::Auto`] shares the layers of
+    /// [`FirstPersonType::Both`].
+    #[must_use]
+    pub const fn get(&self, ty: FirstPersonType) -> &RenderLayers {
+        match ty {
+            FirstPersonType::Auto | FirstPersonType::Both => &self.both,
+            FirstPersonType::FirstPersonOnly => &self.first_person_only,
+            FirstPersonType::ThirdPersonOnly => &self.third_person_only,
+        }
+    }
+}
 
 /// Splits each VRM mesh into first- and third-person variants and assigns their
 /// [`RenderLayers`]. Cameras must render
 /// [`FIRST_PERSON_LAYER`]/[`THIRD_PERSON_LAYER`] to see the split meshes.
 #[derive(EntityEvent)]
 pub struct SetupFirstPerson {
-    pub entity:        Entity,
-    /// Render layer values to use for each first person flag.
-    /// Defaults to [`DEFAULT_RENDER_LAYERS`] if not provided.
-    pub render_layers: Option<HashMap<FirstPersonFlag, RenderLayers>>,
+    pub entity: Entity,
+    pub layers: FirstPersonLayers,
 }
 
 pub(crate) fn setup_first_person(
     event: On<SetupFirstPerson>,
-    bones: Query<(Entity, &BoneName)>,
+    bones: Query<(Entity, &HumanBoneName)>,
     mut flags: Query<(
         Entity,
-        &mut FirstPersonFlag,
+        &mut FirstPersonType,
         &Mesh3d,
         Option<&Name>,
         Option<&MeshMaterial3d<StandardMaterial>>,
@@ -83,15 +89,15 @@ pub(crate) fn setup_first_person(
         return;
     }
 
-    let render_layers = event
-        .render_layers
-        .as_ref()
-        .unwrap_or(&DEFAULT_RENDER_LAYERS);
+    let layers = &event.layers;
 
-    let (head_ent, _) = bones
+    let Some((head_ent, _)) = bones
         .iter()
-        .find(|(e, name)| **name == BoneName::Head && is_child(*e, event.entity, &parents))
-        .expect("VRM must have Head bone");
+        .find(|(e, name)| **name == HumanBoneName::Head && is_child(*e, event.entity, &parents))
+    else {
+        warn!("VRM has no Head bone, skipping first person setup");
+        return;
+    };
 
     for (
         ent,
@@ -104,55 +110,54 @@ pub(crate) fn setup_first_person(
         outline_sync,
     ) in &mut flags
     {
-        // Skip if not a child of this VRM entity.
         if !is_child(ent, event.entity, &parents) {
             continue;
         }
         // Auto splits into a head-removed first-person variant plus the full
         // third-person original, each on its own render layer.
-        if *flag == FirstPersonFlag::Auto {
-            let Some(mesh) = meshes.get(mesh_handle) else {
-                warn!("Mesh not found");
-                continue;
-            };
-            let Ok(skin) = skins.get(ent) else {
-                continue;
-            };
-            let Some(first_person) = strip_head_vertices(mesh, skin, head_ent, &parents) else {
-                continue;
-            };
+        if *flag == FirstPersonType::Auto {
+            'split: {
+                let Some(mesh) = meshes.get(mesh_handle) else {
+                    warn!("Mesh not found");
+                    break 'split;
+                };
+                let Ok(skin) = skins.get(ent) else {
+                    break 'split;
+                };
+                let Some(first_person) = strip_head_vertices(mesh, skin, head_ent, &parents) else {
+                    break 'split;
+                };
 
-            let new_ent = commands
-                .spawn((
-                    Transform::default(),
-                    Mesh3d(meshes.add(first_person)),
-                    render_layers[&FirstPersonFlag::FirstPersonOnly].clone(),
-                ))
-                .id();
+                let new_ent = commands
+                    .spawn((
+                        Transform::default(),
+                        Mesh3d(meshes.add(first_person)),
+                        layers.first_person_only.clone(),
+                    ))
+                    .id();
 
-            insert_cloned(&mut commands, new_ent, mtoon_material);
-            insert_cloned(&mut commands, new_ent, standard_material);
-            insert_cloned(&mut commands, new_ent, name);
-            insert_cloned(&mut commands, new_ent, morph_weights);
-            insert_cloned(&mut commands, new_ent, outline_sync);
+                insert_cloned(&mut commands, new_ent, mtoon_material);
+                insert_cloned(&mut commands, new_ent, standard_material);
+                insert_cloned(&mut commands, new_ent, name);
+                insert_cloned(&mut commands, new_ent, morph_weights);
+                insert_cloned(&mut commands, new_ent, outline_sync);
 
-            let mut new_skin = skin.clone();
-            for (i, e) in new_skin.joints.iter().enumerate() {
-                if *e == ent {
-                    new_skin.joints.insert(i, new_ent);
-                    break;
+                let mut new_skin = skin.clone();
+                for (i, e) in new_skin.joints.iter().enumerate() {
+                    if *e == ent {
+                        new_skin.joints.insert(i, new_ent);
+                        break;
+                    }
                 }
+
+                commands.entity(new_ent).insert(new_skin);
+                commands.entity(ent).add_child(new_ent);
+
+                *flag = FirstPersonType::ThirdPersonOnly;
             }
-
-            commands.entity(new_ent).insert(new_skin);
-            commands.entity(ent).add_child(new_ent);
-
-            *flag = FirstPersonFlag::ThirdPersonOnly;
         }
 
-        commands
-            .entity(ent)
-            .insert(render_layers[flag.as_ref()].clone());
+        commands.entity(ent).insert(layers.get(*flag).clone());
     }
 }
 
@@ -184,17 +189,16 @@ fn strip_head_vertices(
     };
 
     let mut to_remove = HashSet::<usize>::default();
-    for (i, item) in joints.iter().enumerate() {
-        for (j, idx) in item.iter().enumerate() {
-            let joint_ent = skin.joints[*idx as usize];
-            if is_child(joint_ent, head_ent, parents) && weights[i][j] > 0.0 {
+    for (i, (item, item_weights)) in joints.iter().zip(weights).enumerate() {
+        for (idx, weight) in item.iter().zip(item_weights) {
+            let Some(&joint_ent) = skin.joints.get(*idx as usize) else {
+                continue;
+            };
+            if is_child(joint_ent, head_ent, parents) && *weight > 0.0 {
                 to_remove.insert(i);
             }
         }
     }
-
-    let mut to_remove = to_remove.into_iter().collect::<Vec<_>>();
-    to_remove.sort_by(|a, b| b.cmp(a));
 
     let mut mesh = mesh.clone();
     if let Some(indices) = mesh.indices_mut() {
@@ -206,41 +210,19 @@ fn strip_head_vertices(
     Some(mesh)
 }
 
-trait ToUsize {
-    fn to_usize(self) -> usize;
-}
-
-impl ToUsize for u16 {
-    fn to_usize(self) -> usize {
-        self as usize
-    }
-}
-
-impl ToUsize for u32 {
-    fn to_usize(self) -> usize {
-        self as usize
-    }
-}
-
-/// Remove the specified vertices from the indices.
-fn clean_indices<T: Copy + PartialEq + ToUsize>(indices: &mut Vec<T>, vertices: &[usize]) {
-    let mut to_remove = Vec::default();
-
-    for (i, chunk) in indices.chunks(3).enumerate() {
-        for n in chunk {
-            if vertices.contains(&n.to_usize()) {
-                to_remove.push(i);
-                break;
-            }
-        }
-    }
-
-    for i in to_remove.into_iter().rev() {
-        let start = i * 3;
-        indices.remove(start);
-        indices.remove(start);
-        indices.remove(start);
-    }
+/// Keeps only the triangles that touch none of the removed vertices.
+fn clean_indices<T: Copy + Into<u32>>(indices: &mut Vec<T>, removed: &HashSet<usize>) {
+    *indices = indices
+        .as_chunks::<3>()
+        .0
+        .iter()
+        .filter(|tri| {
+            tri.iter()
+                .all(|i| !removed.contains(&(Into::<u32>::into(*i) as usize)))
+        })
+        .flatten()
+        .copied()
+        .collect();
 }
 
 /// Walks up the parent tree, searching for a specific Entity.

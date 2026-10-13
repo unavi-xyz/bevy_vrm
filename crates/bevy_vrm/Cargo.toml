@@ -23,6 +23,7 @@ bevy = { features = [
 ], workspace = true }
 bevy_shader_mtoon.workspace = true
 gltf = { default-features = false, features = [
+  "KHR_materials_emissive_strength",
   "extensions",
   "extras",
   "names",

@@ -1,3 +1,5 @@
+//! Builds animation target ids from a chain of bone names.
+
 use bevy::{
     animation::AnimationTargetId,
     ecs::name::Name,

@@ -1,0 +1,2097 @@
+{
+  "extensions": {
+    "VRMC_springBone": {
+      "colliderGroups": [
+        {
+          "colliders": [
+            0,
+            1,
+            2,
+            3
+          ]
+        },
+        {
+          "colliders": [
+            6,
+            7,
+            4,
+            5
+          ]
+        }
+      ],
+      "colliders": [
+        {
+          "node": 4,
+          "shape": {
+            "capsule": {
+              "offset": [
+                -0.04,
+                0,
+                0.02
+              ],
+              "radius": 0.088,
+              "tail": [
+                0.04,
+                0,
+                0.02
+              ]
+            }
+          }
+        },
+        {
+          "node": 5,
+          "shape": {
+            "sphere": {
+              "offset": [
+                0,
+                0.02,
+                -0.07
+              ],
+              "radius": 0.113
+            }
+          }
+        },
+        {
+          "node": 5,
+          "shape": {
+            "capsule": {
+              "offset": [
+                0.065,
+                0.14,
+                0.01
+              ],
+              "radius": 0.083,
+              "tail": [
+                -0.065,
+                0.14,
+                0.01
+              ]
+            }
+          }
+        },
+        {
+          "node": 5,
+          "shape": {
+            "capsule": {
+              "offset": [
+                0.04,
+                0,
+                0.02
+              ],
+              "radius": 0.083,
+              "tail": [
+                -0.04,
+                0,
+                0.02
+              ]
+            }
+          }
+        },
+        {
+          "node": 130,
+          "shape": {
+            "capsule": {
+              "offset": [
+                -0.004536999,
+                7.566095e-9,
+                0.0127928918
+              ],
+              "radius": 0.07,
+              "tail": [
+                -0.001991607,
+                0.329534262,
+                0.009325488
+              ]
+            }
+          }
+        },
+        {
+          "node": 131,
+          "shape": {
+            "capsule": {
+              "offset": [
+                4.570225e-9,
+                -1.477034e-8,
+                0.008859742
+              ],
+              "radius": 0.065,
+              "tail": [
+                2.013798e-8,
+                0.3535266,
+                0.008811156
+              ]
+            }
+          }
+        },
+        {
+          "node": 137,
+          "shape": {
+            "capsule": {
+              "offset": [
+                0.004536999,
+                7.566095e-9,
+                0.0127928918
+              ],
+              "radius": 0.07,
+              "tail": [
+                0.001991607,
+                0.329534262,
+                0.009325488
+              ]
+            }
+          }
+        },
+        {
+          "node": 138,
+          "shape": {
+            "capsule": {
+              "offset": [
+                -4.57022464e-9,
+                -1.477034e-8,
+                0.008859742
+              ],
+              "radius": 0.065,
+              "tail": [
+                -2.013798e-8,
+                0.3535266,
+                0.008811156
+              ]
+            }
+          }
+        }
+      ],
+      "specVersion": "1.0",
+      "springs": [
+        {
+          "center": 3,
+          "colliderGroups": [
+            0
+          ],
+          "joints": [
+            {
+              "dragForce": 1,
+              "gravityDir": [
+                0,
+                -1,
+                0
+              ],
+              "gravityPower": 0,
+              "hitRadius": 0.02,
+              "node": 75,
+              "stiffness": 4
+            },
+            {
+              "dragForce": 1,
+              "gravityDir": [
+                0,
+                -1,
+                0
+              ],
+              "gravityPower": 0,
+              "hitRadius": 0.02,
+              "node": 76,
+              "stiffness": 4
+            },
+            {
+              "dragForce": 1,
+              "gravityDir": [
+                0,
+                -1,
+                0
+              ],
+              "gravityPower": 0,
+              "hitRadius": 0.02,
+              "node": 77,
+              "stiffness": 3
+            },
+            {
+              "dragForce": 1,
+              "gravityDir": [
+                0,
+                -1,
+                0
+              ],
+              "gravityPower": 0,
+              "hitRadius": 0.02,
+              "node": 78,
+              "stiffness": 3
+            },
+            {
+              "dragForce": 1,
+              "gravityDir": [
+                0,
+                -1,
+                0
+              ],
+              "gravityPower": 0,
+              "hitRadius": 0.02,
+              "node": 79,
+              "stiffness": 2
+            },
+            {
+              "dragForce": 1,
+              "gravityDir": [
+                0,
+                -1,
+                0
+              ],
+              "gravityPower": 0,
+              "hitRadius": 0.02,
+              "node": 80,
+              "stiffness": 2
+            },
+            {
+              "dragForce": 1,
+              "gravityDir": [
+                0,
+                -1,
+                0
+              ],
+              "gravityPower": 0,
+              "hitRadius": 0.02,
+              "node": 81,
+              "stiffness": 2
+            }
+          ],
+          "name": "TailHair"
+        },
+        {
+          "center": 3,
+          "joints": [
+            {
+              "dragForce": 1,
+              "gravityDir": [
+                0,
+                -1,
+                0
+              ],
+              "gravityPower": 0,
+              "hitRadius": 0.01,
+              "node": 47,
+              "stiffness": 1.2
+            },
+            {
+              "dragForce": 1,
+              "gravityDir": [
+                0,
+                -1,
+                0
+              ],
+              "gravityPower": 0,
+              "hitRadius": 0.01,
+              "node": 48,
+              "stiffness": 1.2
+            }
+          ],
+          "name": "FrontHairA"
+        },
+        {
+          "center": 3,
+          "joints": [
+            {
+              "dragForce": 1,
+              "gravityDir": [
+                0,
+                -1,
+                0
+              ],
+              "gravityPower": 0,
+              "hitRadius": 0.01,
+              "node": 50,
+              "stiffness": 1.2
+            },
+            {
+              "dragForce": 1,
+              "gravityDir": [
+                0,
+                -1,
+                0
+              ],
+              "gravityPower": 0,
+              "hitRadius": 0.01,
+              "node": 51,
+              "stiffness": 1.2
+            }
+          ],
+          "name": "FrontHairB"
+        },
+        {
+          "center": 3,
+          "joints": [
+            {
+              "dragForce": 1,
+              "gravityDir": [
+                0,
+                -1,
+                0
+              ],
+              "gravityPower": 0,
+              "hitRadius": 0.01,
+              "node": 53,
+              "stiffness": 1.2
+            },
+            {
+              "dragForce": 1,
+              "gravityDir": [
+                0,
+                -1,
+                0
+              ],
+              "gravityPower": 0,
+              "hitRadius": 0.01,
+              "node": 54,
+              "stiffness": 1.2
+            }
+          ],
+          "name": "FrontHairC"
+        },
+        {
+          "center": 3,
+          "joints": [
+            {
+              "dragForce": 1,
+              "gravityDir": [
+                0,
+                -1,
+                0
+              ],
+              "gravityPower": 0,
+              "hitRadius": 0.01,
+              "node": 56,
+              "stiffness": 1.2
+            },
+            {
+              "dragForce": 1,
+              "gravityDir": [
+                0,
+                -1,
+                0
+              ],
+              "gravityPower": 0,
+              "hitRadius": 0.01,
+              "node": 57,
+              "stiffness": 1.2
+            }
+          ],
+          "name": "FrontHairD"
+        },
+        {
+          "center": 3,
+          "joints": [
+            {
+              "dragForce": 1,
+              "gravityDir": [
+                0,
+                -1,
+                0
+              ],
+              "gravityPower": 0,
+              "hitRadius": 0.01,
+              "node": 59,
+              "stiffness": 1.2
+            },
+            {
+              "dragForce": 1,
+              "gravityDir": [
+                0,
+                -1,
+                0
+              ],
+              "gravityPower": 0,
+              "hitRadius": 0.01,
+              "node": 60,
+              "stiffness": 1.2
+            }
+          ],
+          "name": "FrontHairE"
+        },
+        {
+          "center": 3,
+          "joints": [
+            {
+              "dragForce": 1,
+              "gravityDir": [
+                0,
+                -1,
+                0
+              ],
+              "gravityPower": 0,
+              "hitRadius": 0.01,
+              "node": 62,
+              "stiffness": 1.2
+            },
+            {
+              "dragForce": 1,
+              "gravityDir": [
+                0,
+                -1,
+                0
+              ],
+              "gravityPower": 0,
+              "hitRadius": 0.01,
+              "node": 63,
+              "stiffness": 1.2
+            }
+          ],
+          "name": "FrontHairF"
+        },
+        {
+          "center": 3,
+          "joints": [
+            {
+              "dragForce": 1,
+              "gravityDir": [
+                0,
+                -1,
+                0
+              ],
+              "gravityPower": 0,
+              "hitRadius": 0.01,
+              "node": 65,
+              "stiffness": 1.2
+            },
+            {
+              "dragForce": 1,
+              "gravityDir": [
+                0,
+                -1,
+                0
+              ],
+              "gravityPower": 0,
+              "hitRadius": 0.01,
+              "node": 66,
+              "stiffness": 1.2
+            }
+          ],
+          "name": "FrontHairG"
+        },
+        {
+          "colliderGroups": [
+            1
+          ],
+          "joints": [
+            {
+              "dragForce": 1,
+              "gravityDir": [
+                0,
+                -1,
+                0
+              ],
+              "gravityPower": 0,
+              "hitRadius": 0.02,
+              "node": 37,
+              "stiffness": 4
+            },
+            {
+              "dragForce": 1,
+              "gravityDir": [
+                0,
+                -1,
+                0
+              ],
+              "gravityPower": 0,
+              "hitRadius": 0.02,
+              "node": 38,
+              "stiffness": 4
+            },
+            {
+              "dragForce": 1,
+              "gravityDir": [
+                0,
+                -1,
+                0
+              ],
+              "gravityPower": 0,
+              "hitRadius": 0.02,
+              "node": 39,
+              "stiffness": 4
+            },
+            {
+              "dragForce": 1,
+              "gravityDir": [
+                0,
+                -1,
+                0
+              ],
+              "gravityPower": 0,
+              "hitRadius": 0.02,
+              "node": 40,
+              "stiffness": 4
+            },
+            {
+              "dragForce": 1,
+              "gravityDir": [
+                0,
+                -1,
+                0
+              ],
+              "gravityPower": 0,
+              "hitRadius": 0.02,
+              "node": 41,
+              "stiffness": 4
+            },
+            {
+              "dragForce": 1,
+              "gravityDir": [
+                0,
+                -1,
+                0
+              ],
+              "gravityPower": 0,
+              "hitRadius": 0.06,
+              "node": 42,
+              "stiffness": 4
+            },
+            {
+              "dragForce": 1,
+              "gravityDir": [
+                0,
+                -1,
+                0
+              ],
+              "gravityPower": 0,
+              "hitRadius": 0.02,
+              "node": 43,
+              "stiffness": 4
+            }
+          ],
+          "name": "RoboWire"
+        }
+      ]
+    },
+    "VRMC_vrm": {
+      "expressions": {
+        "preset": {
+          "aa": {
+            "isBinary": false,
+            "morphTargetBinds": [
+              {
+                "index": 25,
+                "node": 2,
+                "weight": 1
+              }
+            ],
+            "overrideBlink": "none",
+            "overrideLookAt": "none",
+            "overrideMouth": "none"
+          },
+          "angry": {
+            "isBinary": true,
+            "morphTargetBinds": [
+              {
+                "index": 34,
+                "node": 2,
+                "weight": 1
+              }
+            ],
+            "overrideBlink": "none",
+            "overrideLookAt": "none",
+            "overrideMouth": "none",
+            "textureTransformBinds": [
+              {
+                "material": 11,
+                "offset": [
+                  0.5,
+                  0
+                ],
+                "scale": [
+                  1,
+                  1
+                ]
+              }
+            ]
+          },
+          "blink": {
+            "isBinary": false,
+            "morphTargetBinds": [
+              {
+                "index": 1,
+                "node": 2,
+                "weight": 1
+              },
+              {
+                "index": 2,
+                "node": 2,
+                "weight": 1
+              }
+            ],
+            "overrideBlink": "none",
+            "overrideLookAt": "none",
+            "overrideMouth": "none"
+          },
+          "blinkLeft": {
+            "isBinary": false,
+            "morphTargetBinds": [
+              {
+                "index": 1,
+                "node": 2,
+                "weight": 1
+              }
+            ],
+            "overrideBlink": "none",
+            "overrideLookAt": "none",
+            "overrideMouth": "none"
+          },
+          "blinkRight": {
+            "isBinary": false,
+            "morphTargetBinds": [
+              {
+                "index": 2,
+                "node": 2,
+                "weight": 1
+              }
+            ],
+            "overrideBlink": "none",
+            "overrideLookAt": "none",
+            "overrideMouth": "none"
+          },
+          "ee": {
+            "isBinary": false,
+            "morphTargetBinds": [
+              {
+                "index": 28,
+                "node": 2,
+                "weight": 1
+              }
+            ],
+            "overrideBlink": "none",
+            "overrideLookAt": "none",
+            "overrideMouth": "none"
+          },
+          "happy": {
+            "isBinary": true,
+            "morphTargetBinds": [
+              {
+                "index": 33,
+                "node": 2,
+                "weight": 1
+              }
+            ],
+            "overrideBlink": "blend",
+            "overrideLookAt": "none",
+            "overrideMouth": "none",
+            "textureTransformBinds": [
+              {
+                "material": 11,
+                "offset": [
+                  0.25,
+                  0
+                ],
+                "scale": [
+                  1,
+                  1
+                ]
+              }
+            ]
+          },
+          "ih": {
+            "isBinary": false,
+            "morphTargetBinds": [
+              {
+                "index": 26,
+                "node": 2,
+                "weight": 1
+              }
+            ],
+            "overrideBlink": "none",
+            "overrideLookAt": "none",
+            "overrideMouth": "none"
+          },
+          "lookDown": {
+            "isBinary": false,
+            "morphTargetBinds": [
+              {
+                "index": 40,
+                "node": 2,
+                "weight": 1
+              }
+            ],
+            "overrideBlink": "none",
+            "overrideLookAt": "none",
+            "overrideMouth": "none"
+          },
+          "lookLeft": {
+            "isBinary": false,
+            "morphTargetBinds": [
+              {
+                "index": 41,
+                "node": 2,
+                "weight": 1
+              }
+            ],
+            "overrideBlink": "none",
+            "overrideLookAt": "none",
+            "overrideMouth": "none"
+          },
+          "lookRight": {
+            "isBinary": false,
+            "morphTargetBinds": [
+              {
+                "index": 42,
+                "node": 2,
+                "weight": 1
+              }
+            ],
+            "overrideBlink": "none",
+            "overrideLookAt": "none",
+            "overrideMouth": "none"
+          },
+          "lookUp": {
+            "isBinary": false,
+            "morphTargetBinds": [
+              {
+                "index": 39,
+                "node": 2,
+                "weight": 1
+              }
+            ],
+            "overrideBlink": "none",
+            "overrideLookAt": "none",
+            "overrideMouth": "none"
+          },
+          "neutral": {
+            "isBinary": false,
+            "overrideBlink": "none",
+            "overrideLookAt": "none",
+            "overrideMouth": "none"
+          },
+          "oh": {
+            "isBinary": false,
+            "morphTargetBinds": [
+              {
+                "index": 29,
+                "node": 2,
+                "weight": 1
+              }
+            ],
+            "overrideBlink": "none",
+            "overrideLookAt": "none",
+            "overrideMouth": "none"
+          },
+          "ou": {
+            "isBinary": false,
+            "morphTargetBinds": [
+              {
+                "index": 27,
+                "node": 2,
+                "weight": 1
+              }
+            ],
+            "overrideBlink": "none",
+            "overrideLookAt": "none",
+            "overrideMouth": "none"
+          },
+          "relaxed": {
+            "isBinary": true,
+            "morphTargetBinds": [
+              {
+                "index": 36,
+                "node": 2,
+                "weight": 1
+              }
+            ],
+            "overrideBlink": "block",
+            "overrideLookAt": "block",
+            "overrideMouth": "none",
+            "textureTransformBinds": [
+              {
+                "material": 11,
+                "offset": [
+                  0.5,
+                  0.25
+                ],
+                "scale": [
+                  1,
+                  1
+                ]
+              }
+            ]
+          },
+          "sad": {
+            "isBinary": true,
+            "morphTargetBinds": [
+              {
+                "index": 35,
+                "node": 2,
+                "weight": 1
+              }
+            ],
+            "overrideBlink": "none",
+            "overrideLookAt": "none",
+            "overrideMouth": "none",
+            "textureTransformBinds": [
+              {
+                "material": 11,
+                "offset": [
+                  0.75,
+                  0
+                ],
+                "scale": [
+                  1,
+                  1
+                ]
+              }
+            ]
+          },
+          "surprised": {
+            "isBinary": true,
+            "morphTargetBinds": [
+              {
+                "index": 38,
+                "node": 2,
+                "weight": 1
+              }
+            ],
+            "overrideBlink": "none",
+            "overrideLookAt": "none",
+            "overrideMouth": "none",
+            "textureTransformBinds": [
+              {
+                "material": 11,
+                "offset": [
+                  0,
+                  0.25
+                ],
+                "scale": [
+                  1,
+                  1
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "firstPerson": {
+        "meshAnnotations": [
+          {
+            "node": 0,
+            "type": "thirdPersonOnly"
+          },
+          {
+            "node": 1,
+            "type": "thirdPersonOnly"
+          },
+          {
+            "node": 2,
+            "type": "thirdPersonOnly"
+          },
+          {
+            "node": 144,
+            "type": "both"
+          },
+          {
+            "node": 145,
+            "type": "both"
+          }
+        ]
+      },
+      "humanoid": {
+        "humanBones": {
+          "chest": {
+            "node": 5
+          },
+          "head": {
+            "node": 45
+          },
+          "hips": {
+            "node": 3
+          },
+          "leftFoot": {
+            "node": 132
+          },
+          "leftHand": {
+            "node": 86
+          },
+          "leftIndexDistal": {
+            "node": 90
+          },
+          "leftIndexIntermediate": {
+            "node": 89
+          },
+          "leftIndexProximal": {
+            "node": 88
+          },
+          "leftLittleDistal": {
+            "node": 105
+          },
+          "leftLittleIntermediate": {
+            "node": 104
+          },
+          "leftLittleProximal": {
+            "node": 103
+          },
+          "leftLowerArm": {
+            "node": 84
+          },
+          "leftLowerLeg": {
+            "node": 131
+          },
+          "leftMiddleDistal": {
+            "node": 97
+          },
+          "leftMiddleIntermediate": {
+            "node": 96
+          },
+          "leftMiddleProximal": {
+            "node": 95
+          },
+          "leftRingDistal": {
+            "node": 101
+          },
+          "leftRingIntermediate": {
+            "node": 100
+          },
+          "leftRingProximal": {
+            "node": 99
+          },
+          "leftShoulder": {
+            "node": 82
+          },
+          "leftThumbDistal": {
+            "node": 93
+          },
+          "leftThumbMetacarpal": {
+            "node": 91
+          },
+          "leftThumbProximal": {
+            "node": 92
+          },
+          "leftToes": {
+            "node": 134
+          },
+          "leftUpperArm": {
+            "node": 83
+          },
+          "leftUpperLeg": {
+            "node": 130
+          },
+          "neck": {
+            "node": 44
+          },
+          "rightFoot": {
+            "node": 139
+          },
+          "rightHand": {
+            "node": 110
+          },
+          "rightIndexDistal": {
+            "node": 114
+          },
+          "rightIndexIntermediate": {
+            "node": 113
+          },
+          "rightIndexProximal": {
+            "node": 112
+          },
+          "rightLittleDistal": {
+            "node": 129
+          },
+          "rightLittleIntermediate": {
+            "node": 128
+          },
+          "rightLittleProximal": {
+            "node": 127
+          },
+          "rightLowerArm": {
+            "node": 108
+          },
+          "rightLowerLeg": {
+            "node": 138
+          },
+          "rightMiddleDistal": {
+            "node": 121
+          },
+          "rightMiddleIntermediate": {
+            "node": 120
+          },
+          "rightMiddleProximal": {
+            "node": 119
+          },
+          "rightRingDistal": {
+            "node": 125
+          },
+          "rightRingIntermediate": {
+            "node": 124
+          },
+          "rightRingProximal": {
+            "node": 123
+          },
+          "rightShoulder": {
+            "node": 106
+          },
+          "rightThumbDistal": {
+            "node": 117
+          },
+          "rightThumbMetacarpal": {
+            "node": 115
+          },
+          "rightThumbProximal": {
+            "node": 116
+          },
+          "rightToes": {
+            "node": 141
+          },
+          "rightUpperArm": {
+            "node": 107
+          },
+          "rightUpperLeg": {
+            "node": 137
+          },
+          "spine": {
+            "node": 4
+          }
+        }
+      },
+      "lookAt": {
+        "offsetFromHeadBone": [
+          0,
+          0.07764859,
+          0.100730225
+        ],
+        "rangeMapHorizontalInner": {
+          "inputMaxValue": 90,
+          "outputScale": 1
+        },
+        "rangeMapHorizontalOuter": {
+          "inputMaxValue": 90,
+          "outputScale": 1
+        },
+        "rangeMapVerticalDown": {
+          "inputMaxValue": 90,
+          "outputScale": 1
+        },
+        "rangeMapVerticalUp": {
+          "inputMaxValue": 90,
+          "outputScale": 1
+        },
+        "type": "expression"
+      },
+      "meta": {
+        "allowAntisocialOrHateUsage": true,
+        "allowExcessivelySexualUsage": true,
+        "allowExcessivelyViolentUsage": true,
+        "allowPoliticalOrReligiousUsage": true,
+        "allowRedistribution": true,
+        "authors": [
+          "VirtualCast, Inc."
+        ],
+        "avatarPermission": "everyone",
+        "commercialUsage": "corporation",
+        "copyrightInformation": "VirtualCast, Inc.",
+        "creditNotation": "required",
+        "licenseUrl": "https://vrm.dev/licenses/1.0/",
+        "modification": "allowModificationRedistribution",
+        "name": "Seed-san",
+        "thumbnailImage": 14,
+        "version": "1"
+      },
+      "specVersion": "1.0"
+    }
+  },
+  "materials": [
+    {
+      "KHR_materials_unlit": {},
+      "VRMC_materials_mtoon": {
+        "giEqualizationFactor": 0.9,
+        "matcapFactor": [
+          0,
+          0,
+          0
+        ],
+        "outlineColorFactor": [
+          0,
+          0,
+          0
+        ],
+        "outlineLightingMixFactor": 1,
+        "outlineWidthFactor": 5e-4,
+        "outlineWidthMode": "worldCoordinates",
+        "outlineWidthMultiplyTexture": {
+          "extensions": {
+            "KHR_texture_transform": {
+              "offset": [
+                0,
+                0
+              ],
+              "scale": [
+                1,
+                1
+              ]
+            }
+          },
+          "index": 1
+        },
+        "parametricRimColorFactor": [
+          0,
+          0,
+          0
+        ],
+        "parametricRimFresnelPowerFactor": 1,
+        "parametricRimLiftFactor": 0,
+        "renderQueueOffsetNumber": 0,
+        "rimLightingMixFactor": 1,
+        "shadeColorFactor": [
+          0.301212043,
+          0.301212043,
+          0.301212043
+        ],
+        "shadeMultiplyTexture": {
+          "extensions": {
+            "KHR_texture_transform": {
+              "offset": [
+                0,
+                0
+              ],
+              "scale": [
+                1,
+                1
+              ]
+            }
+          },
+          "index": 0
+        },
+        "shadingShiftFactor": -0.05,
+        "shadingToonyFactor": 0.95,
+        "specVersion": "1.0",
+        "transparentWithZWrite": false,
+        "uvAnimationRotationSpeedFactor": 0,
+        "uvAnimationScrollXSpeedFactor": 0,
+        "uvAnimationScrollYSpeedFactor": 0
+      }
+    },
+    {
+      "KHR_materials_unlit": {},
+      "VRMC_materials_mtoon": {
+        "giEqualizationFactor": 0.9,
+        "matcapFactor": [
+          0,
+          0,
+          0
+        ],
+        "outlineColorFactor": [
+          0.151317075,
+          0.193065077,
+          0.222877234
+        ],
+        "outlineLightingMixFactor": 1,
+        "outlineWidthFactor": 0.0015,
+        "outlineWidthMode": "worldCoordinates",
+        "parametricRimColorFactor": [
+          0,
+          0,
+          0
+        ],
+        "parametricRimFresnelPowerFactor": 1,
+        "parametricRimLiftFactor": 0,
+        "renderQueueOffsetNumber": 0,
+        "rimLightingMixFactor": 1,
+        "shadeColorFactor": [
+          0.20541285,
+          0.20541285,
+          0.20541285
+        ],
+        "shadeMultiplyTexture": {
+          "extensions": {
+            "KHR_texture_transform": {
+              "offset": [
+                0,
+                0
+              ],
+              "scale": [
+                1,
+                1
+              ]
+            }
+          },
+          "index": 2
+        },
+        "shadingShiftFactor": -0.1,
+        "shadingToonyFactor": 0.9,
+        "specVersion": "1.0",
+        "transparentWithZWrite": false,
+        "uvAnimationRotationSpeedFactor": 0,
+        "uvAnimationScrollXSpeedFactor": 0,
+        "uvAnimationScrollYSpeedFactor": 0
+      }
+    },
+    {
+      "KHR_materials_unlit": {},
+      "VRMC_materials_mtoon": {
+        "giEqualizationFactor": 0.9,
+        "matcapFactor": [
+          0,
+          0,
+          0
+        ],
+        "outlineColorFactor": [
+          0.2411783,
+          0.181807414,
+          0.1557278
+        ],
+        "outlineLightingMixFactor": 1,
+        "outlineWidthFactor": 0.0011,
+        "outlineWidthMode": "worldCoordinates",
+        "outlineWidthMultiplyTexture": {
+          "extensions": {
+            "KHR_texture_transform": {
+              "offset": [
+                0,
+                0
+              ],
+              "scale": [
+                1,
+                1
+              ]
+            }
+          },
+          "index": 6
+        },
+        "parametricRimColorFactor": [
+          0,
+          0,
+          0
+        ],
+        "parametricRimFresnelPowerFactor": 1,
+        "parametricRimLiftFactor": 0,
+        "renderQueueOffsetNumber": 0,
+        "rimLightingMixFactor": 1,
+        "shadeColorFactor": [
+          1,
+          0.613979936,
+          0.5079454
+        ],
+        "shadeMultiplyTexture": {
+          "extensions": {
+            "KHR_texture_transform": {
+              "offset": [
+                0,
+                0
+              ],
+              "scale": [
+                1,
+                1
+              ]
+            }
+          },
+          "index": 4
+        },
+        "shadingShiftFactor": -0.2,
+        "shadingShiftTexture": {
+          "extensions": {
+            "KHR_texture_transform": {
+              "offset": [
+                0,
+                0
+              ],
+              "scale": [
+                1,
+                1
+              ]
+            }
+          },
+          "index": 5,
+          "scale": 1
+        },
+        "shadingToonyFactor": 0.8,
+        "specVersion": "1.0",
+        "transparentWithZWrite": false,
+        "uvAnimationRotationSpeedFactor": 0,
+        "uvAnimationScrollXSpeedFactor": 0,
+        "uvAnimationScrollYSpeedFactor": 0
+      }
+    },
+    {
+      "KHR_materials_unlit": {},
+      "VRMC_materials_mtoon": {
+        "giEqualizationFactor": 0.9,
+        "matcapFactor": [
+          0,
+          0,
+          0
+        ],
+        "outlineColorFactor": [
+          0,
+          0,
+          0
+        ],
+        "outlineLightingMixFactor": 1,
+        "outlineWidthFactor": 0.5,
+        "outlineWidthMode": "none",
+        "parametricRimColorFactor": [
+          0,
+          0,
+          0
+        ],
+        "parametricRimFresnelPowerFactor": 1,
+        "parametricRimLiftFactor": 0,
+        "renderQueueOffsetNumber": 0,
+        "rimLightingMixFactor": 1,
+        "shadeColorFactor": [
+          0.4352691,
+          0.3970382,
+          0.500747442
+        ],
+        "shadeMultiplyTexture": {
+          "extensions": {
+            "KHR_texture_transform": {
+              "offset": [
+                0,
+                0
+              ],
+              "scale": [
+                1,
+                1
+              ]
+            }
+          },
+          "index": 7
+        },
+        "shadingShiftFactor": -0.2,
+        "shadingToonyFactor": 0.8,
+        "specVersion": "1.0",
+        "transparentWithZWrite": false,
+        "uvAnimationRotationSpeedFactor": 0,
+        "uvAnimationScrollXSpeedFactor": 0,
+        "uvAnimationScrollYSpeedFactor": 0
+      }
+    },
+    {
+      "KHR_materials_unlit": {},
+      "VRMC_materials_mtoon": {
+        "giEqualizationFactor": 0.5,
+        "matcapFactor": [
+          0,
+          0,
+          0
+        ],
+        "outlineColorFactor": [
+          0,
+          0,
+          0
+        ],
+        "outlineLightingMixFactor": 1,
+        "outlineWidthFactor": 0.5,
+        "outlineWidthMode": "none",
+        "parametricRimColorFactor": [
+          0,
+          0,
+          0
+        ],
+        "parametricRimFresnelPowerFactor": 1,
+        "parametricRimLiftFactor": 0,
+        "renderQueueOffsetNumber": 0,
+        "rimLightingMixFactor": 1,
+        "shadeColorFactor": [
+          1,
+          1,
+          1
+        ],
+        "shadingShiftFactor": -0.2,
+        "shadingToonyFactor": 0.8,
+        "specVersion": "1.0",
+        "transparentWithZWrite": false,
+        "uvAnimationRotationSpeedFactor": 0,
+        "uvAnimationScrollXSpeedFactor": 0,
+        "uvAnimationScrollYSpeedFactor": 0
+      }
+    },
+    {
+      "KHR_materials_unlit": {},
+      "VRMC_materials_mtoon": {
+        "giEqualizationFactor": 0.9,
+        "matcapFactor": [
+          0,
+          0,
+          0
+        ],
+        "outlineColorFactor": [
+          0,
+          0,
+          0
+        ],
+        "outlineLightingMixFactor": 1,
+        "outlineWidthFactor": 0.0015,
+        "outlineWidthMode": "worldCoordinates",
+        "parametricRimColorFactor": [
+          0.07896994,
+          0.07896994,
+          0.07896994
+        ],
+        "parametricRimFresnelPowerFactor": 4.3,
+        "parametricRimLiftFactor": 0.182,
+        "renderQueueOffsetNumber": 0,
+        "rimLightingMixFactor": 1,
+        "shadeColorFactor": [
+          0.4352691,
+          0.3970382,
+          0.500747442
+        ],
+        "shadeMultiplyTexture": {
+          "extensions": {
+            "KHR_texture_transform": {
+              "offset": [
+                0,
+                0
+              ],
+              "scale": [
+                1,
+                1
+              ]
+            }
+          },
+          "index": 8
+        },
+        "shadingShiftFactor": -0.1,
+        "shadingToonyFactor": 0.9,
+        "specVersion": "1.0",
+        "transparentWithZWrite": false,
+        "uvAnimationRotationSpeedFactor": 0,
+        "uvAnimationScrollXSpeedFactor": 0,
+        "uvAnimationScrollYSpeedFactor": 0
+      }
+    },
+    {
+      "KHR_materials_unlit": {},
+      "VRMC_materials_mtoon": {
+        "giEqualizationFactor": 0.9,
+        "matcapFactor": [
+          1,
+          1,
+          1
+        ],
+        "matcapTexture": {
+          "extensions": {
+            "KHR_texture_transform": {
+              "offset": [
+                0,
+                0
+              ],
+              "scale": [
+                1,
+                1
+              ]
+            }
+          },
+          "index": 9
+        },
+        "outlineColorFactor": [
+          0.07896994,
+          0.07896994,
+          0.07896994
+        ],
+        "outlineLightingMixFactor": 1,
+        "outlineWidthFactor": 0.002,
+        "outlineWidthMode": "worldCoordinates",
+        "parametricRimColorFactor": [
+          0.345616162,
+          0.345616162,
+          0.345616162
+        ],
+        "parametricRimFresnelPowerFactor": 3.2,
+        "parametricRimLiftFactor": 0.15,
+        "renderQueueOffsetNumber": 0,
+        "rimLightingMixFactor": 1,
+        "shadeColorFactor": [
+          0.342953056,
+          0.37243554,
+          0.432035774
+        ],
+        "shadeMultiplyTexture": {
+          "extensions": {
+            "KHR_texture_transform": {
+              "offset": [
+                0,
+                0
+              ],
+              "scale": [
+                1,
+                1
+              ]
+            }
+          },
+          "index": 8
+        },
+        "shadingShiftFactor": -0.1,
+        "shadingToonyFactor": 0.9,
+        "specVersion": "1.0",
+        "transparentWithZWrite": false,
+        "uvAnimationRotationSpeedFactor": 0,
+        "uvAnimationScrollXSpeedFactor": 0,
+        "uvAnimationScrollYSpeedFactor": 0
+      }
+    },
+    {
+      "KHR_materials_emissive_strength": {
+        "emissiveStrength": 1.30411887
+      }
+    },
+    {
+      "KHR_materials_unlit": {},
+      "VRMC_materials_mtoon": {
+        "giEqualizationFactor": 0.9,
+        "matcapFactor": [
+          0,
+          0,
+          0
+        ],
+        "outlineColorFactor": [
+          0.01850021,
+          0.0176419467,
+          0.0251868479
+        ],
+        "outlineLightingMixFactor": 1,
+        "outlineWidthFactor": 0.001,
+        "outlineWidthMode": "worldCoordinates",
+        "parametricRimColorFactor": [
+          0,
+          0,
+          0
+        ],
+        "parametricRimFresnelPowerFactor": 1,
+        "parametricRimLiftFactor": 0,
+        "renderQueueOffsetNumber": 0,
+        "rimLightingMixFactor": 1,
+        "shadeColorFactor": [
+          0.4352691,
+          0.3970382,
+          0.500747442
+        ],
+        "shadeMultiplyTexture": {
+          "extensions": {
+            "KHR_texture_transform": {
+              "offset": [
+                0,
+                0
+              ],
+              "scale": [
+                1,
+                1
+              ]
+            }
+          },
+          "index": 4
+        },
+        "shadingShiftFactor": -0.2,
+        "shadingToonyFactor": 0.8,
+        "specVersion": "1.0",
+        "transparentWithZWrite": false,
+        "uvAnimationRotationSpeedFactor": 0,
+        "uvAnimationScrollXSpeedFactor": 0,
+        "uvAnimationScrollYSpeedFactor": 0
+      }
+    },
+    {},
+    {
+      "KHR_materials_unlit": {},
+      "VRMC_materials_mtoon": {
+        "giEqualizationFactor": 0.9,
+        "matcapFactor": [
+          1,
+          1,
+          1
+        ],
+        "matcapTexture": {
+          "extensions": {
+            "KHR_texture_transform": {
+              "offset": [
+                0,
+                0
+              ],
+              "scale": [
+                1,
+                1
+              ]
+            }
+          },
+          "index": 9
+        },
+        "outlineColorFactor": [
+          0.009166719,
+          0.009166719,
+          0.009166719
+        ],
+        "outlineLightingMixFactor": 1,
+        "outlineWidthFactor": 0.001,
+        "outlineWidthMode": "worldCoordinates",
+        "parametricRimColorFactor": [
+          0.432035774,
+          0.432035774,
+          0.432035774
+        ],
+        "parametricRimFresnelPowerFactor": 7.9,
+        "parametricRimLiftFactor": 0.153,
+        "renderQueueOffsetNumber": 0,
+        "rimLightingMixFactor": 1,
+        "shadeColorFactor": [
+          0.4352691,
+          0.3970382,
+          0.500747442
+        ],
+        "shadeMultiplyTexture": {
+          "extensions": {
+            "KHR_texture_transform": {
+              "offset": [
+                0,
+                0
+              ],
+              "scale": [
+                1,
+                1
+              ]
+            }
+          },
+          "index": 2
+        },
+        "shadingShiftFactor": -0.1,
+        "shadingToonyFactor": 0.9,
+        "specVersion": "1.0",
+        "transparentWithZWrite": false,
+        "uvAnimationRotationSpeedFactor": 0,
+        "uvAnimationScrollXSpeedFactor": 0,
+        "uvAnimationScrollYSpeedFactor": 0
+      }
+    },
+    {
+      "KHR_materials_emissive_strength": {
+        "emissiveStrength": 1.72079539
+      },
+      "KHR_materials_unlit": {},
+      "VRMC_materials_mtoon": {
+        "giEqualizationFactor": 0.9,
+        "matcapFactor": [
+          0,
+          0,
+          0
+        ],
+        "outlineColorFactor": [
+          0,
+          0,
+          0
+        ],
+        "outlineLightingMixFactor": 1,
+        "outlineWidthFactor": 0.5,
+        "outlineWidthMode": "none",
+        "parametricRimColorFactor": [
+          0,
+          0,
+          0
+        ],
+        "parametricRimFresnelPowerFactor": 1,
+        "parametricRimLiftFactor": 0,
+        "renderQueueOffsetNumber": 0,
+        "rimLightingMixFactor": 1,
+        "shadeColorFactor": [
+          1,
+          1,
+          1
+        ],
+        "shadeMultiplyTexture": {
+          "extensions": {
+            "KHR_texture_transform": {
+              "offset": [
+                0,
+                0
+              ],
+              "scale": [
+                1,
+                1
+              ]
+            }
+          },
+          "index": 12
+        },
+        "shadingShiftFactor": -0.1,
+        "shadingToonyFactor": 0.9,
+        "specVersion": "1.0",
+        "transparentWithZWrite": false,
+        "uvAnimationRotationSpeedFactor": 0,
+        "uvAnimationScrollXSpeedFactor": 0,
+        "uvAnimationScrollYSpeedFactor": 0
+      }
+    },
+    {},
+    {},
+    {},
+    {},
+    {}
+  ],
+  "nodes": [
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {
+      "VRMC_node_constraint": {
+        "constraint": {
+          "rotation": {
+            "source": 82,
+            "weight": 1
+          }
+        },
+        "specVersion": "1.0"
+      }
+    },
+    {
+      "VRMC_node_constraint": {
+        "constraint": {
+          "rotation": {
+            "source": 83,
+            "weight": 1
+          }
+        },
+        "specVersion": "1.0"
+      }
+    },
+    {
+      "VRMC_node_constraint": {
+        "constraint": {
+          "rotation": {
+            "source": 84,
+            "weight": 1
+          }
+        },
+        "specVersion": "1.0"
+      }
+    },
+    {
+      "VRMC_node_constraint": {
+        "constraint": {
+          "rotation": {
+            "source": 86,
+            "weight": 1
+          }
+        },
+        "specVersion": "1.0"
+      }
+    },
+    {
+      "VRMC_node_constraint": {
+        "constraint": {
+          "rotation": {
+            "source": 87,
+            "weight": 1
+          }
+        },
+        "specVersion": "1.0"
+      }
+    },
+    {
+      "VRMC_node_constraint": {
+        "constraint": {
+          "rotation": {
+            "source": 88,
+            "weight": 1
+          }
+        },
+        "specVersion": "1.0"
+      }
+    },
+    {
+      "VRMC_node_constraint": {
+        "constraint": {
+          "rotation": {
+            "source": 89,
+            "weight": 1
+          }
+        },
+        "specVersion": "1.0"
+      }
+    },
+    {
+      "VRMC_node_constraint": {
+        "constraint": {
+          "rotation": {
+            "source": 90,
+            "weight": 1
+          }
+        },
+        "specVersion": "1.0"
+      }
+    },
+    {
+      "VRMC_node_constraint": {
+        "constraint": {
+          "rotation": {
+            "source": 91,
+            "weight": 1
+          }
+        },
+        "specVersion": "1.0"
+      }
+    },
+    {
+      "VRMC_node_constraint": {
+        "constraint": {
+          "rotation": {
+            "source": 92,
+            "weight": 1
+          }
+        },
+        "specVersion": "1.0"
+      }
+    },
+    {
+      "VRMC_node_constraint": {
+        "constraint": {
+          "rotation": {
+            "source": 93,
+            "weight": 1
+          }
+        },
+        "specVersion": "1.0"
+      }
+    },
+    {
+      "VRMC_node_constraint": {
+        "constraint": {
+          "rotation": {
+            "source": 94,
+            "weight": 1
+          }
+        },
+        "specVersion": "1.0"
+      }
+    },
+    {
+      "VRMC_node_constraint": {
+        "constraint": {
+          "rotation": {
+            "source": 95,
+            "weight": 1
+          }
+        },
+        "specVersion": "1.0"
+      }
+    },
+    {
+      "VRMC_node_constraint": {
+        "constraint": {
+          "rotation": {
+            "source": 96,
+            "weight": 1
+          }
+        },
+        "specVersion": "1.0"
+      }
+    },
+    {
+      "VRMC_node_constraint": {
+        "constraint": {
+          "rotation": {
+            "source": 97,
+            "weight": 1
+          }
+        },
+        "specVersion": "1.0"
+      }
+    },
+    {
+      "VRMC_node_constraint": {
+        "constraint": {
+          "rotation": {
+            "source": 98,
+            "weight": 1
+          }
+        },
+        "specVersion": "1.0"
+      }
+    },
+    {
+      "VRMC_node_constraint": {
+        "constraint": {
+          "rotation": {
+            "source": 99,
+            "weight": 1
+          }
+        },
+        "specVersion": "1.0"
+      }
+    },
+    {
+      "VRMC_node_constraint": {
+        "constraint": {
+          "rotation": {
+            "source": 100,
+            "weight": 1
+          }
+        },
+        "specVersion": "1.0"
+      }
+    },
+    {
+      "VRMC_node_constraint": {
+        "constraint": {
+          "rotation": {
+            "source": 101,
+            "weight": 1
+          }
+        },
+        "specVersion": "1.0"
+      }
+    },
+    {
+      "VRMC_node_constraint": {
+        "constraint": {
+          "rotation": {
+            "source": 102,
+            "weight": 1
+          }
+        },
+        "specVersion": "1.0"
+      }
+    },
+    {
+      "VRMC_node_constraint": {
+        "constraint": {
+          "rotation": {
+            "source": 103,
+            "weight": 1
+          }
+        },
+        "specVersion": "1.0"
+      }
+    },
+    {
+      "VRMC_node_constraint": {
+        "constraint": {
+          "rotation": {
+            "source": 104,
+            "weight": 1
+          }
+        },
+        "specVersion": "1.0"
+      }
+    },
+    {
+      "VRMC_node_constraint": {
+        "constraint": {
+          "rotation": {
+            "source": 105,
+            "weight": 1
+          }
+        },
+        "specVersion": "1.0"
+      }
+    },
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {}
+  ]
+}

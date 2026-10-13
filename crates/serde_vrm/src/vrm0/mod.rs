@@ -1,6 +1,6 @@
 //! VRM 0.0 types.
 
-use std::fmt::Display;
+mod migrate;
 
 use serde::{
     Deserialize,
@@ -18,6 +18,10 @@ pub struct Vrm {
     pub blend_shape_master:  Option<BlendShapeMaster>,
     pub secondary_animation: Option<SecondaryAnimation>,
     pub material_properties: Option<Vec<MaterialProperty>>,
+}
+
+impl Vrm {
+    pub const EXTENSION_NAME: &str = "VRM";
 }
 
 #[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
@@ -73,14 +77,6 @@ pub struct Bone {
     pub use_default_values: Option<bool>,
 }
 
-#[cfg(feature = "bevy")]
-use bevy::ecs::reflect::ReflectComponent;
-
-#[cfg_attr(
-    feature = "bevy",
-    derive(bevy::reflect::Reflect, bevy::prelude::Component),
-    reflect(Component)
-)]
 #[derive(Copy, Clone, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
 pub enum BoneName {
     #[serde(rename = "hips")]
@@ -195,14 +191,6 @@ pub enum BoneName {
     UpperChest,
 }
 
-impl Display for BoneName {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let json = serde_json::to_string(self)
-            .expect("BoneName enum should always serialize successfully");
-        f.write_str(json.trim_matches('"'))
-    }
-}
-
 #[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct FirstPerson {
@@ -223,11 +211,6 @@ pub struct MeshAnnotation {
     pub first_person_flag: FirstPersonFlag,
 }
 
-#[cfg_attr(
-    feature = "bevy",
-    derive(bevy::reflect::Reflect, bevy::prelude::Component),
-    reflect(Component)
-)]
 #[derive(Copy, Clone, Debug, Default, Hash, Deserialize, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub enum FirstPersonFlag {
