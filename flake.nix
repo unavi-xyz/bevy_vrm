@@ -8,10 +8,6 @@
     systems.url = "github:nix-systems/default";
 
     # Rust
-    advisory-db = {
-      url = "github:rustsec/advisory-db";
-      flake = false;
-    };
     crane.url = "github:ipetkov/crane";
     fenix = {
       url = "github:nix-community/fenix";
@@ -60,10 +56,10 @@
             };
 
             checks = {
-              audit = pkgs.crane.cargoAudit {
-                inherit (inputs) advisory-db;
+              deny = pkgs.crane.cargoDeny {
                 src = ./.;
                 pname = "bevy_vrm";
+                cargoDenyExtraArgs = "--config ${./.deny.toml}";
               };
             };
 
@@ -87,6 +83,7 @@
             devShells.default = pkgs.crane.devShell {
               packages =
                 (with pkgs; [
+                  cargo-deny
                   cargo-edit
                   cargo-machete
                   cargo-nextest

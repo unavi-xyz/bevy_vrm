@@ -1,0 +1,68 @@
+[graph]
+all-features = true
+targets = [
+  "aarch64-apple-darwin",
+  "wasm32-unknown-unknown",
+  "x86_64-apple-darwin",
+  "x86_64-pc-windows-msvc",
+  "x86_64-unknown-linux-gnu",
+]
+
+[licenses]
+allow = [
+  "Apache-2.0 WITH LLVM-exception",
+  "Apache-2.0",
+  "BSD-2-Clause",
+  "BSD-3-Clause",
+  "BSL-1.0",
+  "CC0-1.0",
+  "CDLA-Permissive-2.0",
+  "ISC",
+  "MIT",
+  "MIT-0",
+  "MPL-2.0",
+  "OFL-1.1",
+  "OpenSSL",
+  "Ubuntu-font-1.0",
+  "Unicode-3.0",
+  "Unlicense",
+  "Zlib",
+  "bzip2-1.0.6",
+]
+version = 2
+
+[advisories]
+ignore = [
+  "RUSTSEC-2023-0071", # rsa sidechannel
+  "RUSTSEC-2024-0370", # proc-macro-error no longer maintained
+  "RUSTSEC-2024-0436", # paste unmaintained
+
+  # gtk-rs no longer maintained
+  "RUSTSEC-2024-0411",
+  "RUSTSEC-2024-0412",
+  "RUSTSEC-2024-0413",
+  "RUSTSEC-2024-0414",
+  "RUSTSEC-2024-0415",
+  "RUSTSEC-2024-0416",
+  "RUSTSEC-2024-0418",
+  "RUSTSEC-2024-0419",
+  "RUSTSEC-2024-0420",
+
+  # ttf-parser unmaintained, no maintained successor with a compatible API
+  "RUSTSEC-2026-0192",
+
+  # ruzstd <0.9.1 decompression bomb, pulled in by `bevy_image` via bevy's
+  # `3d_api` -> `zstd_rust`. bevy_image pins `ruzstd = "^0.8.0"` and there is no
+  # patched 0.8.x release; drop once bevy bumps the dependency upstream.
+  "RUSTSEC-2026-0344",
+]
+version = 2
+
+[bans]
+deny              = [{ deny-multiple-versions = true, name = "bevy" }]
+multiple-versions = "warn"
+
+[sources]
+allow-registry   = ["https://github.com/rust-lang/crates.io-index"]
+unknown-git      = "deny"
+unknown-registry = "deny"

@@ -28,6 +28,7 @@ _: {
             file:
             lib.any file.hasExt [
               "html"
+              "wesl"
               "wgsl"
             ]
           ) root)
