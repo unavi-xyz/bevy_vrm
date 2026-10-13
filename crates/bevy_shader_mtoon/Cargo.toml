@@ -22,3 +22,5 @@ bitflags = "2.13.1"
 bevy                           = { default-features = true, workspace = true }
 bevy_egui.workspace            = true
 bevy_panorbit_camera.workspace = true
+naga                           = "=29.0.4"
+naga_oil                       = "=0.22.0"

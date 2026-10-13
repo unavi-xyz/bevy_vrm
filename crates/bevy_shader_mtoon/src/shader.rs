@@ -237,6 +237,18 @@ impl Material for MtoonMaterial {
         SHADER_HANDLE.into()
     }
 
+    // Route the depth/normal/motion-vector prepass through the MToon shader:
+    // the default prepass shader knows nothing about the alpha-cutoff discard,
+    // so mask-mode materials would write full coverage depth and punch holes
+    // in whatever renders behind them (e.g. hair cutouts over the face).
+    fn prepass_fragment_shader() -> ShaderRef {
+        SHADER_HANDLE.into()
+    }
+
+    fn alpha_mode(&self) -> AlphaMode {
+        self.alpha_mode
+    }
+
     fn specialize(
         _pipeline: &bevy::pbr::MaterialPipeline,
         descriptor: &mut bevy::render::render_resource::RenderPipelineDescriptor,

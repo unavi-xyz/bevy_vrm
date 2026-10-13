@@ -4,6 +4,8 @@
     pbr_fragment::pbr_input_from_vertex_output,
     mesh_view_bindings::view,
     ambient::ambient_light,
+    prepass_io,
+    prepass_bindings::previous_view_uniforms,
 }
 
 #ifdef PREPASS_PIPELINE
@@ -62,6 +64,27 @@ const MTOON_FLAGS_SHADING_SHIFT_TEXTURE: u32 = 512u;
 
 const EPSILON: f32 = 0.00001;
 
+// Samples the base color and applies the alpha-mode handling shared by the
+// main and prepass fragment shaders. Fragments below the mask cutoff are
+// discarded here, so masking behaves identically wherever the surface is
+// rendered (color, depth, normal, motion vectors).
+fn mtoon_resolve_base_color(in: VertexOutput) -> vec4<f32> {
+    var base_color = material.base_color;
+    if (material.flags & MTOON_FLAGS_BASE_COLOR_TEXTURE) != 0u {
+        base_color *= textureSampleBias(base_color_texture, base_color_sampler, in.uv, view.mip_bias);
+    }
+    if (material.flags & MTOON_FLAGS_ALPHA_MODE_OPAQUE) != 0u {
+        base_color.a = 1.0;
+    } else if (material.flags & MTOON_FLAGS_ALPHA_MODE_MASK) != 0u {
+        if base_color.a < material.alpha_cutoff {
+            discard;
+        }
+        base_color.a = 1.0;
+    }
+    return base_color;
+}
+
+#ifndef PREPASS_PIPELINE
 fn mtoon_shade(in: VertexOutput, is_front: bool) -> vec4<f32> {
     let double_sided = (material.flags & MTOON_FLAGS_DOUBLE_SIDED) != 0u;
     var pbr_input = pbr_input_from_vertex_output(in, is_front, double_sided);
@@ -69,22 +92,10 @@ fn mtoon_shade(in: VertexOutput, is_front: bool) -> vec4<f32> {
     pbr_input.material.metallic = 0.0;
     pbr_input.material.perceptual_roughness = 0.9;
 
-    // Base color.
-    var base_color = material.base_color;
-    if (material.flags & MTOON_FLAGS_BASE_COLOR_TEXTURE) != 0u {
-        base_color *= textureSampleBias(base_color_texture, base_color_sampler, in.uv, view.mip_bias);
-    }
-
-    // Alpha discard.
-    if (material.flags & MTOON_FLAGS_ALPHA_MODE_OPAQUE) != 0u {
-        base_color.a = 1.0;
-    } else if (material.flags & MTOON_FLAGS_ALPHA_MODE_MASK) != 0u {
-        if base_color.a >= material.alpha_cutoff {
-            base_color.a = 1.0;
-            pbr_input.material.alpha_cutoff = material.alpha_cutoff;
-        } else {
-            discard;
-        }
+    // Base color & alpha. The alpha discard is shared with the prepass shader.
+    let base_color = mtoon_resolve_base_color(in);
+    if (material.flags & MTOON_FLAGS_ALPHA_MODE_MASK) != 0u {
+        pbr_input.material.alpha_cutoff = material.alpha_cutoff;
     }
 
     // Normal mapping. The mikktspace method requires the world normal is NOT re-normalized before
@@ -167,6 +178,61 @@ fn mtoon_shade(in: VertexOutput, is_front: bool) -> vec4<f32> {
     return vec4<f32>(color, base_color.a);
 }
 
+fn linear_step(a: f32, b: f32, t: f32) -> f32 {
+    return saturate((t - a) / (b - a));
+}
+#endif // PREPASS_PIPELINE
+
+// The prepass fragment shader. AlphaMode::Mask surfaces must discard here too;
+// if they don't, the prepass writes full-coverage depth for the cutout regions,
+// which then occludes whatever renders behind them (e.g. a hair cutout in front
+// of the face). The stock prepass shader has no discard, so this mirrors bevy's
+// pbr_prepass.wgsl: same alpha handling as the main pass, plus the normal and
+// motion-vector targets TAA and SSAO need.
+#ifdef PREPASS_PIPELINE
+
+#ifdef PREPASS_FRAGMENT
+@fragment
+fn fragment(
+    in: VertexOutput,
+    @builtin(front_facing) is_front: bool,
+) -> prepass_io::FragmentOutput {
+    mtoon_resolve_base_color(in);
+
+    var out: prepass_io::FragmentOutput;
+
+#ifdef NORMAL_PREPASS
+    let double_sided = (material.flags & MTOON_FLAGS_DOUBLE_SIDED) != 0u;
+    var world_normal = in.world_normal;
+    if double_sided && !is_front {
+        world_normal = -world_normal;
+    }
+    out.normal = vec4<f32>(world_normal * 0.5 + vec3<f32>(0.5), 1.0);
+#endif
+
+#ifdef MOTION_VECTOR_PREPASS
+    let clip_position_t = view.unjittered_clip_from_world * in.world_position;
+    let clip_position = clip_position_t.xy / clip_position_t.w;
+    let previous_clip_position_t = previous_view_uniforms.clip_from_world * in.previous_world_position;
+    let previous_clip_position = previous_clip_position_t.xy / previous_clip_position_t.w;
+    out.motion_vector = (clip_position - previous_clip_position) * vec2<f32>(0.5, -0.5);
+#endif
+
+#ifdef UNCLIPPED_DEPTH_ORTHO_EMULATION
+    out.frag_depth = in.unclipped_depth;
+#endif
+
+    return out;
+}
+#else // PREPASS_FRAGMENT (depth-only prepass)
+@fragment
+fn fragment(in: VertexOutput) {
+    mtoon_resolve_base_color(in);
+}
+#endif // PREPASS_FRAGMENT
+
+#else // PREPASS_PIPELINE
+
 @fragment
 fn fragment(
     in: VertexOutput,
@@ -175,6 +241,4 @@ fn fragment(
     return mtoon_shade(in, is_front);
 }
 
-fn linear_step(a: f32, b: f32, t: f32) -> f32 {
-    return saturate((t - a) / (b - a));
-}
+#endif // PREPASS_PIPELINE

@@ -1535,6 +1535,8 @@ dependencies = [
  "bevy_egui 0.41.1",
  "bevy_panorbit_camera",
  "bitflags 2.13.1",
+ "naga",
+ "naga_oil",
 ]
 
 [[package]]
